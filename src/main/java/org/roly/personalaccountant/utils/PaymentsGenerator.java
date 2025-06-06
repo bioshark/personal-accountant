@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.roly.cci.other.personalaccountant.dto.Payment;
+import org.roly.personalaccountant.dto.Payment;
 
 public class PaymentsGenerator {
 
