@@ -14,7 +14,6 @@ public class PaymentsGenerator {
 
     public static LinkedHashMap<LocalDate, List<Payment>> initializeEmptyMonth(LocalDate currentDate) {
         LinkedList<LocalDate> days = generateDaysForMonth(currentDate);
-        System.out.println("days = " + days);
         return days.stream()
                 .collect(Collectors.toMap(
                         day -> day,
@@ -24,10 +23,8 @@ public class PaymentsGenerator {
                 ));
     }
 
-
     private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate) {
         LocalDate lastDayOfNextMonth = currentDate.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-        System.out.println("lastDayOfNextMonth = " + lastDayOfNextMonth);
         LocalDate adjustedEndDate = getAdjustedEndDate(lastDayOfNextMonth);
 
         LinkedList<LocalDate> generatedDays = new LinkedList<>();
@@ -41,7 +38,6 @@ public class PaymentsGenerator {
         while (isWeekEnd(adjusterLastDay)) {
             adjusterLastDay = adjusterLastDay.minusDays(1);
         }
-        System.out.println("adjusterLastDay = " + adjusterLastDay);
         return adjusterLastDay;
     }
 

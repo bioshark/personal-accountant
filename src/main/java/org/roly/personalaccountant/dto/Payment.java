@@ -6,7 +6,7 @@ public record Payment(
         String description,
         Category category,
         PaymentType type,
-        Float amount,
+        Double amount,
         LocalDate date
 ) {
 
