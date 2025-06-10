@@ -46,6 +46,14 @@ public class ExpenseManager {
         return expenses.get(yearMonth);
     }
 
+    public Map<YearMonth, MonthlyExpenses> getExpenses() {
+        return Map.copyOf(expenses);
+    }
+
+    public void clearExpenses() {
+        expenses.clear();
+    }
+
     private MonthlyExpenses getExpenseMonth(LocalDate searchingDate) {
         for (MonthlyExpenses monthlyExpenses :  expenses.values()) {
             if (monthlyExpenses.payments().keySet().stream()
@@ -58,9 +66,5 @@ public class ExpenseManager {
 
     private boolean isPaymentWithingInterval(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate paymentDate) {
         return paymentDate.isAfter(payments.sequencedKeySet().getFirst()) || paymentDate.isBefore(payments.sequencedKeySet().getLast());
-    }
-
-    public Map<YearMonth, MonthlyExpenses> getExpenses() {
-        return Map.copyOf(expenses);
     }
 }
