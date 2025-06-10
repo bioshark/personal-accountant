@@ -18,9 +18,8 @@ public class ExpenseManager {
 
     private final Map<YearMonth, MonthlyExpenses> expenses = new HashMap<>();
 
-    public void addPayment(LocalDate month, Payment payment) {
-        // TODO fix the retrieval of the expense.
-        MonthlyExpenses expense = expenses.get(month);
+    public void addPayment(LocalDate paymentDay, Payment payment) {
+        MonthlyExpenses expense = getExpenseMonth(paymentDay);
         LocalDate paymentDate = payment.date();
         if (!isPaymentWithingInterval(expense.payments(), paymentDate)) {
             throw new IllegalArgumentException("Payment date is out of range");
@@ -45,6 +44,16 @@ public class ExpenseManager {
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
         return expenses.get(yearMonth);
+    }
+
+    private MonthlyExpenses getExpenseMonth(LocalDate searchingDate) {
+        for (MonthlyExpenses monthlyExpenses :  expenses.values()) {
+            if (monthlyExpenses.payments().keySet().stream()
+                    .anyMatch(searchingDate::equals)) {
+                return monthlyExpenses;
+            }
+        }
+        throw new IllegalArgumentException("Can't find Expense for date " + searchingDate);
     }
 
     private boolean isPaymentWithingInterval(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate paymentDate) {
