@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import org.roly.personalaccountant.dto.Income;
 import org.roly.personalaccountant.dto.MonthlyExpenses;
@@ -32,13 +30,9 @@ public class ExpenseManager {
     public void addPayment(Payment payment) {
         LocalDate paymentDate = payment.date();
         MonthlyExpenses expense = getExpenseMonth(paymentDate);
-        if (!isPaymentWithingInterval(expense.getPayments(), paymentDate)) {
-            throw new IllegalArgumentException("Payment date is out of range");
-        }
         expense.addPayment(payment);
     }
 
-    // TODO add test
     public void addIncome(Income income) {
         MonthlyExpenses expense = getExpenseMonth(income.date());
         expense.addIncome(income);
@@ -66,7 +60,4 @@ public class ExpenseManager {
         throw new IllegalArgumentException("Can't find Expense for date " + searchingDate);
     }
 
-    private boolean isPaymentWithingInterval(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate paymentDate) {
-        return paymentDate.isAfter(payments.sequencedKeySet().getFirst()) || paymentDate.isBefore(payments.sequencedKeySet().getLast());
-    }
 }

@@ -1,6 +1,7 @@
 package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.dto.Payment.Category.FOOD;
 import static org.roly.personalaccountant.dto.Payment.PaymentType.MANDATORY;
 
@@ -10,11 +11,14 @@ import java.time.YearMonth;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.roly.personalaccountant.dto.Income;
 import org.roly.personalaccountant.dto.Payment;
 
 class ExpenseManagerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
+    public static final Income INVALID_INCOME = new Income("salariu", START_DATE, 1122.0d);
+    public static final Income WAGE_INCOME = new Income("Wage", START_DATE.plusDays(1), 1122.0d);
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
     private final ExpenseManager manager = new ExpenseManager();
@@ -42,6 +46,26 @@ class ExpenseManagerTest {
         manager.addPayment(payment);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
+    }
+
+    @Test
+    void shouldNotAddPaymentToNonExistentExpenseDay() {
+        Payment payment = new Payment("food", FOOD, MANDATORY, 11.3d, PAYMENT_DATE.minusDays(100));
+
+        assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
+    }
+
+    @Test
+    void shouldCorrectlyAddIncomeToExpense() {
+        manager.addIncome(WAGE_INCOME);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getCashTotal()).isEqualTo(WAGE_INCOME.value());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getCashLeft()).isEqualTo(WAGE_INCOME.value());
+    }
+
+    @Test
+    void shouldNotAddIncomeToNonExistentExpense() {
+        assertThrows(IllegalArgumentException.class, () -> manager.addIncome(INVALID_INCOME));
     }
 
 }
