@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.roly.personalaccountant.dto.Income;
 import org.roly.personalaccountant.dto.MonthlyExpenses;
 import org.roly.personalaccountant.dto.Payment;
 import org.roly.personalaccountant.utils.PaymentsGenerator;
@@ -17,15 +18,6 @@ public class ExpenseManager {
 
     private final Map<YearMonth, MonthlyExpenses> expenses = new HashMap<>();
 
-    public void addPayment(Payment payment) {
-        LocalDate paymentDate = payment.date();
-        MonthlyExpenses expense = getExpenseMonth(paymentDate);
-        if (!isPaymentWithingInterval(expense.getPayments(), paymentDate)) {
-            throw new IllegalArgumentException("Payment date is out of range");
-        }
-        expense.addPayment(payment);
-    }
-
     public void addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate) {
         expenses.put(
                 YearMonth.of(yearMonth.getYear(), yearMonth.getMonth()),
@@ -35,6 +27,21 @@ public class ExpenseManager {
                         new ArrayList<>()
                 )
         );
+    }
+
+    public void addPayment(Payment payment) {
+        LocalDate paymentDate = payment.date();
+        MonthlyExpenses expense = getExpenseMonth(paymentDate);
+        if (!isPaymentWithingInterval(expense.getPayments(), paymentDate)) {
+            throw new IllegalArgumentException("Payment date is out of range");
+        }
+        expense.addPayment(payment);
+    }
+
+    // TODO add test
+    public void addIncome(Income income) {
+        MonthlyExpenses expense = getExpenseMonth(income.date());
+        expense.addIncome(income);
     }
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {

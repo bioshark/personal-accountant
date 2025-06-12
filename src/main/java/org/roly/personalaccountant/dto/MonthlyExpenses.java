@@ -16,6 +16,20 @@ public class MonthlyExpenses {
         this.payments = payments;
         this.startDate = startDate;
         this.incomes = incomes;
+        this.cashTotal = calculateTotalFromIncomes();
+        this.cashLeft = cashTotal;
+    }
+
+    private double calculateTotalFromIncomes() {
+        return incomes.stream()
+                .mapToDouble(Income::value)
+                .sum();
+    }
+
+    public void addIncome(Income income) {
+        this.incomes.add(income);
+        this.cashTotal += income.value();
+        this.cashLeft += income.value();
     }
 
     public void addPayment(Payment payment) {
