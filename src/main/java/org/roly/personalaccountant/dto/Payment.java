@@ -11,7 +11,9 @@ public record Payment(
 ) {
 
     public enum PaymentType {
-        MANDATORY, LEISURE
+        DAILY,
+        FIXED,
+        LEISURE
     }
 
     public enum Category {

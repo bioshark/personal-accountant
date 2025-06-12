@@ -3,7 +3,7 @@ package org.roly.personalaccountant.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.dto.Payment.Category.FOOD;
-import static org.roly.personalaccountant.dto.Payment.PaymentType.MANDATORY;
+import static org.roly.personalaccountant.dto.Payment.PaymentType.FIXED;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -41,16 +41,17 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentToExpense() {
-        Payment payment = new Payment("food", FOOD, MANDATORY, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment("food", FOOD, FIXED, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getCashLeft()).isEqualTo(-1 * payment.amount());
     }
 
     @Test
     void shouldNotAddPaymentToNonExistentExpenseDay() {
-        Payment payment = new Payment("food", FOOD, MANDATORY, 11.3d, PAYMENT_DATE.minusDays(100));
+        Payment payment = new Payment("food", FOOD, FIXED, 11.3d, PAYMENT_DATE.minusDays(100));
 
         assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
     }
