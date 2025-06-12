@@ -15,6 +15,6 @@ public record Payment(
     }
 
     public enum Category {
-
+        FOOD,
     }
 }

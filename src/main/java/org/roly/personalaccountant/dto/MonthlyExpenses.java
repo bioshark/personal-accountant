@@ -4,14 +4,42 @@ import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public record MonthlyExpenses(
-        LinkedHashMap<LocalDate, List<Payment>> payments,
-        LocalDate startDate,
-        List<Income> incomes
-) {
+public class MonthlyExpenses {
 
-    public void addPayment(LocalDate date, Payment payment) {
-        payments.get(date).add(payment);
+    private final LinkedHashMap<LocalDate, List<Payment>> payments;
+    private final LocalDate startDate;
+    private final List<Income> incomes;
+    private double cashTotal;
+    private double cashLeft;
+
+    public MonthlyExpenses(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate startDate, List<Income> incomes) {
+        this.payments = payments;
+        this.startDate = startDate;
+        this.incomes = incomes;
     }
 
+    public void addPayment(Payment payment) {
+        payments.get(payment.date()).add(payment);
+        cashLeft -= payment.amount();
+    }
+
+    public LinkedHashMap<LocalDate, List<Payment>> getPayments() {
+        return new LinkedHashMap<>(payments);
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public List<Income> getIncomes() {
+        return List.copyOf(incomes);
+    }
+
+    public double getCashTotal() {
+        return cashTotal;
+    }
+
+    public double getCashLeft() {
+        return cashLeft;
+    }
 }

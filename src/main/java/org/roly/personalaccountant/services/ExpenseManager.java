@@ -1,7 +1,6 @@
 package org.roly.personalaccountant.services;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,22 +17,18 @@ public class ExpenseManager {
 
     private final Map<YearMonth, MonthlyExpenses> expenses = new HashMap<>();
 
-    public void addPayment(LocalDate paymentDay, Payment payment) {
-        MonthlyExpenses expense = getExpenseMonth(paymentDay);
+    public void addPayment(Payment payment) {
         LocalDate paymentDate = payment.date();
-        if (!isPaymentWithingInterval(expense.payments(), paymentDate)) {
+        MonthlyExpenses expense = getExpenseMonth(paymentDate);
+        if (!isPaymentWithingInterval(expense.getPayments(), paymentDate)) {
             throw new IllegalArgumentException("Payment date is out of range");
         }
-        expense.addPayment(paymentDate, payment);
+        expense.addPayment(payment);
     }
 
     public void addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate) {
-        addNewMonthlyExpense(yearMonth.getYear(), yearMonth.getMonth(), startDate);
-    }
-
-    public void addNewMonthlyExpense(int year, Month month, LocalDate startDate) {
         expenses.put(
-                YearMonth.of(year, month),
+                YearMonth.of(yearMonth.getYear(), yearMonth.getMonth()),
                 new MonthlyExpenses(
                         PaymentsGenerator.initializeEmptyMonth(startDate),
                         startDate,
@@ -56,7 +51,7 @@ public class ExpenseManager {
 
     private MonthlyExpenses getExpenseMonth(LocalDate searchingDate) {
         for (MonthlyExpenses monthlyExpenses :  expenses.values()) {
-            if (monthlyExpenses.payments().keySet().stream()
+            if (monthlyExpenses.getPayments().keySet().stream()
                     .anyMatch(searchingDate::equals)) {
                 return monthlyExpenses;
             }
