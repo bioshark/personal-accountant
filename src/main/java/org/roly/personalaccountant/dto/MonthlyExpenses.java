@@ -1,11 +1,18 @@
 package org.roly.personalaccountant.dto;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
-public class MonthlyExpenses {
+public class MonthlyExpenses implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    // TODO add yearmonth
     private final LinkedHashMap<LocalDate, List<Payment>> payments;
     private final LocalDate startDate;
     private final List<Income> incomes;
@@ -55,5 +62,40 @@ public class MonthlyExpenses {
 
     public double getCashLeft() {
         return cashLeft;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        MonthlyExpenses that = (MonthlyExpenses) o;
+        return Double.compare(cashTotal, that.cashTotal) == 0 &&
+                Double.compare(cashLeft, that.cashLeft) == 0 &&
+                Objects.equals(payments, that.payments) &&
+                Objects.equals(startDate, that.startDate) &&
+                Objects.equals(incomes, that.incomes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(payments);
+        result = 31 * result + Objects.hashCode(startDate);
+        result = 31 * result + Objects.hashCode(incomes);
+        result = 31 * result + Double.hashCode(cashTotal);
+        result = 31 * result + Double.hashCode(cashLeft);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "MonthlyExpenses{" +
+                "payments=" + payments +
+                ", startDate=" + startDate +
+                ", incomes=" + incomes +
+                ", cashTotal=" + cashTotal +
+                ", cashLeft=" + cashLeft +
+                '}';
     }
 }
