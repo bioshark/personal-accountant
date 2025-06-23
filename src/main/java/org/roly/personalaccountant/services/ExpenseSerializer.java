@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ExpenseSerializer {
 
-    // TODO add jackson serializers
+    // TODO replace with jackson serializers
 
     public void javaSerialize(MonthlyExpenses monthlyExpenses) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(monthlyExpenses.getStartDate() + "-expense.ser"))) {
