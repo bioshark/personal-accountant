@@ -1,16 +1,11 @@
 package org.roly.personalaccountant.dto;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class MonthlyExpenses implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class MonthlyExpenses {
 
     // TODO add yearmonth
     private final LinkedHashMap<LocalDate, List<Payment>> payments;
