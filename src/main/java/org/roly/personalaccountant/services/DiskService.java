@@ -1,8 +1,11 @@
 package org.roly.personalaccountant.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +19,17 @@ public class DiskService {
         this.objectMapper = objectMapper;
     }
 
-    public <T> T parseObject(String filename, Class<T> type) throws IOException {
-        return objectMapper.readValue(new File(filename), type);
+    public <T> T readSave(String filePath, Class<T> type) throws IOException {
+
+        try (InputStream is = Files.newInputStream(Path.of(filePath))) {
+            return objectMapper.readValue(is, type);
+        }
     }
 
     public void writeToJson(Object object, String filePath) throws IOException {
-        objectMapper.writeValue(new File(filePath), object);
+        try (OutputStream os = Files.newOutputStream(Path.of(filePath))) {
+            objectMapper.writeValue(os, object);
+        }
     }
 
 }
