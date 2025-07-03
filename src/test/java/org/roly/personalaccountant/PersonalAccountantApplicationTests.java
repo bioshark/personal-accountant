@@ -10,4 +10,9 @@ class PersonalAccountantApplicationTests {
     void contextLoads() {
     }
 
+    @Test
+    void mainMethodRuns() {
+        PersonalAccountantApplication.main(new String[]{});
+    }
+
 }

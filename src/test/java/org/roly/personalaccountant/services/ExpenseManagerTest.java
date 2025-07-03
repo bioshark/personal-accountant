@@ -8,6 +8,7 @@ import static org.roly.personalaccountant.dto.Payment.PaymentType.FIXED;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,7 @@ class ExpenseManagerTest {
     void shouldCreateExpense() {
         assertThat(manager.getExpenses().values()).isNotNull();
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getPayments()).hasSize(31);
+        assertThat(manager.getExpenses().get(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
     }
 
     @Test
@@ -60,6 +62,7 @@ class ExpenseManagerTest {
     void shouldCorrectlyAddIncomeToExpense() {
         manager.addIncome(WAGE_INCOME);
 
+        assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes()).containsAll(List.of(WAGE_INCOME));
         assertThat(manager.getExpense(EXPENSE_MONTH).getCashTotal()).isEqualTo(WAGE_INCOME.value());
         assertThat(manager.getExpense(EXPENSE_MONTH).getCashLeft()).isEqualTo(WAGE_INCOME.value());
     }
