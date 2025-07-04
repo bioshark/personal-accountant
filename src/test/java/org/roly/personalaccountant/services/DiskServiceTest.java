@@ -36,7 +36,7 @@ class DiskServiceTest {
     private JacksonTester<Payment> jacksonTester;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         JacksonTester.initFields(this, objectMapper);
     }
 
