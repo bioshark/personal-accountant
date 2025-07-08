@@ -6,17 +6,18 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import org.roly.personalaccountant.domain.notifiers.PaymentList;
 
 public class MonthlyExpenses {
 
-    private final LinkedHashMap<LocalDate, List<Payment>> payments;
+    private final LinkedHashMap<LocalDate, PaymentList> payments;
     private final LocalDate startDate;
     private final List<Income> incomes;
     private final YearMonth yearMonth;
     private double cashTotal;
     private double cashLeft;
 
-    public MonthlyExpenses(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate startDate, YearMonth yearMonth) {
+    public MonthlyExpenses(LinkedHashMap<LocalDate, PaymentList> payments, LocalDate startDate, YearMonth yearMonth) {
         this.payments = payments;
         this.startDate = startDate;
         this.incomes = new ArrayList<>();

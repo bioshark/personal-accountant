@@ -2,22 +2,20 @@ package org.roly.personalaccountant.utils;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.roly.personalaccountant.domain.model.expenses.Payment;
+import org.roly.personalaccountant.domain.notifiers.PaymentList;
 
 public class PaymentsGenerator {
 
-    public static LinkedHashMap<LocalDate, List<Payment>> initializeEmptyMonth(LocalDate currentDate) {
+    public static LinkedHashMap<LocalDate, PaymentList> initializeEmptyMonth(LocalDate currentDate) {
         LinkedList<LocalDate> days = generateDaysForMonth(currentDate);
         return days.stream()
                 .collect(Collectors.toMap(
                         day -> day,
-                        day -> new ArrayList<>(),
+                        day -> new PaymentList(),
                         (v1, v2) -> v1,
                         LinkedHashMap::new
                 ));
