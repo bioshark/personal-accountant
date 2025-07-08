@@ -2,8 +2,8 @@ package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.roly.personalaccountant.domain.model.Payment.Category.FOOD;
-import static org.roly.personalaccountant.domain.model.Payment.PaymentType.FIXED;
+import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.FOOD;
+import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.FIXED;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -12,8 +12,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.roly.personalaccountant.domain.model.Income;
-import org.roly.personalaccountant.domain.model.Payment;
+import org.roly.personalaccountant.domain.model.expenses.Income;
+import org.roly.personalaccountant.domain.model.expenses.Payment;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 
 class ExpenseManagerTest {

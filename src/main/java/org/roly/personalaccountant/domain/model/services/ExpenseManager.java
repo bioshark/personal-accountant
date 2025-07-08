@@ -4,9 +4,9 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
-import org.roly.personalaccountant.domain.model.Income;
-import org.roly.personalaccountant.domain.model.Payment;
+import org.roly.personalaccountant.domain.model.expenses.Income;
 import org.roly.personalaccountant.domain.model.expenses.MonthlyExpenses;
+import org.roly.personalaccountant.domain.model.expenses.Payment;
 import org.roly.personalaccountant.utils.PaymentsGenerator;
 import org.springframework.stereotype.Service;
 

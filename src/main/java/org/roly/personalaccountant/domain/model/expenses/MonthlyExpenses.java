@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import org.roly.personalaccountant.domain.model.Income;
-import org.roly.personalaccountant.domain.model.Payment;
 
 public class MonthlyExpenses {
 

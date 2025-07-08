@@ -1,4 +1,4 @@
-package org.roly.personalaccountant.domain.model;
+package org.roly.personalaccountant.domain.model.expenses;
 
 import java.time.LocalDate;
 
