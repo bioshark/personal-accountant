@@ -16,6 +16,7 @@ public class MonthlyExpenses {
     private final YearMonth yearMonth;
     private double cashTotal;
     private double cashLeft;
+    private OverallSumsTracker overallSumsTracker;
 
     public MonthlyExpenses(LinkedHashMap<LocalDate, PaymentList> payments, LocalDate startDate, YearMonth yearMonth) {
         this.payments = payments;
