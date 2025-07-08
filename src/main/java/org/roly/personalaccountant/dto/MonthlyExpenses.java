@@ -1,25 +1,28 @@
 package org.roly.personalaccountant.dto;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
 public class MonthlyExpenses {
 
-    // TODO add yearmonth
     private final LinkedHashMap<LocalDate, List<Payment>> payments;
     private final LocalDate startDate;
     private final List<Income> incomes;
+    private final YearMonth yearMonth;
     private double cashTotal;
     private double cashLeft;
 
-    public MonthlyExpenses(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate startDate, List<Income> incomes) {
+    public MonthlyExpenses(LinkedHashMap<LocalDate, List<Payment>> payments, LocalDate startDate, YearMonth yearMonth) {
         this.payments = payments;
         this.startDate = startDate;
-        this.incomes = incomes;
+        this.incomes = new ArrayList<>();
         this.cashTotal = calculateTotalFromIncomes();
         this.cashLeft = cashTotal;
+        this.yearMonth = yearMonth;
     }
 
     private double calculateTotalFromIncomes() {
@@ -59,6 +62,10 @@ public class MonthlyExpenses {
         return cashLeft;
     }
 
+    public YearMonth getYearMonth() {
+        return yearMonth;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
@@ -66,20 +73,19 @@ public class MonthlyExpenses {
         }
 
         MonthlyExpenses that = (MonthlyExpenses) o;
-        return Double.compare(cashTotal, that.cashTotal) == 0 &&
-                Double.compare(cashLeft, that.cashLeft) == 0 &&
-                Objects.equals(payments, that.payments) &&
-                Objects.equals(startDate, that.startDate) &&
-                Objects.equals(incomes, that.incomes);
+        return Double.compare(cashTotal, that.cashTotal) == 0 && Double.compare(cashLeft, that.cashLeft) == 0
+                && Objects.equals(payments, that.payments) && Objects.equals(startDate, that.startDate) && incomes.equals(
+                that.incomes) && Objects.equals(yearMonth, that.yearMonth);
     }
 
     @Override
     public int hashCode() {
         int result = Objects.hashCode(payments);
         result = 31 * result + Objects.hashCode(startDate);
-        result = 31 * result + Objects.hashCode(incomes);
+        result = 31 * result + incomes.hashCode();
         result = 31 * result + Double.hashCode(cashTotal);
         result = 31 * result + Double.hashCode(cashLeft);
+        result = 31 * result + Objects.hashCode(yearMonth);
         return result;
     }
 

@@ -2,7 +2,6 @@ package org.roly.personalaccountant.services;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.roly.personalaccountant.dto.Income;
@@ -22,7 +21,7 @@ public class ExpenseManager {
                 new MonthlyExpenses(
                         PaymentsGenerator.initializeEmptyMonth(startDate),
                         startDate,
-                        new ArrayList<>()
+                        yearMonth
                 )
         );
     }

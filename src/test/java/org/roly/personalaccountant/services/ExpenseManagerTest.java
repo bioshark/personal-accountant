@@ -39,6 +39,7 @@ class ExpenseManagerTest {
         assertThat(manager.getExpenses().values()).isNotNull();
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getPayments()).hasSize(31);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
+        assertThat(manager.getExpenses().get(EXPENSE_MONTH).getYearMonth()).isEqualTo(EXPENSE_MONTH);
     }
 
     @Test
