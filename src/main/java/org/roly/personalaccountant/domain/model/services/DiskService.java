@@ -1,4 +1,4 @@
-package org.roly.personalaccountant.services;
+package org.roly.personalaccountant.domain.model.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

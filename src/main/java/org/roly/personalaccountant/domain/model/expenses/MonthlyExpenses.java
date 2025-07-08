@@ -1,4 +1,4 @@
-package org.roly.personalaccountant.dto;
+package org.roly.personalaccountant.domain.model.expenses;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import org.roly.personalaccountant.domain.model.Income;
+import org.roly.personalaccountant.domain.model.Payment;
 
 public class MonthlyExpenses {
 

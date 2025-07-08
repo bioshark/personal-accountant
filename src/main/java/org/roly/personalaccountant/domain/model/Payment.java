@@ -1,4 +1,4 @@
-package org.roly.personalaccountant.dto;
+package org.roly.personalaccountant.domain.model;
 
 import java.time.LocalDate;
 
