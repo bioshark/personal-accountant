@@ -1,8 +1,8 @@
 package org.roly.personalaccountant.domain.model.expenses;
 
-import org.roly.personalaccountant.domain.notifiers.PaymentListener;
+import org.roly.personalaccountant.domain.notifiers.Listener;
 
-public class OverallSumsTracker implements PaymentListener {
+public class OverallSumsTracker implements Listener<Payment> {
 
     private double overallCashLeft;
     private double dailyExpenseTotal;
