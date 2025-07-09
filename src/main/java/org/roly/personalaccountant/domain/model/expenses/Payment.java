@@ -8,7 +8,7 @@ public record Payment(
         PaymentType type,
         Double amount,
         LocalDate date
-) {
+) implements BaseTransaction {
 
     public enum PaymentType {
         DAILY,

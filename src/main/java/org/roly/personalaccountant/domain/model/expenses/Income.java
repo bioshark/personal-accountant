@@ -6,6 +6,6 @@ public record Income(
         String source,
         LocalDate date,
         double value
-) {
+) implements BaseTransaction {
 
 }

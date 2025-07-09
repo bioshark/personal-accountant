@@ -10,22 +10,22 @@ import org.roly.personalaccountant.utils.PaymentsGenerator;
 
 public class MonthlyExpenses {
 
-    private final LinkedHashMap<LocalDate, ReactiveList<Payment>> payments;
+    private final LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> payments;
     private final LocalDate startDate;
-    private final ReactiveList<Income> incomes;
+    private final ReactiveList<BaseTransaction> incomes;
     private final YearMonth yearMonth;
     private double cashTotal;
     private double cashLeft;
     private final OverallSumsTracker overallSumsTracker = new OverallSumsTracker();
 
-    public MonthlyExpenses(LinkedHashMap<LocalDate, ReactiveList<Payment>> payments, LocalDate startDate, YearMonth yearMonth) {
-        this.payments = payments;
-        this.startDate = startDate;
-        this.incomes = new ReactiveList<>();
-        this.cashTotal = calculateTotalFromIncomes();
-        this.cashLeft = cashTotal;
-        this.yearMonth = yearMonth;
-    }
+//    public MonthlyExpenses(LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> payments, LocalDate startDate, YearMonth yearMonth) {
+//        this.payments = payments;
+//        this.startDate = startDate;
+//        this.incomes = new ReactiveList<>();
+//        this.cashTotal = calculateTotalFromIncomes();
+//        this.cashLeft = cashTotal;
+//        this.yearMonth = yearMonth;
+//    }
 
     public MonthlyExpenses(LocalDate startDate, YearMonth yearMonth) {
         this.startDate = startDate;
@@ -34,11 +34,11 @@ public class MonthlyExpenses {
         this.payments = PaymentsGenerator.initializeEmptyMonth(startDate, this.overallSumsTracker);
     }
 
-    private double calculateTotalFromIncomes() {
-        return incomes.stream()
-                .mapToDouble(Income::value)
-                .sum();
-    }
+//    private double calculateTotalFromIncomes() {
+//        return incomes.stream()
+//                .mapToDouble(Income::value)
+//                .sum();
+//    }
 
     public void addIncome(Income income) {
         this.incomes.add(income);
@@ -51,7 +51,7 @@ public class MonthlyExpenses {
         cashLeft -= payment.amount();
     }
 
-    public LinkedHashMap<LocalDate, List<Payment>> getPayments() {
+    public LinkedHashMap<LocalDate, List<BaseTransaction>> getPayments() {
         return new LinkedHashMap<>(payments);
     }
 
@@ -59,7 +59,7 @@ public class MonthlyExpenses {
         return startDate;
     }
 
-    public List<Income> getIncomes() {
+    public List<BaseTransaction> getIncomes() {
         return List.copyOf(incomes);
     }
 
