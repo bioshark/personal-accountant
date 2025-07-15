@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.roly.personalaccountant.domain.model.expenses.BaseTransaction;
 import org.roly.personalaccountant.domain.notifiers.Listener;
@@ -12,19 +11,19 @@ import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 
 public class PaymentsGenerator {
 
+    private PaymentsGenerator() {}
+
+    @SuppressWarnings("java:S1319")
     public static LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> initializeEmptyMonth(LocalDate currentDate,
             Listener<BaseTransaction> listener) {
         LinkedList<LocalDate> days = generateDaysForMonth(currentDate);
-        return days.stream()
-                .collect(Collectors.toMap(
-                        day -> day,
-                        day -> new ReactiveList<>(),
-                        (v1, v2) -> {
-                            v1.registerListener(listener);
-                            return v1;
-                        },
-                        LinkedHashMap::new
-                ));
+        LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> result = new LinkedHashMap<>();
+        for (LocalDate day : days) {
+            ReactiveList<BaseTransaction> payments = new ReactiveList<>();
+            payments.registerListener(listener);
+            result.put(day, payments);
+        }
+        return result;
     }
 
     private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate) {

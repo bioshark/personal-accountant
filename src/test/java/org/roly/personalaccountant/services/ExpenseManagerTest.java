@@ -50,7 +50,7 @@ class ExpenseManagerTest {
         manager.addPayment(payment);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
-        assertThat(manager.getExpense(EXPENSE_MONTH).getCashLeft()).isEqualTo(-1 * payment.amount());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getOverallSumsTracker().getCashLeft()).isEqualTo(-1 * payment.amount());
     }
 
     @Test
@@ -65,8 +65,8 @@ class ExpenseManagerTest {
         manager.addIncome(WAGE_INCOME);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes()).containsAll(List.of(WAGE_INCOME));
-        assertThat(manager.getExpense(EXPENSE_MONTH).getCashTotal()).isEqualTo(WAGE_INCOME.value());
-        assertThat(manager.getExpense(EXPENSE_MONTH).getCashLeft()).isEqualTo(WAGE_INCOME.value());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getOverallSumsTracker().getCashLeft()).isEqualTo(WAGE_INCOME.value());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getOverallSumsTracker().getCashTotal()).isEqualTo(WAGE_INCOME.value());
     }
 
     @Test
