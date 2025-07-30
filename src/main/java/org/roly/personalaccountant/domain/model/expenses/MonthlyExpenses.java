@@ -14,41 +14,27 @@ public class MonthlyExpenses {
     private final LocalDate startDate;
     private final ReactiveList<BaseTransaction> incomes;
     private final YearMonth yearMonth;
-    private double cashTotal;
-    private double cashLeft;
-    private final OverallSumsTracker overallSumsTracker = new OverallSumsTracker();
-
-//    public MonthlyExpenses(LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> payments, LocalDate startDate, YearMonth yearMonth) {
-//        this.payments = payments;
-//        this.startDate = startDate;
-//        this.incomes = new ReactiveList<>();
-//        this.cashTotal = calculateTotalFromIncomes();
-//        this.cashLeft = cashTotal;
-//        this.yearMonth = yearMonth;
-//    }
+    private final OverallSumsTracker statistics = new OverallSumsTracker();
 
     public MonthlyExpenses(LocalDate startDate, YearMonth yearMonth) {
         this.startDate = startDate;
         this.incomes = new ReactiveList<>();
         this.yearMonth = yearMonth;
-        this.payments = PaymentsGenerator.initializeEmptyMonth(startDate, this.overallSumsTracker);
+        this.payments = PaymentsGenerator.initializeEmptyMonth(startDate);
+        registrations();
     }
 
-//    private double calculateTotalFromIncomes() {
-//        return incomes.stream()
-//                .mapToDouble(Income::value)
-//                .sum();
-//    }
+    private void registrations() {
+        this.incomes.registerListener(statistics);
+        this.payments.forEach((key, value) -> value.registerListener(statistics));
+    }
 
     public void addIncome(Income income) {
         this.incomes.add(income);
-        this.cashTotal += income.value();
-        this.cashLeft += income.value();
     }
 
     public void addPayment(Payment payment) {
         payments.get(payment.date()).add(payment);
-        cashLeft -= payment.amount();
     }
 
     public LinkedHashMap<LocalDate, List<BaseTransaction>> getPayments() {
@@ -63,20 +49,12 @@ public class MonthlyExpenses {
         return List.copyOf(incomes);
     }
 
-    public double getCashTotal() {
-        return cashTotal;
-    }
-
-    public double getCashLeft() {
-        return cashLeft;
-    }
-
     public YearMonth getYearMonth() {
         return yearMonth;
     }
 
-    public OverallSumsTracker getOverallSumsTracker() {
-        return overallSumsTracker;
+    public OverallSumsTracker getStatistics() {
+        return statistics;
     }
 
     @Override
@@ -86,9 +64,9 @@ public class MonthlyExpenses {
         }
 
         MonthlyExpenses that = (MonthlyExpenses) o;
-        return Double.compare(cashTotal, that.cashTotal) == 0 && Double.compare(cashLeft, that.cashLeft) == 0
-                && Objects.equals(payments, that.payments) && Objects.equals(startDate, that.startDate) && incomes.equals(
-                that.incomes) && Objects.equals(yearMonth, that.yearMonth);
+        return Objects.equals(payments, that.payments) && Objects.equals(startDate, that.startDate) && Objects.equals(
+                incomes, that.incomes) && Objects.equals(yearMonth, that.yearMonth) && Objects.equals(statistics,
+                that.statistics);
     }
 
     @Override
@@ -96,8 +74,6 @@ public class MonthlyExpenses {
         int result = Objects.hashCode(payments);
         result = 31 * result + Objects.hashCode(startDate);
         result = 31 * result + incomes.hashCode();
-        result = 31 * result + Double.hashCode(cashTotal);
-        result = 31 * result + Double.hashCode(cashLeft);
         result = 31 * result + Objects.hashCode(yearMonth);
         return result;
     }
@@ -108,8 +84,6 @@ public class MonthlyExpenses {
                 "payments=" + payments +
                 ", startDate=" + startDate +
                 ", incomes=" + incomes +
-                ", cashTotal=" + cashTotal +
-                ", cashLeft=" + cashLeft +
                 '}';
     }
 }
