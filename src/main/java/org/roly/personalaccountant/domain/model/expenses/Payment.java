@@ -18,5 +18,10 @@ public record Payment(
 
     public enum Category {
         FOOD,
+        MEDIA
+    }
+
+    public boolean isFixed() {
+        return type == PaymentType.FIXED;
     }
 }

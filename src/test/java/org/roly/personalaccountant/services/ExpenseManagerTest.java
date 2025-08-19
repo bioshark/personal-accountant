@@ -3,7 +3,10 @@ package org.roly.personalaccountant.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.FOOD;
+import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.MEDIA;
+import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.FIXED;
+import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.LEISURE;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -51,11 +54,23 @@ class ExpenseManagerTest {
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(-1 * payment.amount());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(payment.amount());
+    }
+
+    @Test
+    void shouldNotAddPaymentToFixedExpense() {
+        Payment payment = new Payment("food", MEDIA, LEISURE, 11.3d, PAYMENT_DATE);
+
+        manager.addPayment(payment);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(-1 * payment.amount());
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isZero();
     }
 
     @Test
     void shouldNotAddPaymentToNonExistentExpenseDay() {
-        Payment payment = new Payment("food", FOOD, FIXED, 11.3d, PAYMENT_DATE.minusDays(100));
+        Payment payment = new Payment("food", FOOD, DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
 
         assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
     }

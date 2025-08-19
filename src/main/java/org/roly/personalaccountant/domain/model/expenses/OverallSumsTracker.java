@@ -4,7 +4,6 @@ import static org.roly.personalaccountant.utils.StructuredLoggerHelper.ACTION_1_
 import static org.roly.personalaccountant.utils.StructuredLoggerHelper.action;
 import static org.roly.personalaccountant.utils.StructuredLoggerHelper.key;
 
-import org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType;
 import org.roly.personalaccountant.domain.notifiers.Listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,20 +21,15 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
         switch (transaction) {
             case Payment payment -> {
                 cashLeft -= payment.amount();
-                addToFixedExpense(payment);
+                if (payment.isFixed()) {
+                    fixedExpenseTotal += payment.amount();
+                }
             }
             case Income income -> {
                 cashTotal += income.value();
                 cashLeft += income.value();
             }
             default -> LOGGER.error(ACTION_1_PARAMS, action("Transaction is of wrong type"), key(transaction));
-        }
-    }
-
-    // TODO write a test for this.
-    private void addToFixedExpense(Payment payment) {
-        if (payment.type().equals(PaymentType.FIXED)) {
-            fixedExpenseTotal += payment.amount();
         }
     }
 
