@@ -2,8 +2,10 @@ package org.roly.personalaccountant.view.rs;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import org.roly.personalaccountant.domain.model.expenses.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +23,12 @@ public class ExpenseController {
         this.expenseManager = expenseManager;
     }
 
-    @GetMapping("/{yearMonth}")
-    public void getNonCombinable(@PathVariable YearMonth yearMonth, @RequestParam("startDate") LocalDate startDate) {
-        expenseManager.addNewMonthlyExpense(yearMonth, startDate);
+    @GetMapping("/expense/{yearMonth}")
+    public ResponseEntity<Void> generateNewExpense(@PathVariable YearMonth yearMonth, @RequestParam("startDate") LocalDate startDate) {
+        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(yearMonth, startDate);
+        if (expenseManager.getExpense(yearMonth).equals(monthlyExpenses)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

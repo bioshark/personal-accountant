@@ -14,8 +14,8 @@ public class ExpenseManager {
 
     private final Map<YearMonth, MonthlyExpenses> expenses = new HashMap<>();
 
-    public void addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate) {
-        expenses.put(
+    public MonthlyExpenses addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate) {
+        return expenses.put(
                 YearMonth.of(yearMonth.getYear(), yearMonth.getMonth()),
                 new MonthlyExpenses(startDate, yearMonth)
         );
