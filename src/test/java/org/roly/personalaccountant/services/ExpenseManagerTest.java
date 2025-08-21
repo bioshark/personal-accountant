@@ -2,11 +2,11 @@ package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.FOOD;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.MEDIA;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.DAILY;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.FIXED;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.LEISURE;
+import static org.roly.personalaccountant.domain.model.dto.Payment.Category.FOOD;
+import static org.roly.personalaccountant.domain.model.dto.Payment.Category.MEDIA;
+import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
+import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
+import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.LEISURE;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -15,8 +15,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.roly.personalaccountant.domain.model.expenses.Income;
-import org.roly.personalaccountant.domain.model.expenses.Payment;
+import org.roly.personalaccountant.domain.model.dto.Income;
+import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 
 class ExpenseManagerTest {
@@ -26,6 +26,7 @@ class ExpenseManagerTest {
     public static final Income WAGE_INCOME = new Income("Wage", START_DATE.plusDays(1), 1122.0d);
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
+    private static final String EXPENSE_MONTH_NAME = "June 2025";
     private final ExpenseManager manager = new ExpenseManager();
 
     @BeforeEach
@@ -44,6 +45,7 @@ class ExpenseManagerTest {
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getPayments()).hasSize(31);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getYearMonth()).isEqualTo(EXPENSE_MONTH);
+        assertThat(manager.getExpenses().get(EXPENSE_MONTH).getExpenseName()).isEqualTo(EXPENSE_MONTH_NAME);
     }
 
     @Test

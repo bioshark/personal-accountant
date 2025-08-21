@@ -1,8 +1,8 @@
 package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.Category.FOOD;
-import static org.roly.personalaccountant.domain.model.expenses.Payment.PaymentType.FIXED;
+import static org.roly.personalaccountant.domain.model.dto.Payment.Category.FOOD;
+import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.roly.personalaccountant.domain.model.expenses.Payment;
+import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.services.DiskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

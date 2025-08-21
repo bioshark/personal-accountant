@@ -1,4 +1,6 @@
-package org.roly.personalaccountant.domain.model.expenses;
+package org.roly.personalaccountant.domain.model.dto;
+
+import static org.roly.personalaccountant.utils.Utils.initCap;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -15,17 +17,20 @@ public class MonthlyExpenses {
     private final ReactiveList<BaseTransaction> incomes;
     private final YearMonth yearMonth;
     private final OverallSumsTracker statistics = new OverallSumsTracker();
+    private final String expenseName;
 
     public MonthlyExpenses(LocalDate startDate, YearMonth yearMonth) {
         this.startDate = startDate;
         this.incomes = new ReactiveList<>();
         this.yearMonth = yearMonth;
         this.payments = PaymentsGenerator.initializeEmptyMonth(startDate);
+        this.expenseName = initCap(yearMonth.getMonth().toString()) + " " + yearMonth.getYear();
         registrations();
     }
 
     private void registrations() {
         this.incomes.registerListener(statistics);
+        // TODO check unused param
         this.payments.forEach((key, value) -> value.registerListener(statistics));
     }
 
@@ -55,6 +60,10 @@ public class MonthlyExpenses {
 
     public OverallSumsTracker getStatistics() {
         return statistics;
+    }
+
+    public String getExpenseName() {
+        return expenseName;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.roly.personalaccountant.domain.model.expenses;
+package org.roly.personalaccountant.domain.model.dto;
 
 import static org.roly.personalaccountant.utils.StructuredLoggerHelper.ACTION_1_PARAMS;
 import static org.roly.personalaccountant.utils.StructuredLoggerHelper.action;

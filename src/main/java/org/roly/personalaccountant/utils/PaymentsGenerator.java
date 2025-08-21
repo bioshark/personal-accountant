@@ -6,13 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.roly.personalaccountant.domain.model.expenses.BaseTransaction;
+import org.roly.personalaccountant.domain.model.dto.BaseTransaction;
 import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 
 public class PaymentsGenerator {
 
     public static LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> initializeEmptyMonth(LocalDate currentDate) {
         LinkedList<LocalDate> days = generateDaysForMonth(currentDate);
+        // TODO check this unused params
         return days.stream()
                 .collect(Collectors.toMap(
                         day -> day,
