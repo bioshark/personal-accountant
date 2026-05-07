@@ -18,7 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 class ExpenseManagerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
@@ -27,7 +30,9 @@ class ExpenseManagerTest {
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
     private static final String EXPENSE_MONTH_NAME = "June 2025";
-    private final ExpenseManager manager = new ExpenseManager();
+
+    @Autowired
+    private ExpenseManager manager;
 
     @BeforeEach
     void setUp() {
@@ -90,5 +95,4 @@ class ExpenseManagerTest {
     void shouldNotAddIncomeToNonExistentExpense() {
         assertThrows(IllegalArgumentException.class, () -> manager.addIncome(INVALID_INCOME));
     }
-
 }
