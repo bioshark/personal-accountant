@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${expense.expenseName}">Month Detail</title>
+</head>
+<body>
+<a href="/">&larr; Back</a>
+<h1 th:text="${expense.expenseName}"></h1>
+
+<h2>Summary</h2>
+<ul>
+  <li>Total Income: <span th:text="${expense.statistics.cashTotal}"></span></li>
+  <li>Cash Left: <span th:text="${expense.statistics.cashLeft}"></span></li>
+  <li>Fixed Expenses: <span th:text="${expense.statistics.fixedExpenseTotal}"></span></li>
+</ul>
+
+<h2>Incomes</h2>
+<table th:if="${!expense.incomes.isEmpty()}">
+  <thead>
+  <tr>
+    <th>Source</th>
+    <th>Date</th>
+    <th>Amount</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="income : ${expense.incomes}">
+    <td th:text="${income.source}"></td>
+    <td th:text="${income.date}"></td>
+    <td th:text="${income.value}"></td>
+  </tr>
+  </tbody>
+</table>
+<p th:if="${expense.incomes.isEmpty()}">No incomes recorded.</p>
+
+<h2>Payments</h2>
+<div th:each="entry : ${expense.payments}">
+  <h3 th:text="${entry.key}"></h3>
+  <table th:if="${!entry.value.isEmpty()}">
+    <thead>
+    <tr>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Type</th>
+      <th>Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="payment : ${entry.value}">
+      <td th:text="${payment.description}"></td>
+      <td th:text="${payment.category}"></td>
+      <td th:text="${payment.type}"></td>
+      <td th:text="${payment.amount}"></td>
+    </tr>
+    </tbody>
+  </table>
+  <p th:if="${entry.value.isEmpty()}">No payments.</p>
+</div>
+</body>
+</html>

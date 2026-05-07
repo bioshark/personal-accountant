@@ -15,10 +15,9 @@ public class ExpenseManager {
     private final Map<YearMonth, MonthlyExpenses> expenses = new HashMap<>();
 
     public MonthlyExpenses addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate) {
-        return expenses.put(
-                YearMonth.of(yearMonth.getYear(), yearMonth.getMonth()),
-                new MonthlyExpenses(startDate, yearMonth)
-        );
+        MonthlyExpenses value = new MonthlyExpenses(startDate, yearMonth);
+        expenses.put(YearMonth.of(yearMonth.getYear(), yearMonth.getMonth()), value);
+        return value;
     }
 
     public void addPayment(Payment payment) {

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Personal Accountant</title>
+</head>
+<body>
+<h1>Monthly Expenses</h1>
+<table>
+  <thead>
+  <tr>
+    <th>Month</th>
+    <th>Total Income</th>
+    <th>Cash Left</th>
+    <th>Fixed Expenses</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="expense : ${expenses}">
+    <td><a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" th:text="${expense.expenseName}"></a></td>
+    <td th:text="${expense.statistics.cashTotal}"></td>
+    <td th:text="${expense.statistics.cashLeft}"></td>
+    <td th:text="${expense.statistics.fixedExpenseTotal}"></td>
+  </tr>
+  </tbody>
+</table>
+<p th:if="${#lists.isEmpty(expenses)}">No expenses recorded yet.</p>
+</body>
+</html>
