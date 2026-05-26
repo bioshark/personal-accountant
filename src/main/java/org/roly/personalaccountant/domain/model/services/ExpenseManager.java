@@ -38,10 +38,10 @@ public class ExpenseManager {
         repository.save(entity);
     }
 
-    public void addIncome(Income income) {
+    public MonthlyExpenseEntity addIncome(Income income) {
         MonthlyExpenseEntity entity = findExpenseForDate(income.date());
         entity.addIncome(new IncomeEntity(income.source(), income.date(), income.value()));
-        repository.save(entity);
+        return repository.save(entity);
     }
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {

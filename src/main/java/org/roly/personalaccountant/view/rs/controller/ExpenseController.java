@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
+import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
+import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.view.rs.dto.ExpenseResult;
 import org.roly.personalaccountant.view.rs.mapper.ExpenseConverter;
@@ -47,5 +49,16 @@ public class ExpenseController {
             return ResponseEntity.ok(expenseConverter.convertToList(expenses));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/addincome")
+    public ResponseEntity<Void> addIncome(@RequestParam("source") String source,
+            @RequestParam("date") LocalDate date,
+            @RequestParam("value") double value) {
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addIncome(new Income(source, date, value));
+        if (monthlyExpenseEntity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
     }
 }

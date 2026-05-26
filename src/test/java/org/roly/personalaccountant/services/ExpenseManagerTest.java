@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
+import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -84,8 +85,10 @@ class ExpenseManagerTest {
 
     @Test
     void shouldCorrectlyAddIncomeToExpense() {
-        manager.addIncome(WAGE_INCOME);
+        MonthlyExpenseEntity monthlyExpenseEntity = manager.addIncome(WAGE_INCOME);
 
+        assertThat(monthlyExpenseEntity).isNotNull();
+        assertThat(monthlyExpenseEntity.getIncomes().getFirst().getValue()).isEqualTo(WAGE_INCOME.value());
         assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes()).containsAll(List.of(WAGE_INCOME));
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashTotal()).isEqualTo(WAGE_INCOME.value());
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(WAGE_INCOME.value());
