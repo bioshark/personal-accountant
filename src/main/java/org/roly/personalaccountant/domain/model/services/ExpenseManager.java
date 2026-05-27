@@ -30,12 +30,11 @@ public class ExpenseManager {
         return dto;
     }
 
-    public void addPayment(Payment payment) {
+    public MonthlyExpenseEntity addPayment(Payment payment) {
         LocalDate paymentDate = payment.date();
         MonthlyExpenseEntity entity = findExpenseForDate(paymentDate);
-        entity.addPayment(new PaymentEntity(
-                payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
-        repository.save(entity);
+        entity.addPayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
+        return repository.save(entity);
     }
 
     public MonthlyExpenseEntity addIncome(Income income) {

@@ -3,6 +3,9 @@ package org.roly.personalaccountant.view.web;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import org.roly.personalaccountant.domain.model.dto.Income;
+import org.roly.personalaccountant.domain.model.dto.Payment;
+import org.roly.personalaccountant.domain.model.dto.Payment.Category;
+import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,5 +46,12 @@ public class ExpenseWebController {
     public String generateExpense(@RequestParam YearMonth yearMonth, @RequestParam LocalDate startDate) {
         expenseManager.addNewMonthlyExpense(yearMonth, startDate);
         return "redirect:/";
+    }
+
+    @PostMapping("/month/addpayment")
+    public String addPayment(@RequestParam String description, @RequestParam Category category,
+            @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date) {
+        expenseManager.addPayment(new Payment(description, category, type, amount, date));
+        return "redirect:/month/" + YearMonth.from(date);
     }
 }

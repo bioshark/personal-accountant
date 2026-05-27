@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
+import org.roly.personalaccountant.domain.model.dto.Payment;
+import org.roly.personalaccountant.domain.model.dto.Payment.Category;
+import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.view.rs.dto.ExpenseResult;
@@ -61,4 +64,18 @@ public class ExpenseController {
         }
         return ResponseEntity.internalServerError().build();
     }
+
+    @PostMapping("/addpayment")
+    public ResponseEntity<Void> addPayment(@RequestParam("description") String description,
+            @RequestParam("category") Category category,
+            @RequestParam("type") PaymentType type,
+            @RequestParam("amount") double amount,
+            @RequestParam("date") LocalDate date) {
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addPayment(new Payment(description, category, type, amount, date));
+        if (monthlyExpenseEntity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
 }
