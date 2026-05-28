@@ -75,11 +75,19 @@
         <button class="accordion-button collapsed" type="button"
                 data-bs-toggle="collapse"
                 th:attr="data-bs-target='#day-' + ${iter.index}"
-                th:text="${entry.key}">
+                th:style="${expense.statistics.dailyPayments[entry.key]?.weekEnd} ? 'background-color: #e9ecef;' : ''"
+                th:text="${#temporals.format(entry.key, 'dd MMM, EEEE')}">
         </button>
-        <span class="position-absolute top-50 translate-middle-y badge bg-secondary"
-              style="right: 3rem; z-index: 3;"
-              th:text="${expense.statistics.dailyPayments.getOrDefault(entry.key, 0.0)}"></span>
+        <span class="position-absolute top-50 translate-middle-y d-flex"
+              style="right: 3rem; z-index: 3;">
+          <span class="badge bg-secondary d-inline-block text-center"
+                style="width: 10rem;"
+                th:text="'Spent: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 1)}"></span>
+          <span class="badge d-inline-block text-center ms-1"
+                style="width: 10rem;"
+                th:classappend="${expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0} >= 0 ? 'bg-success' : 'bg-danger'"
+                th:text="'Diff: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0, 1, 1)}"></span>
+        </span>
       </h2>
       <div th:id="'day-' + ${iter.index}" class="accordion-collapse collapse" data-bs-parent="#paymentsAccordion">
         <div class="accordion-body">

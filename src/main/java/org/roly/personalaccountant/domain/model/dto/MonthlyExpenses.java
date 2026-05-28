@@ -16,7 +16,7 @@ public class MonthlyExpenses {
     private final LocalDate startDate;
     private final ReactiveList<BaseTransaction> incomes;
     private final YearMonth yearMonth;
-    private final OverallSumsTracker statistics = new OverallSumsTracker();
+    private final OverallSumsTracker statistics;
     private final String expenseName;
 
     public MonthlyExpenses(LocalDate startDate, YearMonth yearMonth) {
@@ -25,6 +25,7 @@ public class MonthlyExpenses {
         this.yearMonth = yearMonth;
         this.payments = PaymentsGenerator.initializeEmptyMonth(startDate);
         this.expenseName = initCap(yearMonth.getMonth().toString()) + " " + yearMonth.getYear();
+        this.statistics = new OverallSumsTracker(payments.keySet());
         registrations();
     }
 
