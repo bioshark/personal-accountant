@@ -36,8 +36,10 @@ public class ExpenseController {
     }
 
     @PostMapping("/expense/{yearMonth}")
-    public ResponseEntity<Void> generateNewExpense(@PathVariable YearMonth yearMonth, @RequestParam("startDate") LocalDate startDate) {
-        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(yearMonth, startDate);
+    public ResponseEntity<Void> generateNewExpense(@PathVariable YearMonth yearMonth,
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
+        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(yearMonth, startDate, endDate);
         if (expenseManager.getExpense(yearMonth).equals(monthlyExpenses)) {
             return ResponseEntity.ok().build();
         }

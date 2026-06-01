@@ -11,9 +11,8 @@ import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 
 public class PaymentsGenerator {
 
-    public static LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> initializeEmptyMonth(LocalDate currentDate) {
-        LinkedList<LocalDate> days = generateDaysForMonth(currentDate);
-        // TODO check this unused params
+    public static LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> initializeEmptyMonth(LocalDate currentDate, LocalDate endDate) {
+        LinkedList<LocalDate> days = generateDaysForMonth(currentDate, endDate);
         return days.stream()
                 .collect(Collectors.toMap(
                         day -> day,
@@ -23,9 +22,11 @@ public class PaymentsGenerator {
                 ));
     }
 
-    private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate) {
-        LocalDate lastDayOfNextMonth = currentDate.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
-        LocalDate adjustedEndDate = getAdjustedEndDate(lastDayOfNextMonth);
+    private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate, LocalDate endDate) {
+        if (endDate == null || endDate.isAfter(currentDate)) {
+            endDate = currentDate.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+        }
+        LocalDate adjustedEndDate = getAdjustedEndDate(endDate);
 
         LinkedList<LocalDate> generatedDays = new LinkedList<>();
         Stream.iterate(currentDate.plusDays(1), date -> !date.isAfter(adjustedEndDate), date -> date.plusDays(1)).forEach(generatedDays::add);

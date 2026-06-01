@@ -25,6 +25,7 @@ public class MonthlyExpenseEntity {
     @Column(name = "expense_month")
     private int month;
     private LocalDate startDate;
+    private LocalDate endDate;
     private String expenseName;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -36,10 +37,11 @@ public class MonthlyExpenseEntity {
     protected MonthlyExpenseEntity() {
     }
 
-    public MonthlyExpenseEntity(int year, int month, LocalDate startDate, String expenseName) {
+    public MonthlyExpenseEntity(int year, int month, LocalDate startDate, LocalDate endDate, String expenseName) {
         this.year = year;
         this.month = month;
         this.startDate = startDate;
+        this.endDate = endDate;
         this.expenseName = expenseName;
     }
 
@@ -57,6 +59,10 @@ public class MonthlyExpenseEntity {
 
     public LocalDate getStartDate() {
         return startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public String getExpenseName() {

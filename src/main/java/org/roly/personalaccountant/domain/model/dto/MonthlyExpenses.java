@@ -7,6 +7,7 @@ import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 import org.roly.personalaccountant.utils.PaymentsGenerator;
 
@@ -15,18 +16,29 @@ public class MonthlyExpenses {
     private final LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> payments;
     private final LocalDate startDate;
     private final ReactiveList<BaseTransaction> incomes;
+    // TODO change this to String.
     private final YearMonth yearMonth;
     private final OverallSumsTracker statistics;
     private final String expenseName;
 
-    public MonthlyExpenses(LocalDate startDate, YearMonth yearMonth) {
+    public MonthlyExpenses(YearMonth yearMonth, LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.incomes = new ReactiveList<>();
-        this.yearMonth = yearMonth;
-        this.payments = PaymentsGenerator.initializeEmptyMonth(startDate);
+        this.payments = PaymentsGenerator.initializeEmptyMonth(startDate, endDate);
+        this.yearMonth = computeMonth(yearMonth, this.payments.keySet());
         this.expenseName = initCap(yearMonth.getMonth().toString()) + " " + yearMonth.getYear();
         this.statistics = new OverallSumsTracker(payments.keySet());
         registrations();
+    }
+
+    private YearMonth computeMonth(YearMonth yearMonth, Set<LocalDate> localDates) {
+        if (yearMonth != null) {
+            return yearMonth;
+        }
+        if (!localDates.isEmpty()) {
+            return YearMonth.from(localDates.stream().skip(localDates.size() / 2).findFirst().orElseThrow());
+        }
+        return null;
     }
 
     private void registrations() {

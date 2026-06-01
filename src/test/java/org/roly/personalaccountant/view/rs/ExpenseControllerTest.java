@@ -22,7 +22,7 @@ class ExpenseControllerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
-    private static final MonthlyExpenses DUMMY_EXPENSE = new MonthlyExpenses(START_DATE, EXPENSE_MONTH);
+    private static final MonthlyExpenses DUMMY_EXPENSE = new MonthlyExpenses(EXPENSE_MONTH, START_DATE, null);
 
     @Mock
     private ExpenseManager expenseManager;
@@ -32,10 +32,10 @@ class ExpenseControllerTest {
 
     @Test
     void shouldGenerateNewExpense() {
-        when(expenseManager.addNewMonthlyExpense(EXPENSE_MONTH, START_DATE)).thenReturn(DUMMY_EXPENSE);
+        when(expenseManager.addNewMonthlyExpense(EXPENSE_MONTH, START_DATE, null)).thenReturn(DUMMY_EXPENSE);
         when(expenseManager.getExpense(EXPENSE_MONTH)).thenReturn(DUMMY_EXPENSE);
 
-        ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_MONTH, START_DATE);
+        ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_MONTH, START_DATE, null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNull();
@@ -43,10 +43,10 @@ class ExpenseControllerTest {
 
     @Test
     void shouldHandleNonGeneratableExpense() {
-        when(expenseManager.addNewMonthlyExpense(EXPENSE_MONTH, START_DATE)).thenReturn(DUMMY_EXPENSE);
-        when(expenseManager.getExpense(EXPENSE_MONTH)).thenReturn(new MonthlyExpenses(START_DATE.plusDays(1), EXPENSE_MONTH));
+        when(expenseManager.addNewMonthlyExpense(EXPENSE_MONTH, START_DATE, null)).thenReturn(DUMMY_EXPENSE);
+        when(expenseManager.getExpense(EXPENSE_MONTH)).thenReturn(new MonthlyExpenses(EXPENSE_MONTH, START_DATE.plusDays(1), null));
 
-        ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_MONTH, START_DATE);
+        ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_MONTH, START_DATE, null);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNull();
