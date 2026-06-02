@@ -41,7 +41,6 @@ public class MonthlyExpenses {
 
     private void registrations() {
         this.incomes.registerListener(statistics);
-        // TODO check unused param
         this.payments.forEach((key, value) -> value.registerListener(statistics));
     }
 

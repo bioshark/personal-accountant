@@ -46,7 +46,14 @@ public class ExpenseController {
         return ResponseEntity.notFound().build();
     }
 
-    // TODO add a test
+    @PostMapping("/expense/delete/{yearMonth}")
+    public ResponseEntity<Void> deleteExpense(@PathVariable YearMonth yearMonth) {
+        if (expenseManager.deleteMonthlyExpense(yearMonth)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/expenses")
     public ResponseEntity<List<ExpenseResult>> getExpenses() {
         Map<YearMonth, MonthlyExpenses> expenses = expenseManager.getExpenses();

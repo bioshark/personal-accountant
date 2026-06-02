@@ -55,4 +55,10 @@ public class ExpenseWebController {
         expenseManager.addPayment(new Payment(description, category, type, amount, date));
         return "redirect:/month/" + YearMonth.from(date);
     }
+
+    @PostMapping("/month/delete/{yearMonth}")
+    public String deleteExpense(@PathVariable YearMonth yearMonth) {
+        expenseManager.deleteMonthlyExpense(yearMonth);
+        return "redirect:/";
+    }
 }

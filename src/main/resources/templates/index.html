@@ -18,8 +18,8 @@
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     <div class="col" th:each="expense : ${expenses}">
-      <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none">
-        <div class="card h-100 shadow-sm">
+      <div class="card h-100 shadow-sm">
+        <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
           <div class="card-body">
             <h5 class="card-title" th:text="${expense.expenseName}"></h5>
             <ul class="list-unstyled mb-0">
@@ -28,8 +28,14 @@
               <li><strong>Fixed:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span></li>
             </ul>
           </div>
+        </a>
+        <div class="card-footer bg-transparent border-0 text-end">
+          <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post"
+                onsubmit="return confirm('Delete this month?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
         </div>
-      </a>
+      </div>
     </div>
   </div>
 </div>

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
@@ -33,6 +34,16 @@ public class ExpenseManager {
         );
         repository.save(entity);
         return dto;
+    }
+
+    public boolean deleteMonthlyExpense(YearMonth yearMonth) {
+        Optional<MonthlyExpenseEntity> monthlyExpenseEntity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue());
+
+        if (monthlyExpenseEntity.isEmpty()) {
+            return false;
+        }
+        repository.delete(monthlyExpenseEntity.get());
+        return true;
     }
 
     public MonthlyExpenseEntity addPayment(Payment payment) {
