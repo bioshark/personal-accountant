@@ -35,12 +35,12 @@ public class ExpenseController {
         this.expenseConverter = expenseConverter;
     }
 
-    @PostMapping("/expense/{yearMonth}")
-    public ResponseEntity<Void> generateNewExpense(@PathVariable YearMonth yearMonth,
+    @PostMapping("/expense/{expenseName}")
+    public ResponseEntity<Void> generateNewExpense(@PathVariable String expenseName,
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate) {
-        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(yearMonth, startDate, endDate);
-        if (expenseManager.getExpense(yearMonth).equals(monthlyExpenses)) {
+        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+        if (expenseManager.getExpense(monthlyExpenses.getYearMonth()).equals(monthlyExpenses)) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();

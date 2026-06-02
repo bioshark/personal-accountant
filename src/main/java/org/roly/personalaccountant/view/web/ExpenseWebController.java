@@ -43,9 +43,9 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/generate")
-    public String generateExpense(@RequestParam(required = false) YearMonth yearMonth, @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
-        expenseManager.addNewMonthlyExpense(yearMonth, startDate, endDate);
+    public String generateExpense(@RequestParam(required = false) String expenseName, @RequestParam LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate) {
+        expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
         return "redirect:/";
     }
 

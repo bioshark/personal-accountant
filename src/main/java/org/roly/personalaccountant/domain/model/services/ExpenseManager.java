@@ -22,10 +22,15 @@ public class ExpenseManager {
         this.repository = repository;
     }
 
-    public MonthlyExpenses addNewMonthlyExpense(YearMonth yearMonth, LocalDate startDate, LocalDate endDate) {
-        MonthlyExpenses dto = new MonthlyExpenses(yearMonth, startDate, endDate);
-        MonthlyExpenseEntity entity = new MonthlyExpenseEntity(yearMonth.getYear(), yearMonth.getMonthValue(), startDate, endDate,
-                dto.getExpenseName());
+    public MonthlyExpenses addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate) {
+        MonthlyExpenses dto = new MonthlyExpenses(expenseName, startDate, endDate);
+        MonthlyExpenseEntity entity = new MonthlyExpenseEntity(
+                dto.getYearMonth().getYear(),
+                dto.getYearMonth().getMonthValue(),
+                startDate,
+                endDate,
+                dto.getExpenseName()
+        );
         repository.save(entity);
         return dto;
     }
@@ -74,7 +79,7 @@ public class ExpenseManager {
 
     private MonthlyExpenses toDto(MonthlyExpenseEntity entity) {
         MonthlyExpenses dto = new MonthlyExpenses(
-                YearMonth.of(entity.getYear(), entity.getMonth()),
+                entity.getExpenseName(),
                 entity.getStartDate(),
                 entity.getEndDate());
         for (IncomeEntity ie : entity.getIncomes()) {

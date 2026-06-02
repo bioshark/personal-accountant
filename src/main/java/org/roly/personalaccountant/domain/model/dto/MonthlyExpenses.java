@@ -16,29 +16,27 @@ public class MonthlyExpenses {
     private final LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> payments;
     private final LocalDate startDate;
     private final ReactiveList<BaseTransaction> incomes;
-    // TODO change this to String.
     private final YearMonth yearMonth;
     private final OverallSumsTracker statistics;
     private final String expenseName;
 
-    public MonthlyExpenses(YearMonth yearMonth, LocalDate startDate, LocalDate endDate) {
+    public MonthlyExpenses(String expenseName, LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.incomes = new ReactiveList<>();
         this.payments = PaymentsGenerator.initializeEmptyMonth(startDate, endDate);
-        this.yearMonth = computeMonth(yearMonth, this.payments.keySet());
-        this.expenseName = initCap(yearMonth.getMonth().toString()) + " " + yearMonth.getYear();
+        this.yearMonth = computeMonth(this.payments.keySet());
+        this.expenseName = expenseName == null ?
+                initCap(yearMonth.getMonth().toString()) + " " + yearMonth.getYear() :
+                expenseName;
         this.statistics = new OverallSumsTracker(payments.keySet());
         registrations();
     }
 
-    private YearMonth computeMonth(YearMonth yearMonth, Set<LocalDate> localDates) {
-        if (yearMonth != null) {
-            return yearMonth;
-        }
+    private YearMonth computeMonth(Set<LocalDate> localDates) {
         if (!localDates.isEmpty()) {
             return YearMonth.from(localDates.stream().skip(localDates.size() / 2).findFirst().orElseThrow());
         }
-        return null;
+        throw new IllegalArgumentException("No dates found");
     }
 
     private void registrations() {

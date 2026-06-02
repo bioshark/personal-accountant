@@ -37,7 +37,7 @@ class ExpenseManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager.addNewMonthlyExpense(EXPENSE_MONTH, START_DATE);
+        manager.addNewMonthlyExpense(EXPENSE_MONTH.toString(), START_DATE, null);
     }
 
     @AfterEach
