@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 public class IncomeEntity {
@@ -54,5 +55,24 @@ public class IncomeEntity {
 
     public void setMonthlyExpense(MonthlyExpenseEntity monthlyExpense) {
         this.monthlyExpense = monthlyExpense;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        IncomeEntity that = (IncomeEntity) o;
+        return Double.compare(value, that.value) == 0 && Objects.equals(source, that.source) && Objects.equals(date,
+                that.date);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hashCode(source);
+        result = 31 * result + Objects.hashCode(date);
+        result = 31 * result + Double.hashCode(value);
+        return result;
     }
 }

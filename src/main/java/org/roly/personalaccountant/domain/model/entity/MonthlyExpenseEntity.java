@@ -86,4 +86,9 @@ public class MonthlyExpenseEntity {
         incomes.add(income);
         income.setMonthlyExpense(this);
     }
+
+    public void removeIncome(IncomeEntity income) {
+        incomes.remove(income);
+    }
+
 }

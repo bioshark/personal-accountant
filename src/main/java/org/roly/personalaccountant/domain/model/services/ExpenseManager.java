@@ -59,6 +59,14 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
+    public MonthlyExpenseEntity removeIncome(Income income) {
+        MonthlyExpenseEntity entity = findExpenseForDate(income.date());
+        entity.removeIncome(new IncomeEntity(income.source(), income.date(), income.value()));
+//        repository.delete(entity);
+        return entity;
+    }
+
+
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .map(this::toDto)
