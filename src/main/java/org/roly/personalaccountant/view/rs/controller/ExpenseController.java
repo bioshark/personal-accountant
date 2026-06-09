@@ -67,7 +67,7 @@ public class ExpenseController {
     public ResponseEntity<Void> addIncome(@RequestParam("source") String source,
             @RequestParam("date") LocalDate date,
             @RequestParam("value") double value) {
-        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addIncome(new Income(source, date, value));
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addIncome(new Income(null, source, date, value));
         if (monthlyExpenseEntity != null) {
             return ResponseEntity.ok().build();
         }
@@ -78,7 +78,7 @@ public class ExpenseController {
     public ResponseEntity<Void> removeIncome(@RequestParam("source") String source,
             @RequestParam("date") LocalDate date,
             @RequestParam("value") double value) {
-        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.removeIncome(new Income(source, date, value));
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.removeIncome(new Income(null, source, date, value));
         if (monthlyExpenseEntity != null) {
             return ResponseEntity.ok().build();
         }

@@ -6,6 +6,7 @@ import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
+import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,8 +39,15 @@ public class ExpenseWebController {
     @PostMapping("/month/addincome")
     public String addIncome(@RequestParam String source, @RequestParam LocalDate date,
             @RequestParam double value) {
-        expenseManager.addIncome(new Income(source, date, value));
+        expenseManager.addIncome(new Income(null, source, date, value));
         return "redirect:/month/" + YearMonth.from(date);
+    }
+
+    @PostMapping("/month/removeincome/{incomeId}")
+    public String removeIncome(@PathVariable Long incomeId) {
+        MonthlyExpenseEntity entity = expenseManager.removeIncomeById(incomeId);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
     }
 
     @PostMapping("/month/generate")

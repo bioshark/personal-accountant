@@ -54,6 +54,7 @@
           <th>Source</th>
           <th>Date</th>
           <th class="text-end">Amount</th>
+          <th></th>
         </tr>
         </thead>
         <tbody>
@@ -61,6 +62,12 @@
           <td th:text="${income.source}"></td>
           <td th:text="${income.date}"></td>
           <td class="text-end" th:text="${#numbers.formatDecimal(income.value, 1, 2)}"></td>
+          <td class="text-end">
+            <form method="post" th:action="@{/month/removeincome/{id}(id=${income.id})}" style="display:inline;"
+                  onsubmit="return confirm('Delete this income?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+            </form>
+          </td>
         </tr>
         </tbody>
       </table>

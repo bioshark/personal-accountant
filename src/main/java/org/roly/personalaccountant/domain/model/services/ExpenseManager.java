@@ -62,10 +62,17 @@ public class ExpenseManager {
     public MonthlyExpenseEntity removeIncome(Income income) {
         MonthlyExpenseEntity entity = findExpenseForDate(income.date());
         entity.removeIncome(new IncomeEntity(income.source(), income.date(), income.value()));
-//        repository.delete(entity);
-        return entity;
+        return repository.save(entity);
     }
 
+    public MonthlyExpenseEntity removeIncomeById(Long incomeId) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
+        entity.getIncomes().removeIf(i -> i.getId().equals(incomeId));
+        return repository.save(entity);
+    }
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
@@ -102,7 +109,7 @@ public class ExpenseManager {
                 entity.getStartDate(),
                 entity.getEndDate());
         for (IncomeEntity ie : entity.getIncomes()) {
-            dto.addIncome(new Income(ie.getSource(), ie.getDate(), ie.getValue()));
+            dto.addIncome(new Income(ie.getId(), ie.getSource(), ie.getDate(), ie.getValue()));
         }
         for (PaymentEntity pe : entity.getPayments()) {
             dto.addPayment(new Payment(pe.getDescription(), pe.getCategory(), pe.getType(), pe.getAmount(), pe.getDate()));

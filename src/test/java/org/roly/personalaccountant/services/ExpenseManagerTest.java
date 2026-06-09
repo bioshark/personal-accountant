@@ -11,7 +11,6 @@ import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.L
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ExpenseManagerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
-    public static final Income INVALID_INCOME = new Income("salariu", START_DATE, 1122.0d);
-    public static final Income WAGE_INCOME = new Income("Wage", START_DATE.plusDays(1), 1122.0d);
+    public static final Income INVALID_INCOME = new Income(null, "salariu", START_DATE, 1122.0d);
+    public static final Income WAGE_INCOME = new Income(null, "Wage", START_DATE.plusDays(1), 1122.0d);
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
     private static final String EXPENSE_MONTH_NAME = "June 2025";
@@ -37,7 +36,7 @@ class ExpenseManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager.addNewMonthlyExpense(EXPENSE_MONTH.toString(), START_DATE, null);
+        manager.addNewMonthlyExpense(null, START_DATE, null);
     }
 
     @AfterEach
@@ -89,7 +88,10 @@ class ExpenseManagerTest {
 
         assertThat(monthlyExpenseEntity).isNotNull();
         assertThat(monthlyExpenseEntity.getIncomes().getFirst().getValue()).isEqualTo(WAGE_INCOME.value());
-        assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes()).containsAll(List.of(WAGE_INCOME));
+        assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes())
+                .anyMatch(i -> ((Income) i).source().equals(WAGE_INCOME.source())
+                        && ((Income) i).date().equals(WAGE_INCOME.date())
+                        && ((Income) i).value() == WAGE_INCOME.value());
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashTotal()).isEqualTo(WAGE_INCOME.value());
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(WAGE_INCOME.value());
     }
