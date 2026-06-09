@@ -74,6 +74,20 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
+    public MonthlyExpenseEntity editIncome(Long incomeId, String source, LocalDate date, double value) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
+        IncomeEntity income = entity.getIncomes().stream()
+                .filter(i -> i.getId().equals(incomeId))
+                .findFirst().orElseThrow();
+        income.setSource(source);
+        income.setDate(date);
+        income.setValue(value);
+        return repository.save(entity);
+    }
+
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .map(this::toDto)

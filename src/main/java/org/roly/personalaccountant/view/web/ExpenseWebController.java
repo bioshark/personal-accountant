@@ -50,6 +50,14 @@ public class ExpenseWebController {
         return "redirect:/month/" + ym;
     }
 
+    @PostMapping("/month/editincome/{incomeId}")
+    public String editIncome(@PathVariable Long incomeId, @RequestParam String source,
+            @RequestParam LocalDate date, @RequestParam double value) {
+        MonthlyExpenseEntity entity = expenseManager.editIncome(incomeId, source, date, value);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
+
     @PostMapping("/month/generate")
     public String generateExpense(@RequestParam(required = false) String expenseName, @RequestParam LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate) {

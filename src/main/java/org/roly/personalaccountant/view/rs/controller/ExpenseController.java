@@ -85,6 +85,18 @@ public class ExpenseController {
         return ResponseEntity.internalServerError().build();
     }
 
+    @PostMapping("/editIncome")
+    public ResponseEntity<Void> editIncome(@RequestParam("id") Long id,
+            @RequestParam("source") String source,
+            @RequestParam("date") LocalDate date,
+            @RequestParam("value") double value) {
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.editIncome(id, source, date, value);
+        if (monthlyExpenseEntity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
 
     @PostMapping("/addpayment")
     public ResponseEntity<Void> addPayment(@RequestParam("description") String description,

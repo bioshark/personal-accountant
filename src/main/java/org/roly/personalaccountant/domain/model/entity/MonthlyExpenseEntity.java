@@ -91,4 +91,7 @@ public class MonthlyExpenseEntity {
         incomes.remove(income);
     }
 
+    private void editIncome(IncomeEntity newIncome) {
+
+    }
 }
