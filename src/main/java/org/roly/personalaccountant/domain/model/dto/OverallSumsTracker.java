@@ -20,7 +20,6 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private double cashTotal;
     private double cashLeft;
     private double fixedExpenseTotal;
-    // TODO the value has  to be more than the payment.amount sum. need to keep track of stats like: week-end day, estimate for the day and diff to it.
     private final Map<LocalDate, DailyStatistics> dailyPayments = new HashMap<>();
 
     public OverallSumsTracker(Set<LocalDate> days) {

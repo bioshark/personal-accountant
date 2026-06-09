@@ -7,7 +7,7 @@ import java.util.Objects;
 public class DailyStatistics {
 
     private static final int DEFAULT_MAX_ALLOCATION = 10;
-    private static final int WEEKEND_MAX_ALLOCATION = 100;
+    private static final int SATURDAY_MAX_ALLOCATION = 100;
     private final LocalDate date;
     private final double dailyMaxAllocation;
 
@@ -16,14 +16,14 @@ public class DailyStatistics {
 
     public DailyStatistics(LocalDate date) {
         this.date = date;
-        this.dailyMaxAllocation = isWeekEnd() ? WEEKEND_MAX_ALLOCATION : DEFAULT_MAX_ALLOCATION;
+        this.dailyMaxAllocation = isSaturday() ? SATURDAY_MAX_ALLOCATION : DEFAULT_MAX_ALLOCATION;
     }
 
-    private LocalDate getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    private double getDailyMaxAllocation() {
+    public double getDailyMaxAllocation() {
         return dailyMaxAllocation;
     }
 
@@ -35,8 +35,8 @@ public class DailyStatistics {
         this.dailyTotalExpenditure += dailyTotalExpenditure;
     }
 
-    public boolean isWeekEnd() {
-        return (this.date.getDayOfWeek() == DayOfWeek.SATURDAY || this.date.getDayOfWeek() == DayOfWeek.SUNDAY);
+    public boolean isSaturday() {
+        return (this.date.getDayOfWeek() == DayOfWeek.SATURDAY);
     }
 
     public double getDailyDifference() {
