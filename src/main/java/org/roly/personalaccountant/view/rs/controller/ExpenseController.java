@@ -104,7 +104,34 @@ public class ExpenseController {
             @RequestParam("type") PaymentType type,
             @RequestParam("amount") double amount,
             @RequestParam("date") LocalDate date) {
-        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addPayment(new Payment(description, category, type, amount, date));
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
+        if (monthlyExpenseEntity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
+    @PostMapping("/removePayment")
+    public ResponseEntity<Void> removePayment(@RequestParam("description") String description,
+            @RequestParam("category") Category category,
+            @RequestParam("type") PaymentType type,
+            @RequestParam("amount") double amount,
+            @RequestParam("date") LocalDate date) {
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.removePayment(new Payment(null, description, category, type, amount, date));
+        if (monthlyExpenseEntity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
+    @PostMapping("/editPayment")
+    public ResponseEntity<Void> editPayment(@RequestParam("id") Long id,
+            @RequestParam("description") String description,
+            @RequestParam("category") Category category,
+            @RequestParam("type") PaymentType type,
+            @RequestParam("amount") double amount,
+            @RequestParam("date") LocalDate date) {
+        MonthlyExpenseEntity monthlyExpenseEntity = expenseManager.editPayment(id, description, date, amount, type, category);
         if (monthlyExpenseEntity != null) {
             return ResponseEntity.ok().build();
         }

@@ -68,8 +68,24 @@ public class ExpenseWebController {
     @PostMapping("/month/addpayment")
     public String addPayment(@RequestParam String description, @RequestParam Category category,
             @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date) {
-        expenseManager.addPayment(new Payment(description, category, type, amount, date));
+        expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
         return "redirect:/month/" + YearMonth.from(date);
+    }
+
+    @PostMapping("/month/removepayment/{paymentId}")
+    public String removePayment(@PathVariable Long paymentId) {
+        MonthlyExpenseEntity entity = expenseManager.removePaymentById(paymentId);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
+
+    @PostMapping("/month/editpayment/{paymentId}")
+    public String editPayment(@PathVariable Long paymentId, @RequestParam String description,
+            @RequestParam Category category, @RequestParam PaymentType type,
+            @RequestParam double amount, @RequestParam LocalDate date) {
+        MonthlyExpenseEntity entity = expenseManager.editPayment(paymentId, description, date, amount, type, category);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
     }
 
     @PostMapping("/month/delete/{yearMonth}")

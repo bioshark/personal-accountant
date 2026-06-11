@@ -55,29 +55,33 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentToExpense() {
-        Payment payment = new Payment("food", FOOD, FIXED, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, "food", FOOD, FIXED, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
-        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE))
+                .anyMatch(p -> ((Payment) p).description().equals(payment.description())
+                        && ((Payment) p).amount().equals(payment.amount()));
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(-1 * payment.amount());
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(payment.amount());
     }
 
     @Test
     void shouldNotAddPaymentToFixedExpense() {
-        Payment payment = new Payment("food", MEDIA, LEISURE, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, "food", MEDIA, LEISURE, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
-        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).contains(payment);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE))
+                .anyMatch(p -> ((Payment) p).description().equals(payment.description())
+                        && ((Payment) p).amount().equals(payment.amount()));
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getCashLeft()).isEqualTo(-1 * payment.amount());
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isZero();
     }
 
     @Test
     void shouldNotAddPaymentToNonExistentExpenseDay() {
-        Payment payment = new Payment("food", FOOD, DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
+        Payment payment = new Payment(null, "food", FOOD, DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
 
         assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
     }

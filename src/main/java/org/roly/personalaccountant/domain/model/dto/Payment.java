@@ -3,6 +3,7 @@ package org.roly.personalaccountant.domain.model.dto;
 import java.time.LocalDate;
 
 public record Payment(
+        Long id,
         String description,
         Category category,
         PaymentType type,

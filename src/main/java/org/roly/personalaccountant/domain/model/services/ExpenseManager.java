@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
+import org.roly.personalaccountant.domain.model.dto.Payment.Category;
+import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.IncomeEntity;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.entity.PaymentEntity;
@@ -50,6 +52,37 @@ public class ExpenseManager {
         LocalDate paymentDate = payment.date();
         MonthlyExpenseEntity entity = findExpenseForDate(paymentDate);
         entity.addPayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity removePayment(Payment payment) {
+        MonthlyExpenseEntity entity = findExpenseForDate(payment.date());
+        entity.removePayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity removePaymentById(Long paymentId) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+        entity.getPayments().removeIf(i -> i.getId().equals(paymentId));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity editPayment(Long paymentId, String description, LocalDate date, double amount, PaymentType type, Category category) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+        PaymentEntity payment = entity.getPayments().stream()
+                .filter(p -> p.getId().equals(paymentId))
+                .findFirst().orElseThrow();
+        payment.setDescription(description);
+        payment.setDate(date);
+        payment.setAmount(amount);
+        payment.setType(type);
+        payment.setCategory(category);
         return repository.save(entity);
     }
 
@@ -122,11 +155,12 @@ public class ExpenseManager {
                 entity.getExpenseName(),
                 entity.getStartDate(),
                 entity.getEndDate());
-        for (IncomeEntity ie : entity.getIncomes()) {
-            dto.addIncome(new Income(ie.getId(), ie.getSource(), ie.getDate(), ie.getValue()));
+        for (IncomeEntity income : entity.getIncomes()) {
+            dto.addIncome(new Income(income.getId(), income.getSource(), income.getDate(), income.getValue()));
         }
-        for (PaymentEntity pe : entity.getPayments()) {
-            dto.addPayment(new Payment(pe.getDescription(), pe.getCategory(), pe.getType(), pe.getAmount(), pe.getDate()));
+        for (PaymentEntity payment : entity.getPayments()) {
+            dto.addPayment(new Payment(payment.getId(), payment.getDescription(), payment.getCategory(), payment.getType(), payment.getAmount(),
+                    payment.getDate()));
         }
         return dto;
     }

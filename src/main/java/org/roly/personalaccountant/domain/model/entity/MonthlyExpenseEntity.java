@@ -91,6 +91,10 @@ public class MonthlyExpenseEntity {
         incomes.remove(income);
     }
 
+    public void removePayment(PaymentEntity payment) {
+        payments.remove(payment);
+    }
+
     private void editIncome(IncomeEntity newIncome) {
 
     }
