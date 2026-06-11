@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ExpenseWebController {
@@ -26,7 +27,10 @@ public class ExpenseWebController {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("expenses", expenseManager.getExpenses().values());
+        var expenses = expenseManager.getExpenses().values().stream()
+                .sorted((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
+                .toList();
+        model.addAttribute("expenses", expenses);
         return "index";
     }
 
@@ -60,8 +64,12 @@ public class ExpenseWebController {
 
     @PostMapping("/month/generate")
     public String generateExpense(@RequestParam(required = false) String expenseName, @RequestParam LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
-        expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+            @RequestParam(required = false) LocalDate endDate, RedirectAttributes redirectAttributes) {
+        try {
+            expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/";
     }
 

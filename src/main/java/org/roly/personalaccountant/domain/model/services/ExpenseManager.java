@@ -27,6 +27,9 @@ public class ExpenseManager {
 
     public MonthlyExpenses addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate) {
         MonthlyExpenses dto = new MonthlyExpenses(expenseName, startDate, endDate);
+        if (repository.findByYearAndMonth(dto.getYearMonth().getYear(), dto.getYearMonth().getMonthValue()).isPresent()) {
+            throw new IllegalArgumentException("An expense for " + dto.getYearMonth() + " already exists");
+        }
         MonthlyExpenseEntity entity = new MonthlyExpenseEntity(
                 dto.getYearMonth().getYear(),
                 dto.getYearMonth().getMonthValue(),

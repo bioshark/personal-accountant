@@ -60,6 +60,10 @@ public class MonthlyExpenses {
         return startDate;
     }
 
+    public LocalDate getEndDate() {
+        return payments.sequencedKeySet().getLast();
+    }
+
     public List<BaseTransaction> getIncomes() {
         return List.copyOf(incomes);
     }

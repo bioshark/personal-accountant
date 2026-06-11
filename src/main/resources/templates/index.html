@@ -14,6 +14,11 @@
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateModal">+ New Month</button>
   </div>
 
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
   <div th:if="${#lists.isEmpty(expenses)}" class="alert alert-info">No expenses recorded yet.</div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -21,7 +26,9 @@
       <div class="card h-100 shadow-sm">
         <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
           <div class="card-body">
-            <h5 class="card-title" th:text="${expense.expenseName}"></h5>
+            <h5 class="card-title" th:text="${expense.expenseName}"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                th:title="${#temporals.format(expense.startDate, 'dd MMM')} + ' → ' + ${#temporals.format(expense.endDate, 'dd MMM')}"></h5>
             <ul class="list-unstyled mb-0">
               <li><strong>Income:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span></li>
               <li><strong>Cash Left:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span></li>
@@ -73,5 +80,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+</script>
 </body>
 </html>
