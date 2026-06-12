@@ -33,8 +33,16 @@
     <div class="col-md-4">
       <div class="card text-bg-warning">
         <div class="card-body">
-          <h6 class="card-title">Fixed Expenses</h6>
-          <p class="card-text fs-4" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></p>
+          <div class="d-flex justify-content-between">
+            <div>
+              <h6 class="card-title">Fixed</h6>
+              <p class="card-text fs-5" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></p>
+            </div>
+            <div class="text-end">
+              <h6 class="card-title">Daily</h6>
+              <p class="card-text fs-5" th:text="${#numbers.formatDecimal(expense.statistics.dailyExpenseTotal, 1, 2)}"></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -88,8 +96,14 @@
                 th:style="${expense.statistics.dailyPayments[entry.key]?.saturday} ? 'background-color: #e9ecef;' : ''"
                 th:text="${#temporals.format(entry.key, 'dd MMM, EEEE')}">
         </button>
-        <span class="position-absolute top-50 translate-middle-y d-flex"
+        <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y"
               style="right: 3rem; z-index: 3;">
+          <input type="hidden" name="date" th:value="${entry.key}">
+          <input type="checkbox" class="form-check-input" onchange="this.form.submit()"
+                 th:checked="${expense.statistics.dailyPayments[entry.key]?.dayDone}">
+        </form>
+        <span class="position-absolute top-50 translate-middle-y d-flex"
+              style="right: 5rem; z-index: 3;">
           <span class="badge bg-secondary d-inline-block text-center"
                 style="width: 10rem;"
                 th:text="'Spent: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 1)}"></span>

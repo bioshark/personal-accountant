@@ -12,7 +12,7 @@ public class DailyStatistics {
     private final double dailyMaxAllocation;
 
     private double dailyTotalExpenditure = 0.0d;
-//    private boolean isDayDone;
+    private boolean isDayDone = false;
 
     public DailyStatistics(LocalDate date) {
         this.date = date;
@@ -40,7 +40,18 @@ public class DailyStatistics {
     }
 
     public double getDailyDifference() {
-        return getDailyMaxAllocation() - getDailyTotalExpenditure();
+        if (isDayDone()) {
+            return getDailyMaxAllocation() - getDailyTotalExpenditure();
+        }
+        return 0.0d;
+    }
+
+    public boolean isDayDone() {
+        return isDayDone;
+    }
+
+    public void setDayDone(boolean dayDone) {
+        isDayDone = dayDone;
     }
 
     @Override

@@ -130,6 +130,12 @@ public class ExpenseManager {
                 .orElse(null);
     }
 
+    public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
+        MonthlyExpenseEntity entity = findExpenseForDate(date);
+        entity.toggleDayDone(date);
+        return repository.save(entity);
+    }
+
     public Map<YearMonth, MonthlyExpenses> getExpenses() {
         Map<YearMonth, MonthlyExpenses> result = new LinkedHashMap<>();
         for (MonthlyExpenseEntity entity : repository.findAll()) {
@@ -164,6 +170,12 @@ public class ExpenseManager {
         for (PaymentEntity payment : entity.getPayments()) {
             dto.addPayment(new Payment(payment.getId(), payment.getDescription(), payment.getCategory(), payment.getType(), payment.getAmount(),
                     payment.getDate()));
+        }
+        for (LocalDate doneDay : entity.getDoneDays()) {
+            var stats = dto.getStatistics().getDailyPayments().get(doneDay);
+            if (stats != null) {
+                stats.setDayDone(true);
+            }
         }
         return dto;
     }

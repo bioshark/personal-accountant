@@ -101,4 +101,11 @@ public class ExpenseWebController {
         expenseManager.deleteMonthlyExpense(yearMonth);
         return "redirect:/";
     }
+
+    @PostMapping("/month/toggleday")
+    public String toggleDayDone(@RequestParam LocalDate date) {
+        MonthlyExpenseEntity entity = expenseManager.toggleDayDone(date);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
 }

@@ -20,6 +20,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private double cashTotal;
     private double cashLeft;
     private double fixedExpenseTotal;
+    private double dailyExpenseTotal;
     private final Map<LocalDate, DailyStatistics> dailyPayments = new HashMap<>();
 
     public OverallSumsTracker(Set<LocalDate> days) {
@@ -35,6 +36,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
                     fixedExpenseTotal += payment.amount();
                 } else if (payment.type() == PaymentType.DAILY) {
                     dailyPayments.get(payment.date()).addDailyExpenditure(payment.amount());
+                    dailyExpenseTotal += payment.amount();
                 }
             }
             case Income income -> {
@@ -55,6 +57,10 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
 
     public double getFixedExpenseTotal() {
         return fixedExpenseTotal;
+    }
+
+    public double getDailyExpenseTotal() {
+        return dailyExpenseTotal;
     }
 
     public Map<LocalDate, DailyStatistics> getDailyPayments() {

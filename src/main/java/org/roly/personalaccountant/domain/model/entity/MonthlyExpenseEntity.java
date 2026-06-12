@@ -2,6 +2,7 @@ package org.roly.personalaccountant.domain.model.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"expense_year", "expense_month"}))
@@ -36,6 +39,9 @@ public class MonthlyExpenseEntity {
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<IncomeEntity> incomes = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<LocalDate> doneDays = new HashSet<>();
 
     protected MonthlyExpenseEntity() {
     }
@@ -96,6 +102,16 @@ public class MonthlyExpenseEntity {
 
     public void removePayment(PaymentEntity payment) {
         payments.remove(payment);
+    }
+
+    public Set<LocalDate> getDoneDays() {
+        return doneDays;
+    }
+
+    public void toggleDayDone(LocalDate date) {
+        if (!doneDays.remove(date)) {
+            doneDays.add(date);
+        }
     }
 
     private void editIncome(IncomeEntity newIncome) {
