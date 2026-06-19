@@ -93,24 +93,24 @@
         <button class="accordion-button collapsed" type="button"
                 data-bs-toggle="collapse"
                 th:attr="data-bs-target='#day-' + ${iter.index}"
-                th:style="${expense.statistics.dailyPayments[entry.key]?.saturday} ? 'background-color: #e9ecef;' : ''"
+                th:style="(${expense.statistics.dailyPayments[entry.key]?.weekEnd} ? 'background-color: #e9ecef;' : '') + (${expense.statistics.dailyPayments[entry.key]?.dayDone} ? ' font-style: italic; color: #6c757d;' : '')"
                 th:text="${#temporals.format(entry.key, 'dd MMM, EEEE')}">
         </button>
-        <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y"
+        <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y d-flex align-items-center"
               style="right: 3rem; z-index: 3;">
           <input type="hidden" name="date" th:value="${entry.key}">
           <input type="checkbox" class="form-check-input" onchange="this.form.submit()"
                  th:checked="${expense.statistics.dailyPayments[entry.key]?.dayDone}">
         </form>
         <span class="position-absolute top-50 translate-middle-y d-flex"
-              style="right: 5rem; z-index: 3;">
+              style="right: 6.5rem; z-index: 3;">
           <span class="badge bg-secondary d-inline-block text-center"
                 style="width: 10rem;"
-                th:text="'Spent: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 1)}"></span>
+                th:text="'Spent: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 2)}"></span>
           <span class="badge d-inline-block text-center ms-1"
                 style="width: 10rem;"
                 th:classappend="${expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0} >= 0 ? 'bg-success' : 'bg-danger'"
-                th:text="'Diff: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0, 1, 1)}"></span>
+                th:text="'Diff: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0, 1, 2)}"></span>
         </span>
       </h2>
       <div th:id="'day-' + ${iter.index}" class="accordion-collapse collapse" data-bs-parent="#paymentsAccordion">

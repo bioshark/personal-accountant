@@ -39,6 +39,10 @@ public class DailyStatistics {
         return (this.date.getDayOfWeek() == DayOfWeek.SATURDAY);
     }
 
+    public boolean isWeekEnd() {
+        return (this.date.getDayOfWeek() == DayOfWeek.SATURDAY || this.date.getDayOfWeek() == DayOfWeek.SUNDAY);
+    }
+
     public double getDailyDifference() {
         if (isDayDone()) {
             return getDailyMaxAllocation() - getDailyTotalExpenditure();
