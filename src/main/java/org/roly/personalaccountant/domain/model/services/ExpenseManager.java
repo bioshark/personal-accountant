@@ -10,9 +10,11 @@ import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
+import org.roly.personalaccountant.domain.model.dto.Saving;
 import org.roly.personalaccountant.domain.model.entity.IncomeEntity;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.entity.PaymentEntity;
+import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
 import org.springframework.stereotype.Service;
 
@@ -136,6 +138,35 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
+    public MonthlyExpenseEntity addSaving(YearMonth yearMonth, String name, double percentage) {
+        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        entity.addSaving(new SavingEntity(name, percentage));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity removeSavingById(Long savingId) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getSavings().stream().anyMatch(s -> s.getId().equals(savingId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Saving not found: " + savingId));
+        entity.getSavings().removeIf(s -> s.getId().equals(savingId));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity editSaving(Long savingId, String name, double percentage) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getSavings().stream().anyMatch(s -> s.getId().equals(savingId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Saving not found: " + savingId));
+        SavingEntity saving = entity.getSavings().stream()
+                .filter(s -> s.getId().equals(savingId))
+                .findFirst().orElseThrow();
+        saving.setName(name);
+        saving.setPercentage(percentage);
+        return repository.save(entity);
+    }
+
     public Map<YearMonth, MonthlyExpenses> getExpenses() {
         Map<YearMonth, MonthlyExpenses> result = new LinkedHashMap<>();
         for (MonthlyExpenseEntity entity : repository.findAll()) {
@@ -170,6 +201,9 @@ public class ExpenseManager {
         for (PaymentEntity payment : entity.getPayments()) {
             dto.addPayment(new Payment(payment.getId(), payment.getDescription(), payment.getCategory(), payment.getType(), payment.getAmount(),
                     payment.getDate()));
+        }
+        for (SavingEntity saving : entity.getSavings()) {
+            dto.getStatistics().addSaving(new Saving(saving.getId(), saving.getName(), saving.getPercentage()));
         }
         for (LocalDate doneDay : entity.getDoneDays()) {
             var stats = dto.getStatistics().getDailyPayments().get(doneDay);

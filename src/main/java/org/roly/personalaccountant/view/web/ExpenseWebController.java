@@ -108,4 +108,26 @@ public class ExpenseWebController {
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
         return "redirect:/month/" + ym;
     }
+
+    @PostMapping("/month/addsaving/{yearMonth}")
+    public String addSaving(@PathVariable YearMonth yearMonth, @RequestParam String name,
+            @RequestParam double percentage) {
+        expenseManager.addSaving(yearMonth, name, percentage);
+        return "redirect:/month/" + yearMonth;
+    }
+
+    @PostMapping("/month/removesaving/{savingId}")
+    public String removeSaving(@PathVariable Long savingId) {
+        MonthlyExpenseEntity entity = expenseManager.removeSavingById(savingId);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
+
+    @PostMapping("/month/editsaving/{savingId}")
+    public String editSaving(@PathVariable Long savingId, @RequestParam String name,
+            @RequestParam double percentage) {
+        MonthlyExpenseEntity entity = expenseManager.editSaving(savingId, name, percentage);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
 }

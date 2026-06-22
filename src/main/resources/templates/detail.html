@@ -15,32 +15,37 @@
   <!-- Summary -->
   <div class="row g-3 my-3">
     <div class="col-md-4">
-      <div class="card text-bg-success">
+      <div class="card text-bg-success h-100">
         <div class="card-body">
-          <h6 class="card-title">Total Income</h6>
-          <p class="card-text fs-4" th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></p>
+          <h6 class="card-title text-center">Total Income</h6>
+          <hr class="my-2">
+          <p class="card-text fs-4 text-center mb-0" th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></p>
         </div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card text-bg-info">
+      <div class="card text-bg-info h-100">
         <div class="card-body">
-          <h6 class="card-title">Cash Left</h6>
-          <p class="card-text fs-4" th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></p>
+          <h6 class="card-title text-center">Cash Left</h6>
+          <hr class="my-2">
+          <p class="card-text fs-4 text-center mb-0" th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></p>
         </div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="card text-bg-warning">
+      <div class="card text-bg-warning h-100">
         <div class="card-body">
+          <h6 class="card-title text-center">Expenses</h6>
+          <hr class="my-2">
           <div class="d-flex justify-content-between">
             <div>
-              <h6 class="card-title">Fixed</h6>
-              <p class="card-text fs-5" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></p>
+              <small class="text-muted">Fixed</small>
+              <p class="card-text fs-5 mb-0" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></p>
             </div>
+            <div class="vr mx-2"></div>
             <div class="text-end">
-              <h6 class="card-title">Daily</h6>
-              <p class="card-text fs-5" th:text="${#numbers.formatDecimal(expense.statistics.dailyExpenseTotal, 1, 2)}"></p>
+              <small class="text-muted">Daily</small>
+              <p class="card-text fs-5 mb-0" th:text="${#numbers.formatDecimal(expense.statistics.dailyExpenseTotal, 1, 2)}"></p>
             </div>
           </div>
         </div>
@@ -76,6 +81,43 @@
             </button>
             <form method="post" th:action="@{/month/removeincome/{id}(id=${income.id})}" style="display:inline;"
                   onsubmit="return confirm('Delete this income?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Savings -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Savings</h5>
+      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+ Add Saving</button>
+    </div>
+    <div class="card-body">
+      <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted">No savings defined.</div>
+      <table th:if="${!expense.statistics.savings.isEmpty()}" class="table table-sm mb-0">
+        <thead>
+        <tr>
+          <th>Name</th>
+          <th class="text-end">%</th>
+          <th class="text-end">Value</th>
+          <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="saving, sIter : ${expense.statistics.savings}">
+          <td th:text="${saving.name}"></td>
+          <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 2)}"></td>
+          <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
+          <td class="text-end text-nowrap">
+            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                    th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
+            </button>
+            <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
+                  onsubmit="return confirm('Delete this saving?');">
               <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
             </form>
           </td>
@@ -265,6 +307,64 @@
           <button type="submit" class="btn btn-success">Add</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Saving Modal -->
+<div class="modal fade" id="addSavingModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" th:action="@{/month/addsaving/{ym}(ym=${expense.yearMonth})}">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Saving</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Percentage</label>
+            <input type="number" step="0.01" class="form-control" name="percentage" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-success">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Saving Modals -->
+<div th:each="saving, sIter : ${expense.statistics.savings}">
+  <div class="modal fade" th:id="'editSavingModal-' + ${sIter.index}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" th:action="@{/month/editsaving/{id}(id=${saving.id})}">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Saving</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="name" th:value="${saving.name}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Percentage</label>
+              <input type="number" step="0.01" class="form-control" name="percentage" th:value="${saving.percentage}" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </div>

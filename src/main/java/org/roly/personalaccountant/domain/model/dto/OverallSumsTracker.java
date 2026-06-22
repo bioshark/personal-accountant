@@ -5,7 +5,9 @@ import static org.roly.personalaccountant.utils.StructuredLoggerHelper.action;
 import static org.roly.personalaccountant.utils.StructuredLoggerHelper.key;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
@@ -22,6 +24,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private double fixedExpenseTotal;
     private double dailyExpenseTotal;
     private final Map<LocalDate, DailyStatistics> dailyPayments = new HashMap<>();
+    private final List<Saving> savings = new ArrayList<>();
 
     public OverallSumsTracker(Set<LocalDate> days) {
         days.forEach(day -> dailyPayments.put(day, new DailyStatistics(day)));
@@ -45,6 +48,13 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
             }
             default -> LOGGER.error(ACTION_1_PARAMS, action("Transaction is of wrong type"), key(transaction));
         }
+        adjustSavings(cashLeft);
+    }
+
+    private void adjustSavings(double cashLeft) {
+        for (Saving saving : savings) {
+            saving.calculateValue(cashLeft);
+        }
     }
 
     public double getCashTotal() {
@@ -66,4 +76,19 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     public Map<LocalDate, DailyStatistics> getDailyPayments() {
         return Map.copyOf(dailyPayments);
     }
+
+    public List<Saving> getSavings() {
+        return List.copyOf(savings);
+    }
+
+    public void addSaving(Saving saving) {
+        this.savings.add(saving);
+        adjustSavings(cashLeft);
+    }
+
+    public void removeSaving(Saving saving) {
+        this.savings.remove(saving);
+        adjustSavings(cashLeft);
+    }
+
 }

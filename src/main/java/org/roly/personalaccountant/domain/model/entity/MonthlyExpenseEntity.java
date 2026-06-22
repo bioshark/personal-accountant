@@ -43,6 +43,9 @@ public class MonthlyExpenseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<LocalDate> doneDays = new HashSet<>();
 
+    @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<SavingEntity> savings = new ArrayList<>();
+
     protected MonthlyExpenseEntity() {
     }
 
@@ -106,6 +109,15 @@ public class MonthlyExpenseEntity {
 
     public Set<LocalDate> getDoneDays() {
         return doneDays;
+    }
+
+    public List<SavingEntity> getSavings() {
+        return savings;
+    }
+
+    public void addSaving(SavingEntity saving) {
+        savings.add(saving);
+        saving.setMonthlyExpense(this);
     }
 
     public void toggleDayDone(LocalDate date) {

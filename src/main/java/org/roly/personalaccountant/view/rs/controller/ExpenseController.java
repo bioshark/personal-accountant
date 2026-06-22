@@ -138,4 +138,35 @@ public class ExpenseController {
         return ResponseEntity.internalServerError().build();
     }
 
+    @PostMapping("/addSaving")
+    public ResponseEntity<Void> addSaving(@RequestParam("yearMonth") YearMonth yearMonth,
+            @RequestParam("name") String name,
+            @RequestParam("percentage") double percentage) {
+        MonthlyExpenseEntity entity = expenseManager.addSaving(yearMonth, name, percentage);
+        if (entity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
+    @PostMapping("/removeSaving")
+    public ResponseEntity<Void> removeSaving(@RequestParam("id") Long id) {
+        MonthlyExpenseEntity entity = expenseManager.removeSavingById(id);
+        if (entity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
+    @PostMapping("/editSaving")
+    public ResponseEntity<Void> editSaving(@RequestParam("id") Long id,
+            @RequestParam("name") String name,
+            @RequestParam("percentage") double percentage) {
+        MonthlyExpenseEntity entity = expenseManager.editSaving(id, name, percentage);
+        if (entity != null) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.internalServerError().build();
+    }
+
 }
