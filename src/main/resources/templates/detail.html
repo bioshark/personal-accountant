@@ -8,11 +8,60 @@
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body class="bg-light">
-<div class="container py-4">
+<div class="container-fluid py-4 px-4">
   <a href="/" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back</a>
   <h1 th:text="${expense.expenseName}"></h1>
 
-  <!-- Summary -->
+  <div class="row">
+    <!-- Left Column: Savings -->
+    <div class="col-md-2 mt-4 pt-2">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Savings</h6>
+          <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+</button>
+        </div>
+        <div class="card-body p-2">
+          <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted small">No savings.</div>
+          <table th:if="${!expense.statistics.savings.isEmpty()}" class="table table-sm mb-0 small">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-end">%</th>
+              <th class="text-end">Val</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="saving, sIter : ${expense.statistics.savings}"
+                th:classappend="${saving.name == 'Unallocated'} ? 'table-info' : ''">
+              <td th:text="${saving.name}"></td>
+              <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 1)}"></td>
+              <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
+                </button>
+                <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
+                      onsubmit="return confirm('Delete this saving?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1">&times;</button>
+                </form>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Central Column -->
+    <div class="col-md-8">
+
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <!-- Summary -->
   <div class="row g-3 my-3">
     <div class="col-md-4">
       <div class="card text-bg-success h-100">
@@ -90,43 +139,6 @@
     </div>
   </div>
 
-  <!-- Savings -->
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Savings</h5>
-      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+ Add Saving</button>
-    </div>
-    <div class="card-body">
-      <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted">No savings defined.</div>
-      <table th:if="${!expense.statistics.savings.isEmpty()}" class="table table-sm mb-0">
-        <thead>
-        <tr>
-          <th>Name</th>
-          <th class="text-end">%</th>
-          <th class="text-end">Value</th>
-          <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="saving, sIter : ${expense.statistics.savings}">
-          <td th:text="${saving.name}"></td>
-          <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 2)}"></td>
-          <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
-          <td class="text-end text-nowrap">
-            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                    th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
-            </button>
-            <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
-                  onsubmit="return confirm('Delete this saving?');">
-              <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-            </form>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
   <!-- Payments by Day -->
   <h4 class="mb-3">Payments</h4>
   <div class="accordion" id="paymentsAccordion">
@@ -193,7 +205,32 @@
       </div>
     </div>
   </div>
-</div>
+    </div><!-- end central column -->
+
+    <!-- Right Column: Fixed Expenses -->
+    <div class="col-md-2 mt-4 pt-2">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">Fixed Expenses</h6>
+        </div>
+        <div class="card-body p-2">
+          <table class="table table-sm mb-0 small">
+            <tbody>
+            <th:block th:each="entry : ${expense.payments}">
+              <tr th:each="payment : ${entry.value}" th:if="${payment.fixed}">
+                <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
+                <td th:text="${payment.description}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
+              </tr>
+            </th:block>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end row -->
+</div><!-- end container -->
 
 <!-- Edit Payment Modals -->
 <th:block th:each="entry, iter : ${expense.payments}">

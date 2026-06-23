@@ -142,6 +142,8 @@ public class ExpenseManager {
     public MonthlyExpenseEntity addSaving(YearMonth yearMonth, String name, double percentage) {
         MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        MonthlyExpenses dto = toDto(entity);
+        dto.getStatistics().addSaving(new Saving(null, name, percentage));
         entity.addSaving(new SavingEntity(name, percentage));
         return repository.save(entity);
     }
