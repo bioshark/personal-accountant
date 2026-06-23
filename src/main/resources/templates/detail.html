@@ -147,11 +147,11 @@
         <span class="position-absolute top-50 translate-middle-y d-flex"
               style="right: 6.5rem; z-index: 3;">
           <span class="badge bg-secondary d-inline-block text-center"
-                style="width: 10rem;"
+                style="width: 11rem;"
                 th:text="'Spent: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 2)}"></span>
           <span class="badge d-inline-block text-center ms-1"
                 style="width: 10rem;"
-                th:classappend="${expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0} >= 0 ? 'bg-success' : 'bg-danger'"
+                th:classappend="${expense.statistics.dailyPayments[entry.key]?.dayDone} ? (${expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0} >= 0 ? 'bg-success' : 'bg-danger') : 'bg-secondary'"
                 th:text="'Diff: ' + ${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyDifference ?: 0.0, 1, 2)}"></span>
         </span>
       </h2>

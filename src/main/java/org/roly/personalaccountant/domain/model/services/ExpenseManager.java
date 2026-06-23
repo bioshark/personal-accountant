@@ -16,6 +16,7 @@ import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.entity.PaymentEntity;
 import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -191,6 +192,21 @@ public class ExpenseManager {
     }
 
     private MonthlyExpenses toDto(MonthlyExpenseEntity entity) {
+        MonthlyExpenses dto = getMonthlyExpenses(entity);
+        for (SavingEntity saving : entity.getSavings()) {
+            dto.getStatistics().addSaving(new Saving(saving.getId(), saving.getName(), saving.getPercentage()));
+        }
+        for (LocalDate doneDay : entity.getDoneDays()) {
+            var stats = dto.getStatistics().getDailyPayments().get(doneDay);
+            if (stats != null) {
+                stats.setDayDone(true);
+            }
+        }
+        return dto;
+    }
+
+    @NonNull
+    private static MonthlyExpenses getMonthlyExpenses(MonthlyExpenseEntity entity) {
         MonthlyExpenses dto = new MonthlyExpenses(
                 entity.getExpenseName(),
                 entity.getStartDate(),
@@ -201,15 +217,6 @@ public class ExpenseManager {
         for (PaymentEntity payment : entity.getPayments()) {
             dto.addPayment(new Payment(payment.getId(), payment.getDescription(), payment.getCategory(), payment.getType(), payment.getAmount(),
                     payment.getDate()));
-        }
-        for (SavingEntity saving : entity.getSavings()) {
-            dto.getStatistics().addSaving(new Saving(saving.getId(), saving.getName(), saving.getPercentage()));
-        }
-        for (LocalDate doneDay : entity.getDoneDays()) {
-            var stats = dto.getStatistics().getDailyPayments().get(doneDay);
-            if (stats != null) {
-                stats.setDayDone(true);
-            }
         }
         return dto;
     }
