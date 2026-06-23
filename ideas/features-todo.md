@@ -1,5 +1,13 @@
 # Feature Ideas
 
+## Fixed transaction
+
+- Group fixed transactions (rent)
+
+## Income
+
+- When adding new income, auto-fill the date with the first day of the period
+
 ## Recurring Transactions
 
 - Auto-generate fixed payments each month (rent, subscriptions, utilities)
