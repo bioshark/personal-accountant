@@ -19,7 +19,10 @@ public record Payment(
 
     public enum Category {
         FOOD,
-        MEDIA
+        MEDIA,
+        INVOICE,
+        HEALTH,
+        SAVING
     }
 
     public boolean isFixed() {

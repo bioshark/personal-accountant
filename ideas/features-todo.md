@@ -1,8 +1,30 @@
 # Feature Ideas
 
+
+## General stuff
+
+- New table under fixed for leisure types
+
+Note: ALTER TABLE PAYMENT_ENTITY
+ALTER COLUMN CATEGORY ENUM(
+'FOOD',
+'MEDIA',
+'INVOICE',
+'HEALTH',
+'SAVING'
+);
+
+- Expenses summary: Add also the leisure
+- Resize the 3 summaries: income and cash left smaller, expenses bigger.
+- The stat value with total leisure and fixed should be also displayed on their according tables.
+
+## Month
+- Edit start/end
+- what happens with the days "deleted" if the end is shortened?
+- 
 ## Fixed transaction
 
-- Group fixed transactions (rent)
+- Group fixed transactions?
 
 ## Income
 
@@ -28,11 +50,6 @@
 
 - CSV/OFX file import to avoid manual entry
 - Column mapping configuration
-
-## Currency Support
-
-- Multiple currencies per month
-- Exchange rate tracking
 
 ## Tags & Notes
 

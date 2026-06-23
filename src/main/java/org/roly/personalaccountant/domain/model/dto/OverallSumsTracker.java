@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.notifiers.Listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +26,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private double cashLeft;
     private double fixedExpenseTotal;
     private double dailyExpenseTotal;
+    private double leisureExpenseTotal;
 
     public OverallSumsTracker(Set<LocalDate> days) {
         days.forEach(day -> dailyPayments.put(day, new DailyStatistics(day)));
@@ -38,11 +38,13 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
         switch (transaction) {
             case Payment payment -> {
                 cashLeft -= payment.amount();
-                if (payment.isFixed()) {
-                    fixedExpenseTotal += payment.amount();
-                } else if (payment.type() == PaymentType.DAILY) {
-                    dailyPayments.get(payment.date()).addDailyExpenditure(payment.amount());
-                    dailyExpenseTotal += payment.amount();
+                switch (payment.type()) {
+                    case FIXED -> fixedExpenseTotal += payment.amount();
+                    case DAILY -> {
+                        dailyPayments.get(payment.date()).addDailyExpenditure(payment.amount());
+                        dailyExpenseTotal += payment.amount();
+                    }
+                    case LEISURE -> leisureExpenseTotal += payment.amount();
                 }
             }
             case Income income -> {
@@ -76,6 +78,10 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
         return dailyExpenseTotal;
     }
 
+    public double getLeisureExpenseTotal() {
+        return leisureExpenseTotal;
+    }
+
     public Map<LocalDate, DailyStatistics> getDailyPayments() {
         return Map.copyOf(dailyPayments);
     }
@@ -89,17 +95,17 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
             throw new IllegalArgumentException("Saving percentage is higher than unallocated percentage");
         }
         this.savings.add(saving);
-        adjustUnallocated(saving);
+        adjustUnallocated();
         adjustSavings(cashLeft);
     }
 
     public void removeSaving(Saving saving) {
         this.savings.remove(saving);
-        adjustUnallocated(saving);
+        adjustUnallocated();
         adjustSavings(cashLeft);
     }
 
-    private void adjustUnallocated(Saving saving) {
+    private void adjustUnallocated() {
         double allPercentages = this.savings.stream()
                 .filter(s -> !s.equals(this.defaultSaving))
                 .mapToDouble(Saving::getPercentage)
@@ -107,5 +113,4 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
         this.unallocatedPercentage = 100 - allPercentages;
         this.defaultSaving.setPercentage(unallocatedPercentage);
     }
-
 }
