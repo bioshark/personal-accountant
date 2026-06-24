@@ -28,4 +28,8 @@ public record Payment(
     public boolean isFixed() {
         return type == PaymentType.FIXED;
     }
+
+    public boolean isLeisure() {
+        return type == PaymentType.LEISURE;
+    }
 }

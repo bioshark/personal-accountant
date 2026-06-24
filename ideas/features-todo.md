@@ -3,20 +3,8 @@
 
 ## General stuff
 
-- New table under fixed for leisure types
-
-Note: ALTER TABLE PAYMENT_ENTITY
-ALTER COLUMN CATEGORY ENUM(
-'FOOD',
-'MEDIA',
-'INVOICE',
-'HEALTH',
-'SAVING'
-);
-
-- Expenses summary: Add also the leisure
-- Resize the 3 summaries: income and cash left smaller, expenses bigger.
-- The stat value with total leisure and fixed should be also displayed on their according tables.
+- checkbox color?
+-
 
 ## Month
 - Edit start/end
