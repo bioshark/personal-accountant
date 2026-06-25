@@ -21,10 +21,10 @@
     <developer/>
   </developers>
   <scm>
-    <connection/>
-    <developerConnection/>
-    <tag/>
-    <url/>
+    <connection>scm:git:git@github.com:bioshark/personal-accountant.git</connection>
+    <developerConnection>scm:git:git@github.com:bioshark/personal-accountant.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/bioshark/personal-accountant</url>
   </scm>
 
   <properties>
@@ -67,6 +67,16 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <tagNameFormat>v@{project.version}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <pushChanges>true</pushChanges>
+        </configuration>
       </plugin>
     </plugins>
   </build>

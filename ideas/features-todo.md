@@ -52,3 +52,20 @@
 - Load/switch database files from the main page
 - Backup/restore functionality
 - Export full data as JSON
+
+## Notes
+
+#Release
+
+./mvnw release:prepare release:perform
+
+This will:
+
+1. Prompt for the release version (e.g. 0.0.1) and next dev version (e.g. 0.0.2-SNAPSHOT)
+2. Remove -SNAPSHOT, commit, create git tag v0.0.1
+3. Bump to next snapshot, commit
+4. Push both commits and the tag to origin
+
+If you want to skip the prompts and set versions non-interactively:
+
+./mvnw release:prepare -DreleaseVersion=1.0.0 -DdevelopmentVersion=1.0.1-SNAPSHOT
