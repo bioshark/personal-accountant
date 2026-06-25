@@ -3,16 +3,10 @@
 
 ## General stuff
 
-- checkbox color?
--
-
 ## Month
 - Edit start/end
 - what happens with the days "deleted" if the end is shortened?
 - 
-## Fixed transaction
-
-- Group fixed transactions?
 
 ## Income
 

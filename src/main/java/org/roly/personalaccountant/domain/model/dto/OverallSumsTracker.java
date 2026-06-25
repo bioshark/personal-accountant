@@ -22,6 +22,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private final List<Saving> savings = new ArrayList<>();
     private double unallocatedPercentage = 100L;
     private final Saving defaultSaving = new Saving(null, "Unallocated", unallocatedPercentage);
+    private final Percentages percentages = new Percentages();
     private double cashTotal;
     private double cashLeft;
     private double fixedExpenseTotal;
@@ -56,6 +57,13 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
             default -> LOGGER.error(ACTION_1_PARAMS, action("Transaction is of wrong type"), key(transaction));
         }
         adjustSavings(cashLeft);
+        adjustPercentages();
+    }
+
+    private void adjustPercentages() {
+        percentages.setCorePercentage((dailyExpenseTotal + fixedExpenseTotal) / cashTotal * 100);
+        percentages.setWantPercentage(leisureExpenseTotal / cashTotal * 100);
+        percentages.setSavePercentage((savingExpenseTotal + cashLeft) / cashTotal * 100);
     }
 
     private void adjustSavings(double cashLeft) {
@@ -118,5 +126,9 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
                 .sum();
         this.unallocatedPercentage = 100 - allPercentages;
         this.defaultSaving.setPercentage(unallocatedPercentage);
+    }
+
+    public Percentages getPercentages() {
+        return percentages;
     }
 }

@@ -19,9 +19,15 @@
     }
 
     #paymentsAccordion .form-check-input {
-      width: 0.7em;
-      height: 0.7em;
+      width: 1.5em;
+      height: 0.75em;
       margin-top: 0;
+      margin-left: 0;
+    }
+
+    #paymentsAccordion .form-check-input:checked {
+      background-color: #198754;
+      border-color: #198754;
     }
   </style>
 </head>
@@ -67,6 +73,29 @@
             </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+      <!-- Spending Pie Chart -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Spending Split</h6>
+        </div>
+        <div class="card-body p-2 text-center">
+          <div class="mx-auto rounded-circle"
+               style="width: 100px; height: 100px;"
+               th:style="'width: 100px; height: 100px; background: conic-gradient(#0d6efd 0% ' + ${expense.statistics.percentages.corePercentage} + '%, #ffc107 ' + ${expense.statistics.percentages.corePercentage} + '% ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '%, #198754 ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '% 100%);'">
+          </div>
+          <div class="mt-2 small text-start">
+            <div><span style="color: #0d6efd;">&#9632;</span> Core: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.corePercentage, 1, 1)}"></span>%
+            </div>
+            <div><span style="color: #ffc107;">&#9632;</span> Need: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.wantPercentage, 1, 1)}"></span>%
+            </div>
+            <div><span style="color: #198754;">&#9632;</span> Save: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.savePercentage, 1, 1)}"></span>%
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -177,14 +206,14 @@
                 th:style="(${expense.statistics.dailyPayments[entry.key]?.weekEnd} ? 'background-color: #e9ecef;' : '') + (${expense.statistics.dailyPayments[entry.key]?.dayDone} ? ' font-style: italic; color: #6c757d; text-decoration: line-through;' : '')"
                 th:text="${#temporals.format(entry.key, 'dd MMM, EEEE')}">
         </button>
-        <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y d-flex align-items-center"
-              style="right: 3rem; z-index: 3;">
+        <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y d-flex align-items-center form-switch"
+              style="right: 3.2rem; z-index: 3;">
           <input type="hidden" name="date" th:value="${entry.key}">
-          <input type="checkbox" class="form-check-input" onchange="this.form.submit()"
+          <input type="checkbox" class="form-check-input" role="switch" onchange="this.form.submit()"
                  th:checked="${expense.statistics.dailyPayments[entry.key]?.dayDone}">
         </form>
         <span class="position-absolute top-50 translate-middle-y d-flex"
-              style="right: 5rem; z-index: 3;">
+              style="right: 6.7rem; z-index: 3;">
           <span class="badge bg-secondary d-inline-block text-center"
                 th:text="${#numbers.formatDecimal(expense.statistics.dailyPayments[entry.key]?.dailyTotalExpenditure ?: 0.0, 1, 2)}"></span>
           <span class="badge d-inline-block text-center ms-1"
