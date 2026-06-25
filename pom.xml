@@ -75,6 +75,7 @@
           <tagNameFormat>v@{project.version}</tagNameFormat>
           <autoVersionSubmodules>true</autoVersionSubmodules>
           <pushChanges>true</pushChanges>
+          <goals>clean install</goals>
         </configuration>
       </plugin>
     </plugins>
