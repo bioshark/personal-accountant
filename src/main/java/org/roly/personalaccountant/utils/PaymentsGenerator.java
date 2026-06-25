@@ -29,7 +29,7 @@ public class PaymentsGenerator {
         LocalDate adjustedEndDate = getAdjustedEndDate(endDate);
 
         LinkedList<LocalDate> generatedDays = new LinkedList<>();
-        Stream.iterate(currentDate.plusDays(1), date -> !date.isAfter(adjustedEndDate), date -> date.plusDays(1)).forEach(generatedDays::add);
+        Stream.iterate(currentDate, date -> !date.isAfter(adjustedEndDate), date -> date.plusDays(1)).forEach(generatedDays::add);
 
         return generatedDays;
     }

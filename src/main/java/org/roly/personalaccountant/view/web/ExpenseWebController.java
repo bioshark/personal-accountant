@@ -43,8 +43,9 @@ public class ExpenseWebController {
     @PostMapping("/month/addincome")
     public String addIncome(@RequestParam String source, @RequestParam LocalDate date,
             @RequestParam double value) {
-        expenseManager.addIncome(new Income(null, source, date, value));
-        return "redirect:/month/" + YearMonth.from(date);
+        MonthlyExpenseEntity entity = expenseManager.addIncome(new Income(null, source, date, value));
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
     }
 
     @PostMapping("/month/removeincome/{incomeId}")
@@ -76,8 +77,9 @@ public class ExpenseWebController {
     @PostMapping("/month/addpayment")
     public String addPayment(@RequestParam String description, @RequestParam Category category,
             @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date) {
-        expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
-        return "redirect:/month/" + YearMonth.from(date);
+        MonthlyExpenseEntity entity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
     }
 
     @PostMapping("/month/removepayment/{paymentId}")
