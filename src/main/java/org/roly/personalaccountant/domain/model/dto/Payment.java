@@ -22,6 +22,7 @@ public record Payment(
         FOOD,
         MEDIA,
         INVOICE,
+        INSURANCE,
         HEALTH,
         FUEL,
         TRAVEL,
@@ -29,6 +30,10 @@ public record Payment(
         TELCO,
         FUN,
         GIFT,
+        ETF,
+        PAY_OFF,
+        GARDEN,
+        HOUSE,
         OTHER
     }
 
