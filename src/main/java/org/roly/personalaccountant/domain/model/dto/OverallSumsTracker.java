@@ -27,6 +27,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     private double fixedExpenseTotal;
     private double dailyExpenseTotal;
     private double leisureExpenseTotal;
+    private double savingExpenseTotal;
 
     public OverallSumsTracker(Set<LocalDate> days) {
         days.forEach(day -> dailyPayments.put(day, new DailyStatistics(day)));
@@ -45,6 +46,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
                         dailyExpenseTotal += payment.amount();
                     }
                     case LEISURE -> leisureExpenseTotal += payment.amount();
+                    case SAVING -> savingExpenseTotal += payment.amount();
                 }
             }
             case Income income -> {
@@ -80,6 +82,10 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
 
     public double getLeisureExpenseTotal() {
         return leisureExpenseTotal;
+    }
+
+    public double getSavingExpenseTotal() {
+        return savingExpenseTotal;
     }
 
     public Map<LocalDate, DailyStatistics> getDailyPayments() {

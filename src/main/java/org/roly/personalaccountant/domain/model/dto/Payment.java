@@ -14,7 +14,8 @@ public record Payment(
     public enum PaymentType {
         DAILY,
         FIXED,
-        LEISURE
+        LEISURE,
+        SAVING
     }
 
     public enum Category {
@@ -22,7 +23,13 @@ public record Payment(
         MEDIA,
         INVOICE,
         HEALTH,
-        SAVING
+        FUEL,
+        TRAVEL,
+        VACATION,
+        TELCO,
+        FUN,
+        GIFT,
+        OTHER
     }
 
     public boolean isFixed() {
@@ -32,4 +39,9 @@ public record Payment(
     public boolean isLeisure() {
         return type == PaymentType.LEISURE;
     }
+
+    public boolean isSaving() {
+        return type == PaymentType.SAVING;
+    }
+
 }
