@@ -1,6 +1,5 @@
 # Feature Ideas
 
-
 ## General stuff
 
 ## Month

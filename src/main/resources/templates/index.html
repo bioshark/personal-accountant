@@ -22,7 +22,7 @@
   <div th:if="${#lists.isEmpty(expenses)}" class="alert alert-info">No expenses recorded yet.</div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    <div class="col" th:each="expense : ${expenses}">
+    <div class="col" th:each="expense, iter : ${expenses}">
       <div class="card h-100 shadow-sm">
         <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
           <div class="card-body">
@@ -37,11 +37,44 @@
           </div>
         </a>
         <div class="card-footer bg-transparent border-0 text-end">
-          <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post"
+          <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
+                  th:attr="data-bs-target='#editDatesModal-' + ${iter.index}">Edit Dates
+          </button>
+          <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;"
                 onsubmit="return confirm('Delete this month?');">
             <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
           </form>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Dates Modals -->
+<div th:each="expense, iter : ${expenses}">
+  <div class="modal fade" th:id="'editDatesModal-' + ${iter.index}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" th:action="@{/month/editdates/{ym}(ym=${expense.yearMonth})}">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Period Dates</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" name="startDate" th:value="${expense.startDate}" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">End Date (optional)</label>
+              <input type="date" class="form-control" name="endDate" th:value="${expense.endDate}">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

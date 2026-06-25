@@ -102,6 +102,18 @@ public class ExpenseWebController {
         return "redirect:/";
     }
 
+    @PostMapping("/month/editdates/{yearMonth}")
+    public String editMonthDates(@PathVariable YearMonth yearMonth,
+            @RequestParam LocalDate startDate, @RequestParam(required = false) LocalDate endDate,
+            RedirectAttributes redirectAttributes) {
+        try {
+            expenseManager.editMonthDates(yearMonth, startDate, endDate);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/";
+    }
+
     @PostMapping("/month/toggleday")
     public String toggleDayDone(@RequestParam LocalDate date) {
         MonthlyExpenseEntity entity = expenseManager.toggleDayDone(date);

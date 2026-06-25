@@ -18,6 +18,7 @@ import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ExpenseManager {
@@ -42,6 +43,24 @@ public class ExpenseManager {
         );
         repository.save(entity);
         return dto;
+    }
+
+    @Transactional
+    public MonthlyExpenseEntity editMonthDates(YearMonth yearMonth, LocalDate newStartDate, LocalDate newEndDate) {
+        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+
+        // Validate no payments exist outside new range
+        LocalDate effectiveEnd = newEndDate != null ? newEndDate : newStartDate.plusMonths(1);
+        for (PaymentEntity payment : entity.getPayments()) {
+            if (payment.getDate().isBefore(newStartDate) || payment.getDate().isAfter(effectiveEnd)) {
+                throw new IllegalArgumentException("Cannot change dates: payment exists on " + payment.getDate());
+            }
+        }
+
+        entity.setStartDate(newStartDate);
+        entity.setEndDate(newEndDate);
+        return repository.save(entity);
     }
 
     public boolean deleteMonthlyExpense(YearMonth yearMonth) {
