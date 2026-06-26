@@ -131,4 +131,12 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     public Percentages getPercentages() {
         return percentages;
     }
+
+    public double getTotalDailyAllocation() {
+        return dailyPayments.values().stream().mapToDouble(DailyStatistics::getDailyMaxAllocation).sum();
+    }
+
+    public double getTotalDailyDiff() {
+        return dailyPayments.values().stream().mapToDouble(DailyStatistics::getDailyDifference).sum();
+    }
 }

@@ -98,6 +98,26 @@
           </div>
         </div>
       </div>
+      <!-- Daily Budget Progress -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Daily Budget</h6>
+        </div>
+        <div class="card-body p-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Spent: <span th:text="${#numbers.formatDecimal(expense.statistics.dailyExpenseTotal, 1, 2)}"></span></span>
+            <span>of <span th:text="${#numbers.formatDecimal(expense.statistics.totalDailyAllocation, 1, 2)}"></span></span>
+          </div>
+          <div class="progress" style="height: 1.2rem;">
+            <div class="progress-bar"
+                 th:classappend="${expense.statistics.dailyExpenseTotal <= expense.statistics.totalDailyAllocation} ? 'bg-success' : 'bg-danger'"
+                 role="progressbar"
+                 th:style="'width: ' + ${expense.statistics.totalDailyAllocation > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.dailyExpenseTotal / expense.statistics.totalDailyAllocation) * 100.0) : 0.0} + '%'"
+                 th:text="${#numbers.formatDecimal(expense.statistics.totalDailyAllocation - expense.statistics.dailyExpenseTotal, 1, 2)} + ' left'">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Central Column -->

@@ -15,9 +15,7 @@
 
 ## Category Budgets
 
-- Set monthly limits per category (e.g. max €200 on food)
-    - Sum up all the diffs and make a total. compare it to daily totals.
-- Progress bars or warnings when approaching limit
+- See where can I show and how the daily diff sum.
 
 ## Multi-Month Views & Charts
 
