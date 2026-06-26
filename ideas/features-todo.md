@@ -8,10 +8,6 @@
 
 - Edit start/end - debug!
 
-## Income
-
-- When adding new income, auto-fill the date with the first day of the period
-
 ## Recurring Transactions
 
 - Auto-generate fixed payments each month (rent, subscriptions, utilities)
@@ -20,6 +16,7 @@
 ## Category Budgets
 
 - Set monthly limits per category (e.g. max €200 on food)
+    - Sum up all the diffs and make a total. compare it to daily totals.
 - Progress bars or warnings when approaching limit
 
 ## Multi-Month Views & Charts
