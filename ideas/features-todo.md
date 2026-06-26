@@ -5,9 +5,8 @@
 ## General stuff
 
 ## Month
-- Edit start/end
-- what happens with the days "deleted" if the end is shortened?
-- 
+
+- Edit start/end - debug!
 
 ## Income
 

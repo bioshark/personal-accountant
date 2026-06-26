@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$DIR"
 
 export PATH="$HOME/.jenv/bin:$PATH"
 eval "$(jenv init -)"
