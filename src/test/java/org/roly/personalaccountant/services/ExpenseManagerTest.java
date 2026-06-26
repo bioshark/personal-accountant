@@ -25,7 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ExpenseManagerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
-    public static final Income INVALID_INCOME = new Income(null, "salariu", START_DATE, 1122.0d);
+    public static final Income INVALID_INCOME = new Income(null, "salariu", START_DATE.minusDays(1), 1122.0d);
     public static final Income WAGE_INCOME = new Income(null, "Wage", START_DATE.plusDays(1), 1122.0d);
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
@@ -47,7 +47,7 @@ class ExpenseManagerTest {
     @Test
     void shouldCreateExpense() {
         assertThat(manager.getExpenses().values()).isNotNull();
-        assertThat(manager.getExpenses().get(EXPENSE_MONTH).getPayments()).hasSize(31);
+        assertThat(manager.getExpenses().get(EXPENSE_MONTH).getPayments()).hasSize(32);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getYearMonth()).isEqualTo(EXPENSE_MONTH);
         assertThat(manager.getExpenses().get(EXPENSE_MONTH).getExpenseName()).isEqualTo(EXPENSE_MONTH_NAME);
