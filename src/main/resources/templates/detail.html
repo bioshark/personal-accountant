@@ -216,7 +216,17 @@
   </div>
 
   <!-- Payments by Day -->
-  <h4 class="mb-3">Payments</h4>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="mb-0">Payments</h4>
+        <div class="card d-inline-flex flex-row align-items-center px-3 py-1"
+             th:classappend="${expense.statistics.totalDailyDiff >= 0} ? 'bg-success bg-opacity-10 border-success' : 'bg-danger bg-opacity-10 border-danger'">
+          <h6 class="mb-0 me-2">Total daily difference</h6>
+          <span class="badge text-center"
+                style="width: 4.5rem; font-size: 0.75rem; padding: 0.4em 0.4em;"
+                th:classappend="${expense.statistics.totalDailyDiff >= 0} ? 'bg-success' : 'bg-danger'"
+                th:text="${#numbers.formatDecimal(expense.statistics.totalDailyDiff, 1, 2)}"></span>
+        </div>
+      </div>
   <div class="accordion" id="paymentsAccordion">
     <div class="accordion-item" th:each="entry, iter : ${expense.payments}">
       <h2 class="accordion-header position-relative">

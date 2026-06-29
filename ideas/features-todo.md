@@ -11,10 +11,6 @@
 - Auto-generate fixed payments each month (rent, subscriptions, utilities)
 - Define once, applied to each new expense period
 
-## Category Budgets
-
-- See where can I show and how the daily diff sum.
-
 ## Multi-Month Views & Charts
 
 - Spending trends over time by category
