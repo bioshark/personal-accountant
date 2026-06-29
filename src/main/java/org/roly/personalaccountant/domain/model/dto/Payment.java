@@ -34,7 +34,9 @@ public record Payment(
         PAY_OFF,
         GARDEN,
         HOUSE,
-        OTHER
+        OTHER,
+        TOBACCO,
+        CLOTHES
     }
 
     public boolean isFixed() {

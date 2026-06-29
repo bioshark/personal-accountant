@@ -23,13 +23,15 @@ public class PaymentsGenerator {
     }
 
     private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate, LocalDate endDate) {
-        if (endDate == null || endDate.isAfter(currentDate)) {
-            endDate = currentDate.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+        LocalDate finalEndDate;
+        if (endDate == null) {
+            finalEndDate = getAdjustedEndDate(currentDate.plusMonths(1).with(TemporalAdjusters.lastDayOfMonth()));
+        } else {
+            finalEndDate = endDate;
         }
-        LocalDate adjustedEndDate = getAdjustedEndDate(endDate);
 
         LinkedList<LocalDate> generatedDays = new LinkedList<>();
-        Stream.iterate(currentDate, date -> !date.isAfter(adjustedEndDate), date -> date.plusDays(1)).forEach(generatedDays::add);
+        Stream.iterate(currentDate, date -> !date.isAfter(finalEndDate), date -> date.plusDays(1)).forEach(generatedDays::add);
 
         return generatedDays;
     }

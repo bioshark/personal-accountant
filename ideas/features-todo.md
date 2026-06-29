@@ -6,8 +6,6 @@
 
 ## Month
 
-- Edit start/end - debug!
-
 ## Recurring Transactions
 
 - Auto-generate fixed payments each month (rent, subscriptions, utilities)
