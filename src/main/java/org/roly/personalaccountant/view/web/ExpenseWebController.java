@@ -2,7 +2,9 @@ package org.roly.personalaccountant.view.web;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Comparator;
 import org.roly.personalaccountant.domain.model.dto.Income;
+import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
@@ -28,9 +30,15 @@ public class ExpenseWebController {
     @GetMapping("/")
     public String index(Model model) {
         var expenses = expenseManager.getExpenses().values().stream()
-                .sorted((a, b) -> a.getStartDate().compareTo(b.getStartDate()))
+                .sorted(Comparator.comparing(MonthlyExpenses::getStartDate))
                 .toList();
+        var expensesByYear = expenses.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        e -> e.getYearMonth().getYear(),
+                        java.util.TreeMap::new,
+                        java.util.stream.Collectors.toList()));
         model.addAttribute("expenses", expenses);
+        model.addAttribute("expensesByYear", expensesByYear);
         return "index";
     }
 

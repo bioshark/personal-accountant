@@ -21,29 +21,49 @@
 
   <div th:if="${#lists.isEmpty(expenses)}" class="alert alert-info">No expenses recorded yet.</div>
 
-  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    <div class="col" th:each="expense, iter : ${expenses}">
-      <div class="card h-100 shadow-sm">
-        <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
-          <div class="card-body">
-            <h5 class="card-title" th:text="${expense.expenseName}"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                th:title="${#temporals.format(expense.startDate, 'dd MMM')} + ' → ' + ${#temporals.format(expense.endDate, 'dd MMM')}"></h5>
-            <ul class="list-unstyled mb-0">
-              <li><strong>Income:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span></li>
-              <li><strong>Cash Left:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span></li>
-              <li><strong>Fixed:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span></li>
-            </ul>
+  <!-- Year Tabs -->
+  <ul th:if="${!#maps.isEmpty(expensesByYear)}" class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item" th:each="yearEntry, yIter : ${expensesByYear}">
+      <button class="nav-link" th:classappend="${yIter.last} ? 'active' : ''"
+              th:id="'tab-' + ${yearEntry.key}"
+              data-bs-toggle="tab"
+              th:attr="data-bs-target='#pane-' + ${yearEntry.key}"
+              type="button" role="tab"
+              th:text="${yearEntry.key}"></button>
+    </li>
+  </ul>
+
+  <div th:if="${!#maps.isEmpty(expensesByYear)}" class="tab-content">
+    <div th:each="yearEntry, yIter : ${expensesByYear}"
+         class="tab-pane fade"
+         th:classappend="${yIter.last} ? 'show active' : ''"
+         th:id="'pane-' + ${yearEntry.key}"
+         role="tabpanel">
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div class="col" th:each="expense : ${yearEntry.value}">
+          <div class="card h-100 shadow-sm">
+            <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
+              <div class="card-body">
+                <h5 class="card-title" th:text="${expense.expenseName}"
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    th:title="${#temporals.format(expense.startDate, 'dd MMM')} + ' → ' + ${#temporals.format(expense.endDate, 'dd MMM')}"></h5>
+                <ul class="list-unstyled mb-0">
+                  <li><strong>Income:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span></li>
+                  <li><strong>Cash Left:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span></li>
+                  <li><strong>Fixed:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span></li>
+                </ul>
+              </div>
+            </a>
+            <div class="card-footer bg-transparent border-0 text-end">
+              <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
+                      th:attr="data-bs-target='#editDatesModal-' + ${expense.yearMonth}">Edit Dates
+              </button>
+              <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;"
+                    onsubmit="return confirm('Delete this month?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+              </form>
+            </div>
           </div>
-        </a>
-        <div class="card-footer bg-transparent border-0 text-end">
-          <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
-                  th:attr="data-bs-target='#editDatesModal-' + ${iter.index}">Edit Dates
-          </button>
-          <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;"
-                onsubmit="return confirm('Delete this month?');">
-            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-          </form>
         </div>
       </div>
     </div>
@@ -51,8 +71,8 @@
 </div>
 
 <!-- Edit Dates Modals -->
-<div th:each="expense, iter : ${expenses}">
-  <div class="modal fade" th:id="'editDatesModal-' + ${iter.index}" tabindex="-1">
+<div th:each="expense : ${expenses}">
+  <div class="modal fade" th:id="'editDatesModal-' + ${expense.yearMonth}" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="post" th:action="@{/month/editdates/{ym}(ym=${expense.yearMonth})}">
