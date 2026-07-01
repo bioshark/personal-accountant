@@ -43,6 +43,7 @@ public class ExpenseWebController {
                         java.util.stream.Collectors.toList()));
         model.addAttribute("expenses", expenses);
         model.addAttribute("expensesByYear", expensesByYear);
+        model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         return "index";
     }
 
@@ -80,9 +81,17 @@ public class ExpenseWebController {
 
     @PostMapping("/month/generate")
     public String generateExpense(@RequestParam(required = false) String expenseName, @RequestParam LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate, RedirectAttributes redirectAttributes) {
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) List<Long> templateIds,
+            RedirectAttributes redirectAttributes) {
         try {
-            expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+            var monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+            if (templateIds != null && !templateIds.isEmpty()) {
+                var templates = recurringPaymentService.getAllTemplates().stream()
+                        .filter(t -> templateIds.contains(t.getId()))
+                        .toList();
+                expenseManager.pullTemplatesIntoMonth(monthlyExpenses.getYearMonth(), templates);
+            }
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }

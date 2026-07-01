@@ -1,17 +1,5 @@
 # Feature Ideas
 
-## Bugs
-- 
-## General stuff
-
-## Month
-
-## Recurring Transactions (Full Implementation Plan)
-
-### Concept
-
-Recurring payments as "pending items" per month, converted to real payments when confirmed/paid.
-
 ## Multi-Month Views & Charts
 
 - Spending trends over time by category

@@ -125,6 +125,15 @@
             <label class="form-label">End Date (optional)</label>
             <input type="date" class="form-control" name="endDate">
           </div>
+          <div th:if="${!recurringTemplates.isEmpty()}" class="mb-3">
+            <label class="form-label">Pull Recurring Payments</label>
+            <div th:each="template : ${recurringTemplates}" class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" name="templateIds" th:value="${template.id}"
+                     th:id="'gen-tmpl-' + ${template.id}">
+              <label class="form-check-label" th:for="'gen-tmpl-' + ${template.id}"
+                     th:text="${template.name} + ' (' + ${#numbers.formatDecimal(template.defaultAmount, 1, 2)} + ')'"></label>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
