@@ -3,6 +3,7 @@ package org.roly.personalaccountant.view.web;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Comparator;
+import java.util.List;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
@@ -10,6 +11,7 @@ import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
+import org.roly.personalaccountant.domain.model.services.RecurringPaymentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +24,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ExpenseWebController {
 
     private final ExpenseManager expenseManager;
+    private final RecurringPaymentService recurringPaymentService;
 
-    public ExpenseWebController(ExpenseManager expenseManager) {
+    public ExpenseWebController(ExpenseManager expenseManager, RecurringPaymentService recurringPaymentService) {
         this.expenseManager = expenseManager;
+        this.recurringPaymentService = recurringPaymentService;
     }
 
     @GetMapping("/")
@@ -45,6 +49,8 @@ public class ExpenseWebController {
     @GetMapping("/month/{yearMonth}")
     public String detail(@PathVariable YearMonth yearMonth, Model model) {
         model.addAttribute("expense", expenseManager.getExpense(yearMonth));
+        model.addAttribute("pendingPayments", expenseManager.getPendingPayments(yearMonth));
+        model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         return "detail";
     }
 
@@ -153,6 +159,31 @@ public class ExpenseWebController {
     public String editSaving(@PathVariable Long savingId, @RequestParam String name,
             @RequestParam double percentage) {
         MonthlyExpenseEntity entity = expenseManager.editSaving(savingId, name, percentage);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
+
+    @PostMapping("/month/pullrecurring/{yearMonth}")
+    public String pullRecurringIntoMonth(@PathVariable YearMonth yearMonth,
+            @RequestParam List<Long> templateIds) {
+        var templates = recurringPaymentService.getAllTemplates().stream()
+                .filter(t -> templateIds.contains(t.getId()))
+                .toList();
+        expenseManager.pullTemplatesIntoMonth(yearMonth, templates);
+        return "redirect:/month/" + yearMonth;
+    }
+
+    @PostMapping("/month/paypending/{pendingId}")
+    public String payPendingPayment(@PathVariable Long pendingId, @RequestParam LocalDate date,
+            @RequestParam double amount) {
+        MonthlyExpenseEntity entity = expenseManager.payPendingPayment(pendingId, date, amount);
+        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        return "redirect:/month/" + ym;
+    }
+
+    @PostMapping("/month/skippending/{pendingId}")
+    public String skipPendingPayment(@PathVariable Long pendingId) {
+        MonthlyExpenseEntity entity = expenseManager.removePendingPayment(pendingId);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
         return "redirect:/month/" + ym;
     }

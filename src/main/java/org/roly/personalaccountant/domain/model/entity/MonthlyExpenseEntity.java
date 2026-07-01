@@ -35,16 +35,19 @@ public class MonthlyExpenseEntity {
     private String expenseName;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<PaymentEntity> payments = new ArrayList<>();
+    private final List<PaymentEntity> payments = new ArrayList<>();
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<IncomeEntity> incomes = new ArrayList<>();
+    private final List<IncomeEntity> incomes = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<LocalDate> doneDays = new HashSet<>();
+    private final Set<LocalDate> doneDays = new HashSet<>();
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<SavingEntity> savings = new ArrayList<>();
+    private final List<SavingEntity> savings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private final List<PendingPaymentEntity> pendingPayments = new ArrayList<>();
 
     protected MonthlyExpenseEntity() {
     }
@@ -126,6 +129,15 @@ public class MonthlyExpenseEntity {
     public void addSaving(SavingEntity saving) {
         savings.add(saving);
         saving.setMonthlyExpense(this);
+    }
+
+    public List<PendingPaymentEntity> getPendingPayments() {
+        return pendingPayments;
+    }
+
+    public void addPendingPayment(PendingPaymentEntity pendingPayment) {
+        pendingPayments.add(pendingPayment);
+        pendingPayment.setMonthlyExpense(this);
     }
 
     public void toggleDayDone(LocalDate date) {

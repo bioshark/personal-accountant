@@ -12,42 +12,6 @@
 
 Recurring payments as "pending items" per month, converted to real payments when confirmed/paid.
 
-### Data Model
-
-1. `RecurringPaymentTemplate` entity (global, not per-month)
-    - name, default amount (editable), category, type
-2. `PendingPaymentEntity` (per-month, linked to `MonthlyExpenseEntity`)
-    - references template (or copies values), amount (overridable), status (pending/paid)
-
-### Service Layer
-
-- CRUD for templates (add/edit/remove recurring payment definitions)
-- Pull templates into month as pending items (selective — user picks which ones)
-- Pay action: convert pending → real `PaymentEntity` (user confirms date + final amount)
-- Remove pending (skip this month)
-
-### Controllers
-
-- REST + Web controllers for all template CRUD operations
-- Web endpoints for: pull into month, pay, remove pending
-
-### UI
-
-1. **Main page or settings section:** Manage recurring payment templates (list with add/edit/delete)
-2. **Month creation modal:** Checklist showing all templates — user selects which to include → creates pending items
-3. **Detail page (new section):** Pending payments list showing:
-    - Name, default amount (editable before paying)
-    - "Pay" button → prompts for date (default: today) and final amount (default: template amount) → creates real payment, removes from pending
-    - "Skip" button → removes pending item without creating payment
-
-### Flow
-
-1. User defines recurring templates once (rent: €800, Netflix: €15, etc.)
-2. When creating a new month, user selects which templates to pull in
-3. Pending items appear in the detail page as "outstanding"
-4. As payments happen, user clicks "Pay", confirms amount/date → becomes a real payment
-5. Unpaid items remain visible as reminders
-
 ## Multi-Month Views & Charts
 
 - Spending trends over time by category

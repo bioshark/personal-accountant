@@ -3,6 +3,7 @@ package org.roly.personalaccountant.domain.model.services;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
@@ -14,6 +15,8 @@ import org.roly.personalaccountant.domain.model.dto.Saving;
 import org.roly.personalaccountant.domain.model.entity.IncomeEntity;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.entity.PaymentEntity;
+import org.roly.personalaccountant.domain.model.entity.PendingPaymentEntity;
+import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
 import org.springframework.lang.NonNull;
@@ -152,6 +155,12 @@ public class ExpenseManager {
                 .orElse(null);
     }
 
+    public List<PendingPaymentEntity> getPendingPayments(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getPendingPayments)
+                .orElse(List.of());
+    }
+
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
         MonthlyExpenseEntity entity = findExpenseForDate(date);
         entity.toggleDayDone(date);
@@ -186,6 +195,40 @@ public class ExpenseManager {
                 .findFirst().orElseThrow();
         saving.setName(name);
         saving.setPercentage(percentage);
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
+        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        for (RecurringPaymentTemplate template : templates) {
+            entity.addPendingPayment(new PendingPaymentEntity(
+                    template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType()));
+        }
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity payPendingPayment(Long pendingId, LocalDate date, double amount) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
+        PendingPaymentEntity pending = entity.getPendingPayments().stream()
+                .filter(p -> p.getId().equals(pendingId))
+                .findFirst().orElseThrow();
+        // Convert to real payment
+        entity.addPayment(new PaymentEntity(pending.getName(), pending.getCategory(), pending.getType(), amount, date));
+        // Remove from pending
+        entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity removePendingPayment(Long pendingId) {
+        MonthlyExpenseEntity entity = repository.findAll().stream()
+                .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
+        entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
     }
 

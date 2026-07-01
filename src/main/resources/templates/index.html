@@ -11,7 +11,10 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">Monthly Expenses</h1>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateModal">+ New Month</button>
+    <div>
+      <a href="/recurring" class="btn btn-outline-secondary me-2">Recurring Payments</a>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#generateModal">+ New Month</button>
+    </div>
   </div>
 
   <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
