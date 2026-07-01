@@ -50,6 +50,7 @@ public class ExpenseWebController {
     public String detail(@PathVariable YearMonth yearMonth, Model model) {
         model.addAttribute("expense", expenseManager.getExpense(yearMonth));
         model.addAttribute("pendingPayments", expenseManager.getPendingPayments(yearMonth));
+        model.addAttribute("totalPendingPayments", expenseManager.getTotalPendingPayments(yearMonth));
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         return "detail";
     }

@@ -215,45 +215,6 @@
     </div>
   </div>
 
-      <!-- Pending Payments -->
-      <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Pending Payments</h5>
-          <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#pullRecurringModal">+ Pull Recurring</button>
-        </div>
-        <div class="card-body">
-          <div th:if="${pendingPayments.isEmpty()}" class="text-muted">No pending payments.</div>
-          <table th:if="${!pendingPayments.isEmpty()}" class="table table-sm mb-0">
-            <thead>
-            <tr>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Type</th>
-              <th class="text-end">Amount</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="pending, pIter : ${pendingPayments}">
-              <td th:text="${pending.name}"></td>
-              <td th:text="${pending.category}"></td>
-              <td th:text="${pending.type}"></td>
-              <td class="text-end" th:text="${#numbers.formatDecimal(pending.amount, 1, 2)}"></td>
-              <td class="text-end text-nowrap">
-                <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal"
-                        th:attr="data-bs-target='#payPendingModal-' + ${pIter.index}">Pay
-                </button>
-                <form method="post" th:action="@{/month/skippending/{id}(id=${pending.id})}" style="display:inline;"
-                      onsubmit="return confirm('Skip this payment?');">
-                  <button type="submit" class="btn btn-sm btn-outline-warning">Skip</button>
-                </form>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- Payments by Day -->
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h4 class="mb-0">Payments</h4>
@@ -385,6 +346,35 @@
                 <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
               </tr>
             </th:block>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Pending</h6>
+          <div>
+            <span class="badge bg-secondary me-1" th:text="${#numbers.formatDecimal(totalPendingPayments, 1, 2)}"></span>
+            <button class="btn btn-sm btn-success py-0 px-1" data-bs-toggle="modal" data-bs-target="#pullRecurringModal">+</button>
+          </div>
+        </div>
+        <div class="card-body p-2">
+          <div th:if="${pendingPayments.isEmpty()}" class="text-muted small">No pending.</div>
+          <table th:if="${!pendingPayments.isEmpty()}" class="table table-sm mb-0 small">
+            <tbody>
+            <tr th:each="pending, pIter : ${pendingPayments}">
+              <td th:text="${pending.name}"></td>
+              <td class="text-end" th:text="${#numbers.formatDecimal(pending.amount, 1, 2)}"></td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-success py-0 px-1" data-bs-toggle="modal"
+                        th:attr="data-bs-target='#payPendingModal-' + ${pIter.index}">Pay
+                </button>
+                <form method="post" th:action="@{/month/skippending/{id}(id=${pending.id})}" style="display:inline;"
+                      onsubmit="return confirm('Skip this payment?');">
+                  <button type="submit" class="btn btn-sm btn-outline-warning py-0 px-1">Skip</button>
+                </form>
+              </td>
+            </tr>
             </tbody>
           </table>
         </div>
@@ -522,8 +512,9 @@
         <div class="modal-body">
           <div th:if="${recurringTemplates.isEmpty()}" class="text-muted">No recurring templates defined. <a href="/recurring">Create some first.</a>
           </div>
-          <div th:each="template : ${recurringTemplates}" class="form-check">
-            <input class="form-check-input" type="checkbox" name="templateIds" th:value="${template.id}" th:id="'tmpl-' + ${template.id}">
+          <div th:each="template : ${recurringTemplates}" class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" name="templateIds" th:value="${template.id}"
+                   th:id="'tmpl-' + ${template.id}">
             <label class="form-check-label" th:for="'tmpl-' + ${template.id}"
                    th:text="${template.name} + ' (' + ${#numbers.formatDecimal(template.defaultAmount, 1, 2)} + ')'"></label>
           </div>

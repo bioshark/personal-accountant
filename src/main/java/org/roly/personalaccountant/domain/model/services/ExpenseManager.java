@@ -161,6 +161,15 @@ public class ExpenseManager {
                 .orElse(List.of());
     }
 
+    public double getTotalPendingPayments(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getPendingPayments)
+                .orElse(List.of()).stream()
+                .mapToDouble(PendingPaymentEntity::getAmount)
+                .sum();
+    }
+
+
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
         MonthlyExpenseEntity entity = findExpenseForDate(date);
         entity.toggleDayDone(date);
