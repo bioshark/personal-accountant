@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.roly</groupId>
   <artifactId>personal-accountant</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.1.1-SNAPSHOT</version>
   <name>personal-accountant</name>
   <description>personal-accountant</description>
   <url />
