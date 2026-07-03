@@ -48,3 +48,5 @@ This will:
 If you want to skip the prompts and set versions non-interactively:
 
 ./mvnw release:prepare -DreleaseVersion=1.0.0 -DdevelopmentVersion=1.0.1-SNAPSHOT
+
+ALTER TABLE PAYMENT_ENTITY ALTER COLUMN CATEGORY VARCHAR(255);
