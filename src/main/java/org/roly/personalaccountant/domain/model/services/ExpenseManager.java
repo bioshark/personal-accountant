@@ -225,9 +225,7 @@ public class ExpenseManager {
         PendingPaymentEntity pending = entity.getPendingPayments().stream()
                 .filter(p -> p.getId().equals(pendingId))
                 .findFirst().orElseThrow();
-        // Convert to real payment
         entity.addPayment(new PaymentEntity(pending.getName(), pending.getCategory(), pending.getType(), amount, date));
-        // Remove from pending
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
     }

@@ -4,10 +4,15 @@ import static org.roly.personalaccountant.utils.Utils.initCap;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import org.roly.personalaccountant.domain.model.dto.Payment.Category;
+import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 import org.roly.personalaccountant.utils.PaymentsGenerator;
 
@@ -78,6 +83,22 @@ public class MonthlyExpenses {
 
     public String getExpenseName() {
         return expenseName;
+    }
+
+    public Map<Category, List<Payment>> getPaymentsTypePerCategory(PaymentType type) {
+        return payments.values().stream()
+                .flatMap(Collection::stream)
+                .map(Payment.class::cast)
+                .filter(p -> type.equals(p.type()))
+                .collect(Collectors.groupingBy(Payment::category));
+    }
+
+    public Map<Category, Double> getSumsTypePerCategory(PaymentType type) {
+        return payments.values().stream()
+                .flatMap(Collection::stream)
+                .map(Payment.class::cast)
+                .filter(p -> type.equals(p.type()))
+                .collect(Collectors.groupingBy(Payment::category, Collectors.summingDouble(Payment::amount)));
     }
 
     @Override

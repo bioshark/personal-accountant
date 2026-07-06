@@ -296,58 +296,109 @@
       <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Fixed Expenses</h6>
-          <span class="badge bg-secondary" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span>
+          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span>
         </div>
-        <div class="card-body p-2">
-          <table class="table table-sm mb-0 small">
-            <tbody>
-            <th:block th:each="entry : ${expense.payments}">
-              <tr th:each="payment : ${entry.value}" th:if="${payment.fixed}">
-                <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
-                <td th:text="${payment.description}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
-              </tr>
-            </th:block>
-            </tbody>
-          </table>
+        <div class="card-body p-1">
+          <div class="accordion accordion-flush" id="fixedAccordion">
+            <div class="accordion-item"
+                 th:each="catEntry, cIter : ${expense.getPaymentsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).FIXED)}">
+              <h2 class="accordion-header position-relative">
+                <button class="accordion-button collapsed py-1 px-2 small" type="button"
+                        data-bs-toggle="collapse"
+                        th:attr="data-bs-target='#fixed-cat-' + ${cIter.index}"
+                        th:text="${catEntry.key}">
+                </button>
+                <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
+                      style="right: 2rem; z-index: 3; font-size: 0.7rem;"
+                      th:text="${#numbers.formatDecimal(expense.getSumsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).FIXED)[catEntry.key], 1, 2)}"></span>
+              </h2>
+              <div th:id="'fixed-cat-' + ${cIter.index}" class="accordion-collapse collapse" data-bs-parent="#fixedAccordion">
+                <div class="accordion-body p-1">
+                  <table class="table table-sm mb-0 small">
+                    <tbody>
+                    <tr th:each="payment : ${catEntry.value}">
+                      <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
+                      <td th:text="${payment.description}"></td>
+                      <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Leisure Expenses</h6>
-          <span class="badge bg-secondary" th:text="${#numbers.formatDecimal(expense.statistics.leisureExpenseTotal, 1, 2)}"></span>
+          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.leisureExpenseTotal, 1, 2)}"></span>
         </div>
-        <div class="card-body p-2">
-          <table class="table table-sm mb-0 small">
-            <tbody>
-            <th:block th:each="entry : ${expense.payments}">
-              <tr th:each="payment : ${entry.value}" th:if="${payment.leisure}">
-                <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
-                <td th:text="${payment.description}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
-              </tr>
-            </th:block>
-            </tbody>
-          </table>
+        <div class="card-body p-1">
+          <div class="accordion accordion-flush" id="leisureAccordion">
+            <div class="accordion-item"
+                 th:each="catEntry, cIter : ${expense.getPaymentsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).LEISURE)}">
+              <h2 class="accordion-header position-relative">
+                <button class="accordion-button collapsed py-1 px-2 small" type="button"
+                        data-bs-toggle="collapse"
+                        th:attr="data-bs-target='#leisure-cat-' + ${cIter.index}"
+                        th:text="${catEntry.key}">
+                </button>
+                <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
+                      style="right: 2rem; z-index: 3; font-size: 0.7rem;"
+                      th:text="${#numbers.formatDecimal(expense.getSumsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).LEISURE)[catEntry.key], 1, 2)}"></span>
+              </h2>
+              <div th:id="'leisure-cat-' + ${cIter.index}" class="accordion-collapse collapse" data-bs-parent="#leisureAccordion">
+                <div class="accordion-body p-1">
+                  <table class="table table-sm mb-0 small">
+                    <tbody>
+                    <tr th:each="payment : ${catEntry.value}">
+                      <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
+                      <td th:text="${payment.description}"></td>
+                      <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Saving Expenses</h6>
-          <span class="badge bg-secondary" th:text="${#numbers.formatDecimal(expense.statistics.savingExpenseTotal, 1, 2)}"></span>
+          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.savingExpenseTotal, 1, 2)}"></span>
         </div>
-        <div class="card-body p-2">
-          <table class="table table-sm mb-0 small">
-            <tbody>
-            <th:block th:each="entry : ${expense.payments}">
-              <tr th:each="payment : ${entry.value}" th:if="${payment.saving}">
-                <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
-                <td th:text="${payment.description}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
-              </tr>
-            </th:block>
-            </tbody>
-          </table>
+        <div class="card-body p-1">
+          <div class="accordion accordion-flush" id="savingAccordion">
+            <div class="accordion-item"
+                 th:each="catEntry, cIter : ${expense.getPaymentsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).SAVING)}">
+              <h2 class="accordion-header position-relative">
+                <button class="accordion-button collapsed py-1 px-2 small" type="button"
+                        data-bs-toggle="collapse"
+                        th:attr="data-bs-target='#saving-cat-' + ${cIter.index}"
+                        th:text="${catEntry.key}">
+                </button>
+                <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
+                      style="right: 2rem; z-index: 3; font-size: 0.7rem;"
+                      th:text="${#numbers.formatDecimal(expense.getSumsTypePerCategory(T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).SAVING)[catEntry.key], 1, 2)}"></span>
+              </h2>
+              <div th:id="'saving-cat-' + ${cIter.index}" class="accordion-collapse collapse" data-bs-parent="#savingAccordion">
+                <div class="accordion-body p-1">
+                  <table class="table table-sm mb-0 small">
+                    <tbody>
+                    <tr th:each="payment : ${catEntry.value}">
+                      <td th:text="${#temporals.format(payment.date, 'dd MMM')}"></td>
+                      <td th:text="${payment.description}"></td>
+                      <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="card mt-3">
