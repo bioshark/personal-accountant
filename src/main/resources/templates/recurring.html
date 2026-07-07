@@ -30,7 +30,7 @@
     <tr th:each="template, iter : ${templates}">
       <td th:text="${template.name}"></td>
       <td th:text="${#numbers.formatDecimal(template.defaultAmount, 1, 2)}"></td>
-      <td th:text="${template.category}"></td>
+      <td th:text="${template.category.displayName}"></td>
       <td th:text="${template.type}"></td>
       <td class="text-end text-nowrap">
         <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
@@ -68,7 +68,7 @@
             <label class="form-label">Category</label>
             <select class="form-select" name="category" required>
               <option th:each="cat : ${T(org.roly.personalaccountant.domain.model.dto.Payment.Category).values()}"
-                      th:value="${cat}" th:text="${cat}"></option>
+                      th:value="${cat}" th:text="${cat.displayName}"></option>
             </select>
           </div>
           <div class="mb-3">
@@ -111,7 +111,7 @@
               <label class="form-label">Category</label>
               <select class="form-select" name="category" required>
                 <option th:each="cat : ${T(org.roly.personalaccountant.domain.model.dto.Payment.Category).values()}"
-                        th:value="${cat}" th:text="${cat}" th:selected="${cat == template.category}"></option>
+                        th:value="${cat}" th:text="${cat.displayName}" th:selected="${cat == template.category}"></option>
               </select>
             </div>
             <div class="mb-3">
