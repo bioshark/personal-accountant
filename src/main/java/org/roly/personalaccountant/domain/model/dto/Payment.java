@@ -15,7 +15,11 @@ public record Payment(
         DAILY,
         FIXED,
         LEISURE,
-        SAVING
+        SAVING;
+
+        public String getDisplayName() {
+            return Payment.getDisplayName(this);
+        }
     }
 
     public enum Category {
@@ -39,8 +43,7 @@ public record Payment(
         CLOTHES;
 
         public String getDisplayName() {
-            String name = name().replace('_', ' ').toLowerCase();
-            return name.substring(0, 1).toUpperCase() + name.substring(1);
+            return Payment.getDisplayName(this);
         }
     }
 
@@ -54,6 +57,11 @@ public record Payment(
 
     public boolean isSaving() {
         return type == PaymentType.SAVING;
+    }
+
+    private static String getDisplayName(Enum<?> e) {
+        String name = e.name().replace('_', ' ').toLowerCase();
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
 }

@@ -31,7 +31,7 @@
       <td th:text="${template.name}"></td>
       <td th:text="${#numbers.formatDecimal(template.defaultAmount, 1, 2)}"></td>
       <td th:text="${template.category.displayName}"></td>
-      <td th:text="${template.type}"></td>
+      <td th:text="${template.type.displayName}"></td>
       <td class="text-end text-nowrap">
         <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                 th:attr="data-bs-target='#editTemplateModal-' + ${iter.index}">&#9998;
@@ -75,7 +75,7 @@
             <label class="form-label">Type</label>
             <select class="form-select" name="type" required>
               <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
-                      th:value="${pt}" th:text="${pt}"></option>
+                      th:value="${pt}" th:text="${pt.displayName}"></option>
             </select>
           </div>
         </div>
@@ -118,7 +118,7 @@
               <label class="form-label">Type</label>
               <select class="form-select" name="type" required>
                 <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
-                        th:value="${pt}" th:text="${pt}" th:selected="${pt == template.type}"></option>
+                        th:value="${pt}" th:text="${pt.displayName}" th:selected="${pt == template.type}"></option>
               </select>
             </div>
           </div>

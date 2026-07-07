@@ -268,7 +268,7 @@
             <tr th:each="payment, pIter : ${entry.value}">
               <td th:text="${payment.description}"></td>
               <td th:text="${payment.category.displayName}"></td>
-              <td th:text="${payment.type}"></td>
+              <td th:text="${payment.type.displayName}"></td>
               <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
               <td class="text-end text-nowrap">
                 <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
@@ -462,7 +462,7 @@
                 <label class="form-label">Type</label>
                 <select class="form-select" name="type" required>
                   <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
-                          th:value="${pt}" th:text="${pt}" th:selected="${pt == payment.type}"></option>
+                          th:value="${pt}" th:text="${pt.displayName}" th:selected="${pt == payment.type}"></option>
                 </select>
               </div>
               <div class="mb-3">
@@ -693,7 +693,7 @@
             <label class="form-label">Type</label>
             <select class="form-select" name="type" required>
               <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
-                      th:value="${pt}" th:text="${pt}"></option>
+                      th:value="${pt}" th:text="${pt.displayName}"></option>
             </select>
           </div>
           <div class="mb-3">
