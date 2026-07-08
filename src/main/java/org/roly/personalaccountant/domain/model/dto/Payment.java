@@ -35,6 +35,7 @@ public record Payment(
         FUN,
         GIFT,
         ETF,
+        PAY_OFF,
         GARDEN,
         HOUSE,
         OTHER,
