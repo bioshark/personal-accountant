@@ -40,7 +40,9 @@ public record Payment(
         HOUSE,
         OTHER,
         TOBACCO,
-        CLOTHES;
+        CLOTHES,
+        MORTGAGE,
+        LEASING;
 
         public String getDisplayName() {
             return Payment.getDisplayName(this);
