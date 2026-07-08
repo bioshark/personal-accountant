@@ -50,3 +50,30 @@ If you want to skip the prompts and set versions non-interactively:
 ./mvnw release:prepare -DreleaseVersion=1.0.0 -DdevelopmentVersion=1.0.1-SNAPSHOT
 
 ALTER TABLE PAYMENT_ENTITY ALTER COLUMN CATEGORY VARCHAR(255);
+
+ALTER TABLE RECURRING_PAYMENT_TEMPLATE / pending_payment_entity / PAYMENT_ENTITY
+ALTER COLUMN CATEGORY ENUM(
+'FOOD',
+'MEDIA',
+'INVOICE',
+'INSURANCE',
+'HEALTH',
+'FUEL',
+'TRAVEL',
+'VACATION',
+'TELCO',
+'FUN',
+'GIFT',
+'ETF',
+'PAY_OFF',
+'GARDEN',
+'HOUSE',
+'OTHER',
+'TOBACCO',
+'CLOTHES',
+'MORTGAGE',
+'LEASING',
+'CAT',
+'ELECTRICITY',
+'CREDIT_CARD'
+);
