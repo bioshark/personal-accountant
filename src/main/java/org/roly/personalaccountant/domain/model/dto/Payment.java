@@ -35,14 +35,16 @@ public record Payment(
         FUN,
         GIFT,
         ETF,
-        PAY_OFF,
         GARDEN,
         HOUSE,
         OTHER,
         TOBACCO,
         CLOTHES,
         MORTGAGE,
-        LEASING;
+        LEASING,
+        CAT,
+        ELECTRICITY,
+        CREDIT_CARD;
 
         public String getDisplayName() {
             return Payment.getDisplayName(this);
