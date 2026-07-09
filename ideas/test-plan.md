@@ -22,17 +22,17 @@
 
 ### 1. OverallSumsTracker (Unit Tests) — Core business logic
 
-- [ ] `onAdd(Payment FIXED)` — updates cashLeft, fixedExpenseTotal
-- [ ] `onAdd(Payment DAILY)` — updates cashLeft, dailyExpenseTotal, dailyPayments
-- [ ] `onAdd(Payment LEISURE)` — updates cashLeft, leisureExpenseTotal
-- [ ] `onAdd(Payment SAVING)` — updates cashLeft, savingExpenseTotal
-- [ ] `onAdd(Income)` — updates cashTotal, cashLeft
-- [ ] `addSaving` — adjusts unallocated percentage
-- [ ] `addSaving` — throws when exceeding unallocated
-- [ ] `removeSaving` — restores unallocated percentage
-- [ ] `getTotalDailyAllocation` — correct sum of all day allocations
-- [ ] `getTotalDailyDiff` — correct total (only for done days)
-- [ ] `getPercentages` — correct core/want/save split
+- [x] `onAdd(Payment FIXED)` — updates cashLeft, fixedExpenseTotal
+- [x] `onAdd(Payment DAILY)` — updates cashLeft, dailyExpenseTotal, dailyPayments
+- [x] `onAdd(Payment LEISURE)` — updates cashLeft, leisureExpenseTotal
+- [x] `onAdd(Payment SAVING)` — updates cashLeft, savingExpenseTotal
+- [x] `onAdd(Income)` — updates cashTotal, cashLeft
+- [x] `addSaving` — adjusts unallocated percentage
+- [x] `addSaving` — throws when exceeding unallocated
+- [x] `removeSaving` — restores unallocated percentage
+- [x] `getTotalDailyAllocation` — correct sum of all day allocations
+- [x] `getTotalDailyDiff` — correct total (only for done days)
+- [x] `getPercentages` — correct core/want/save split
 
 ### 2. DailyStatistics (Unit Tests) — Small unit, quick wins
 
