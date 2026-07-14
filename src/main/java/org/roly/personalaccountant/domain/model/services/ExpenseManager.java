@@ -169,6 +169,18 @@ public class ExpenseManager {
                 .sum();
     }
 
+    public double getFixedBudget(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getFixedBudget)
+                .orElse(0.0);
+    }
+
+    public double getSavingBudget(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getSavingBudget)
+                .orElse(0.0);
+    }
+
 
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
         MonthlyExpenseEntity entity = findExpenseForDate(date);
@@ -211,8 +223,10 @@ public class ExpenseManager {
         MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
         for (RecurringPaymentTemplate template : templates) {
-            entity.addPendingPayment(new PendingPaymentEntity(
-                    template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType()));
+            PendingPaymentEntity pending = new PendingPaymentEntity(
+                    template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType());
+            entity.addPendingPayment(pending);
+            entity.addToBudget(pending);
         }
         return repository.save(entity);
     }
@@ -235,6 +249,10 @@ public class ExpenseManager {
                 .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
+        PendingPaymentEntity pending = entity.getPendingPayments().stream()
+                .filter(p -> p.getId().equals(pendingId))
+                .findFirst().orElseThrow();
+        entity.removeFromBudget(pending);
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
     }

@@ -33,6 +33,8 @@ public class MonthlyExpenseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String expenseName;
+    private double fixedBudget;
+    private double savingBudget;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private final List<PaymentEntity> payments = new ArrayList<>();
@@ -90,6 +92,32 @@ public class MonthlyExpenseEntity {
 
     public String getExpenseName() {
         return expenseName;
+    }
+
+    public double getFixedBudget() {
+        return fixedBudget;
+    }
+
+    public double getSavingBudget() {
+        return savingBudget;
+    }
+
+    public void addToBudget(PendingPaymentEntity pending) {
+        switch (pending.getType()) {
+            case FIXED -> fixedBudget += pending.getAmount();
+            case SAVING -> savingBudget += pending.getAmount();
+            default -> {
+            }
+        }
+    }
+
+    public void removeFromBudget(PendingPaymentEntity pending) {
+        switch (pending.getType()) {
+            case FIXED -> fixedBudget -= pending.getAmount();
+            case SAVING -> savingBudget -= pending.getAmount();
+            default -> {
+            }
+        }
     }
 
     public List<PaymentEntity> getPayments() {

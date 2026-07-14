@@ -118,6 +118,46 @@
           </div>
         </div>
       </div>
+      <!-- Fixed Budget Progress -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Fixed Budget</h6>
+        </div>
+        <div class="card-body p-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Spent: <span th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span></span>
+            <span>of <span th:text="${#numbers.formatDecimal(fixedBudget, 1, 2)}"></span></span>
+          </div>
+          <div class="progress" style="height: 1.2rem;">
+            <div class="progress-bar"
+                 th:classappend="${expense.statistics.fixedExpenseTotal <= fixedBudget} ? 'bg-success' : 'bg-danger'"
+                 role="progressbar"
+                 th:style="'width: ' + ${fixedBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.fixedExpenseTotal / fixedBudget) * 100.0) : 0.0} + '%'"
+                 th:text="${#numbers.formatDecimal(fixedBudget - expense.statistics.fixedExpenseTotal, 1, 2)} + ' left'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Saving Budget Progress -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Saving Budget</h6>
+        </div>
+        <div class="card-body p-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Spent: <span th:text="${#numbers.formatDecimal(expense.statistics.savingExpenseTotal, 1, 2)}"></span></span>
+            <span>of <span th:text="${#numbers.formatDecimal(savingBudget, 1, 2)}"></span></span>
+          </div>
+          <div class="progress" style="height: 1.2rem;">
+            <div class="progress-bar"
+                 th:classappend="${expense.statistics.savingExpenseTotal <= savingBudget} ? 'bg-success' : 'bg-danger'"
+                 role="progressbar"
+                 th:style="'width: ' + ${savingBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.savingExpenseTotal / savingBudget) * 100.0) : 0.0} + '%'"
+                 th:text="${#numbers.formatDecimal(savingBudget - expense.statistics.savingExpenseTotal, 1, 2)} + ' left'">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Central Column -->
