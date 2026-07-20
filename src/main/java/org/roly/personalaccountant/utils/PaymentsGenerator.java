@@ -22,6 +22,14 @@ public class PaymentsGenerator {
                 ));
     }
 
+    /**
+     * Resolves the effective (inclusive) end date for a month given its start date and an optional requested end date. When {@code endDate} is
+     * {@code null} the end date is auto-computed using the same rules applied when generating a month's days.
+     */
+    public static LocalDate resolveEndDate(LocalDate currentDate, LocalDate endDate) {
+        return generateDaysForMonth(currentDate, endDate).getLast();
+    }
+
     private static LinkedList<LocalDate> generateDaysForMonth(LocalDate currentDate, LocalDate endDate) {
         LocalDate finalEndDate;
         if (endDate == null) {

@@ -104,4 +104,31 @@ class ExpenseManagerTest {
     void shouldNotAddIncomeToNonExistentExpense() {
         assertThrows(IllegalArgumentException.class, () -> manager.addIncome(INVALID_INCOME));
     }
+
+    @Test
+    void shouldPersistResolvedEndDateWhenNoneProvided() {
+        // START_DATE 2025-05-27 with null end date auto-resolves to 2025-06-27
+        assertThat(manager.getExpense(EXPENSE_MONTH).getEndDate()).isEqualTo(LocalDate.of(2025, 6, 27));
+    }
+
+    @Test
+    void shouldAddPaymentOnStartDateBoundary() {
+        Payment payment = new Payment(null, "food", FOOD, FIXED, 5.0d, START_DATE);
+
+        manager.addPayment(payment);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(START_DATE))
+                .anyMatch(p -> ((Payment) p).description().equals("food"));
+    }
+
+    @Test
+    void shouldAddPaymentOnEndDateBoundary() {
+        LocalDate endDate = LocalDate.of(2025, 6, 27);
+        Payment payment = new Payment(null, "food", FOOD, FIXED, 5.0d, endDate);
+
+        manager.addPayment(payment);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(endDate))
+                .anyMatch(p -> ((Payment) p).description().equals("food"));
+    }
 }

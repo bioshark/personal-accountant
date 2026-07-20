@@ -19,6 +19,7 @@ import org.roly.personalaccountant.domain.model.entity.PendingPaymentEntity;
 import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
+import org.roly.personalaccountant.utils.PaymentsGenerator;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class ExpenseManager {
                 dto.getYearMonth().getYear(),
                 dto.getYearMonth().getMonthValue(),
                 startDate,
-                endDate,
+                dto.getEndDate(),
                 dto.getExpenseName()
         );
         repository.save(entity);
@@ -53,8 +54,10 @@ public class ExpenseManager {
         MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
 
+        // Resolve the effective (inclusive) end date so it is never persisted as null.
+        LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
+
         // Validate no payments exist outside new range
-        LocalDate effectiveEnd = newEndDate != null ? newEndDate : newStartDate.plusMonths(1);
         for (PaymentEntity payment : entity.getPayments()) {
             if (payment.getDate().isBefore(newStartDate) || payment.getDate().isAfter(effectiveEnd)) {
                 throw new IllegalArgumentException("Cannot change dates: payment exists on " + payment.getDate());
@@ -62,7 +65,7 @@ public class ExpenseManager {
         }
 
         entity.setStartDate(newStartDate);
-        entity.setEndDate(newEndDate);
+        entity.setEndDate(effectiveEnd);
         return repository.save(entity);
     }
 
@@ -181,7 +184,6 @@ public class ExpenseManager {
                 .orElse(0.0);
     }
 
-
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
         MonthlyExpenseEntity entity = findExpenseForDate(date);
         entity.toggleDayDone(date);
@@ -271,13 +273,8 @@ public class ExpenseManager {
     }
 
     private MonthlyExpenseEntity findExpenseForDate(LocalDate date) {
-        for (MonthlyExpenseEntity entity : repository.findAll()) {
-            MonthlyExpenses dto = toDto(entity);
-            if (dto.getPayments().containsKey(date)) {
-                return entity;
-            }
-        }
-        throw new IllegalArgumentException("Can't find Expense for date " + date);
+        return repository.findByDateInRange(date)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + date));
     }
 
     private MonthlyExpenses toDto(MonthlyExpenseEntity entity) {

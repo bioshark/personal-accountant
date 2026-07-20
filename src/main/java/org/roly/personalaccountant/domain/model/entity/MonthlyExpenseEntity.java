@@ -34,6 +34,7 @@ public class MonthlyExpenseEntity {
     private LocalDate endDate;
     private String expenseName;
     private double fixedBudget;
+    private double leisureBudget;
     private double savingBudget;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -102,9 +103,14 @@ public class MonthlyExpenseEntity {
         return savingBudget;
     }
 
+    public double getLeisureBudget() {
+        return leisureBudget;
+    }
+
     public void addToBudget(PendingPaymentEntity pending) {
         switch (pending.getType()) {
             case FIXED -> fixedBudget += pending.getAmount();
+            case LEISURE -> leisureBudget += pending.getAmount();
             case SAVING -> savingBudget += pending.getAmount();
             default -> {
             }
@@ -114,6 +120,7 @@ public class MonthlyExpenseEntity {
     public void removeFromBudget(PendingPaymentEntity pending) {
         switch (pending.getType()) {
             case FIXED -> fixedBudget -= pending.getAmount();
+            case LEISURE -> leisureBudget -= pending.getAmount();
             case SAVING -> savingBudget -= pending.getAmount();
             default -> {
             }
@@ -172,9 +179,5 @@ public class MonthlyExpenseEntity {
         if (!doneDays.remove(date)) {
             doneDays.add(date);
         }
-    }
-
-    private void editIncome(IncomeEntity newIncome) {
-
     }
 }

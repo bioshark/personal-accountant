@@ -58,6 +58,12 @@
 - [ ] `deleteMonthlyExpense` — delete non-existent month returns false
 - [ ] `addNewMonthlyExpense` — duplicate month throws exception
 
+#### Date Range Lookup & End Date
+
+- [x] `addNewMonthlyExpense` — persists resolved endDate when none provided
+- [x] `addPayment` — resolves owning month on start-date boundary
+- [x] `addPayment` — resolves owning month on end-date boundary
+
 #### Payment CRUD
 
 - [ ] `removePayment` — by fields
@@ -118,3 +124,11 @@
 - [ ] `getEndDate` — returns last day from payments map
 - [ ] `getPaymentsTypePerCategory` — groups correctly by category for given type
 - [ ] `getSumsTypePerCategory` — computes correct sums per category
+
+### 8. MonthlyExpenseRepository (Integration Tests)
+
+- [x] `findByDateInRange` — returns month for a date within range
+- [x] `findByDateInRange` — matches on start-date boundary (inclusive)
+- [x] `findByDateInRange` — matches on end-date boundary (inclusive)
+- [x] `findByDateInRange` — empty for a date before range
+- [x] `findByDateInRange` — empty for a date after range
