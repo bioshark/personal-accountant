@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"expense_year", "expense_month"}))
@@ -33,8 +34,11 @@ public class MonthlyExpenseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String expenseName;
+    @ColumnDefault("0")
     private double fixedBudget;
+    @ColumnDefault("0")
     private double leisureBudget;
+    @ColumnDefault("0")
     private double savingBudget;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

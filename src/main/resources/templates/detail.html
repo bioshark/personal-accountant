@@ -132,8 +132,28 @@
             <div class="progress-bar"
                  th:classappend="${expense.statistics.fixedExpenseTotal <= fixedBudget} ? 'bg-success' : 'bg-danger'"
                  role="progressbar"
-                 th:style="'width: ' + ${fixedBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.fixedExpenseTotal / fixedBudget) * 100.0) : 0.0} + '%'"
+                 th:style="'width: ' + ${fixedBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.fixedExpenseTotal / fixedBudget) * 100.0) : (expense.statistics.fixedExpenseTotal > 0 ? 100.0 : 0.0)} + '%'"
                  th:text="${#numbers.formatDecimal(fixedBudget - expense.statistics.fixedExpenseTotal, 1, 2)} + ' left'">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Leisure Budget Progress -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Leisure Budget</h6>
+        </div>
+        <div class="card-body p-2">
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Spent: <span th:text="${#numbers.formatDecimal(expense.statistics.leisureExpenseTotal, 1, 2)}"></span></span>
+            <span>of <span th:text="${#numbers.formatDecimal(leisureBudget, 1, 2)}"></span></span>
+          </div>
+          <div class="progress" style="height: 1.2rem;">
+            <div class="progress-bar"
+                 th:classappend="${expense.statistics.leisureExpenseTotal <= leisureBudget} ? 'bg-success' : 'bg-danger'"
+                 role="progressbar"
+                 th:style="'width: ' + ${leisureBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.leisureExpenseTotal / leisureBudget) * 100.0) : (expense.statistics.leisureExpenseTotal > 0 ? 100.0 : 0.0)} + '%'"
+                 th:text="${#numbers.formatDecimal(leisureBudget - expense.statistics.leisureExpenseTotal, 1, 2)} + ' left'">
             </div>
           </div>
         </div>
@@ -152,7 +172,7 @@
             <div class="progress-bar"
                  th:classappend="${expense.statistics.savingExpenseTotal <= savingBudget} ? 'bg-success' : 'bg-danger'"
                  role="progressbar"
-                 th:style="'width: ' + ${savingBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.savingExpenseTotal / savingBudget) * 100.0) : 0.0} + '%'"
+                 th:style="'width: ' + ${savingBudget > 0 ? T(java.lang.Math).min(100.0, (expense.statistics.savingExpenseTotal / savingBudget) * 100.0) : (expense.statistics.savingExpenseTotal > 0 ? 100.0 : 0.0)} + '%'"
                  th:text="${#numbers.formatDecimal(savingBudget - expense.statistics.savingExpenseTotal, 1, 2)} + ' left'">
             </div>
           </div>

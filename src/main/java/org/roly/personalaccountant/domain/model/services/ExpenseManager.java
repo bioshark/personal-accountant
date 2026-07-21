@@ -54,10 +54,7 @@ public class ExpenseManager {
         MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
 
-        // Resolve the effective (inclusive) end date so it is never persisted as null.
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
-
-        // Validate no payments exist outside new range
         for (PaymentEntity payment : entity.getPayments()) {
             if (payment.getDate().isBefore(newStartDate) || payment.getDate().isAfter(effectiveEnd)) {
                 throw new IllegalArgumentException("Cannot change dates: payment exists on " + payment.getDate());
@@ -181,6 +178,12 @@ public class ExpenseManager {
     public double getSavingBudget(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .map(MonthlyExpenseEntity::getSavingBudget)
+                .orElse(0.0);
+    }
+
+    public double getLeisureBudget(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getLeisureBudget)
                 .orElse(0.0);
     }
 

@@ -53,6 +53,7 @@ public class ExpenseWebController {
         model.addAttribute("pendingPayments", expenseManager.getPendingPayments(yearMonth));
         model.addAttribute("totalPendingPayments", expenseManager.getTotalPendingPayments(yearMonth));
         model.addAttribute("fixedBudget", expenseManager.getFixedBudget(yearMonth));
+        model.addAttribute("leisureBudget", expenseManager.getLeisureBudget(yearMonth));
         model.addAttribute("savingBudget", expenseManager.getSavingBudget(yearMonth));
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         return "detail";
