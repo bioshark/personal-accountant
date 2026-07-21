@@ -1,5 +1,9 @@
 # Feature Ideas
 
+## General
+
+- Change colors adn text on Spending split.
+
 ## Search
 
 - Find a specific payment across all months
@@ -36,6 +40,21 @@
 - Load/switch database files from the main page
 - Backup/restore functionality
 - Export full data as JSON
+
+## Installable App (PWA)
+
+Make the existing Thymeleaf web UI installable so it opens as a standalone window with a
+dock/taskbar icon — an app-like feel without leaving the web stack or maintaining a second UI.
+
+- Add a web app manifest (`manifest.webmanifest`): name, icons, `"display": "standalone"`,
+  theme/background colors, start URL.
+- Add a service worker to satisfy installability (and enable basic offline shell/caching of
+  static assets later).
+- Link the manifest from the page `<head>`; provide app icons (192px, 512px, maskable).
+- Result: "Install" option in the browser → launches in its own window, pinned to the dock.
+- Chosen over a native JavaFX desktop app (see git branch `exploration/javafx-desktop-ui`):
+  single codebase, no double UI maintenance. Mirrors how web-based finance apps (e.g. Actual
+  Budget) deliver a desktop experience.
 
 ## Notes
 

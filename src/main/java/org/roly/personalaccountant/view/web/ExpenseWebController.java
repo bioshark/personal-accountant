@@ -49,14 +49,35 @@ public class ExpenseWebController {
 
     @GetMapping("/month/{yearMonth}")
     public String detail(@PathVariable YearMonth yearMonth, Model model) {
-        model.addAttribute("expense", expenseManager.getExpense(yearMonth));
+        MonthlyExpenses expense = expenseManager.getExpense(yearMonth);
+        model.addAttribute("expense", expense);
         model.addAttribute("pendingPayments", expenseManager.getPendingPayments(yearMonth));
         model.addAttribute("totalPendingPayments", expenseManager.getTotalPendingPayments(yearMonth));
         model.addAttribute("fixedBudget", expenseManager.getFixedBudget(yearMonth));
         model.addAttribute("leisureBudget", expenseManager.getLeisureBudget(yearMonth));
         model.addAttribute("savingBudget", expenseManager.getSavingBudget(yearMonth));
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
+        model.addAttribute("defaultDate", defaultDateFor(expense));
         return "detail";
+    }
+
+    /**
+     * Default date to pre-fill in the "add" forms: today when it falls within the month's range, otherwise the closest boundary (start or end).
+     */
+    private LocalDate defaultDateFor(MonthlyExpenses expense) {
+        LocalDate today = LocalDate.now();
+        if (expense == null) {
+            return today;
+        }
+        LocalDate start = expense.getStartDate();
+        LocalDate end = expense.getEndDate();
+        if (today.isBefore(start)) {
+            return start;
+        }
+        if (today.isAfter(end)) {
+            return end;
+        }
+        return today;
     }
 
     @PostMapping("/month/addincome")
