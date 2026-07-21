@@ -81,4 +81,63 @@
     </plugins>
   </build>
 
+  <profiles>
+    <!--
+      Optional JavaFX desktop UI (approach 2: REST client).
+      Isolated in a profile so the default web build stays lean and JavaFX deps are only
+      pulled when explicitly requested.
+      Run:  ./mvnw -Pdesktop javafx:run   (requires the server running on :8080)
+    -->
+    <profile>
+      <id>desktop</id>
+      <properties>
+        <javafx.version>25.0.4</javafx.version>
+        <atlantafx.version>2.1.0</atlantafx.version>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>org.openjfx</groupId>
+          <artifactId>javafx-controls</artifactId>
+          <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>io.github.mkpaz</groupId>
+          <artifactId>atlantafx-base</artifactId>
+          <version>${atlantafx.version}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.6.0</version>
+            <executions>
+              <execution>
+                <id>add-desktop-source</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/desktop/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>0.0.8</version>
+            <configuration>
+              <mainClass>org.roly.personalaccountant.desktop.DesktopApp</mainClass>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

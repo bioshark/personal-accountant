@@ -12,6 +12,8 @@ import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.view.rs.dto.ExpenseResult;
+import org.roly.personalaccountant.view.rs.dto.MonthDetailResult;
+import org.roly.personalaccountant.view.rs.dto.MonthSummaryResult;
 import org.roly.personalaccountant.view.rs.mapper.ExpenseConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +63,28 @@ public class ExpenseController {
             return ResponseEntity.ok(expenseConverter.convertToList(expenses));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/months")
+    public ResponseEntity<List<MonthSummaryResult>> getMonths() {
+        Map<YearMonth, MonthlyExpenses> expenses = expenseManager.getExpenses();
+        if (expenses != null && !expenses.isEmpty()) {
+            return ResponseEntity.ok(expenseConverter.convertSummaries(expenses));
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/expense/{yearMonth}")
+    public ResponseEntity<MonthDetailResult> getExpenseDetail(@PathVariable YearMonth yearMonth) {
+        MonthlyExpenses monthlyExpenses = expenseManager.getExpense(yearMonth);
+        if (monthlyExpenses == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(expenseConverter.convertDetail(
+                monthlyExpenses,
+                expenseManager.getFixedBudget(yearMonth),
+                expenseManager.getLeisureBudget(yearMonth),
+                expenseManager.getSavingBudget(yearMonth)));
     }
 
     @PostMapping("/addIncome")

@@ -1,5 +1,15 @@
 # Feature Ideas
 
+## Search
+
+- Find a specific payment across all months
+- Filter by description, category, amount range, date range
+
+## Tags & Notes
+
+- Flexible labeling beyond fixed categories
+- Free-text notes on payments
+
 ## Multi-Month Views & Charts
 
 - Spending trends over time by category
@@ -11,20 +21,10 @@
 - CSV/OFX file import to avoid manual entry
 - Column mapping configuration
 
-## Tags & Notes
-
-- Flexible labeling beyond fixed categories
-- Free-text notes on payments
-
 ## Reports & Export
 
 - PDF/CSV export for tax or personal review
 - Monthly/yearly summary reports
-
-## Search
-
-- Find a specific payment across all months
-- Filter by description, category, amount range, date range
 
 ## DB Management (UI)
 
