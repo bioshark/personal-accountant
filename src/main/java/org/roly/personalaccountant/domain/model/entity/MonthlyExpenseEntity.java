@@ -17,11 +17,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.hibernate.annotations.ColumnDefault;
+import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"expense_year", "expense_month"}))
 public class MonthlyExpenseEntity {
 
+    private static final String NO_BUDGET_FOR_TYPE = "No budget for type";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -116,8 +118,16 @@ public class MonthlyExpenseEntity {
             case FIXED -> fixedBudget += pending.getAmount();
             case LEISURE -> leisureBudget += pending.getAmount();
             case SAVING -> savingBudget += pending.getAmount();
-            default -> {
-            }
+            default -> throw new IllegalArgumentException(NO_BUDGET_FOR_TYPE);
+        }
+    }
+
+    public void addToBudget(PaymentType paymentType, double newValue) {
+        switch (paymentType) {
+            case FIXED -> fixedBudget = newValue;
+            case LEISURE -> leisureBudget = newValue;
+            case SAVING -> savingBudget = newValue;
+            default -> throw new IllegalArgumentException(NO_BUDGET_FOR_TYPE);
         }
     }
 
@@ -126,8 +136,7 @@ public class MonthlyExpenseEntity {
             case FIXED -> fixedBudget -= pending.getAmount();
             case LEISURE -> leisureBudget -= pending.getAmount();
             case SAVING -> savingBudget -= pending.getAmount();
-            default -> {
-            }
+            default -> throw new IllegalArgumentException(NO_BUDGET_FOR_TYPE);
         }
     }
 

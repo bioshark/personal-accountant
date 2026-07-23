@@ -3,16 +3,17 @@
 ## General
 
 - Change colors adn text on Spending split.
-
-## Search
-
-- Find a specific payment across all months
-- Filter by description, category, amount range, date range
+- Adjust budgets
 
 ## Tags & Notes
 
 - Flexible labeling beyond fixed categories
 - Free-text notes on payments
+
+## Search
+
+- Find a specific payment across all months
+- Filter by description, category, amount range, date range
 
 ## Multi-Month Views & Charts
 

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ExpenseManager {
 
+    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
     private final MonthlyExpenseRepository repository;
 
     public ExpenseManager(MonthlyExpenseRepository repository) {
@@ -51,8 +52,7 @@ public class ExpenseManager {
 
     @Transactional
     public MonthlyExpenseEntity editMonthDates(YearMonth yearMonth, LocalDate newStartDate, LocalDate newEndDate) {
-        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        MonthlyExpenseEntity entity = getEntity(yearMonth);
 
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
         for (PaymentEntity payment : entity.getPayments()) {
@@ -194,11 +194,16 @@ public class ExpenseManager {
     }
 
     public MonthlyExpenseEntity addSaving(YearMonth yearMonth, String name, double percentage) {
-        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        MonthlyExpenseEntity entity = getEntity(yearMonth);
         MonthlyExpenses dto = toDto(entity);
         dto.getStatistics().addSaving(new Saving(null, name, percentage));
         entity.addSaving(new SavingEntity(name, percentage));
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity addToBudget(YearMonth yearMonth, PaymentType paymentType, double newValue) {
+        MonthlyExpenseEntity entity = getEntity(yearMonth);
+        entity.addToBudget(paymentType, newValue);
         return repository.save(entity);
     }
 
@@ -225,8 +230,7 @@ public class ExpenseManager {
     }
 
     public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
-        MonthlyExpenseEntity entity = repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .orElseThrow(() -> new IllegalArgumentException("Expense not found: " + yearMonth));
+        MonthlyExpenseEntity entity = getEntity(yearMonth);
         for (RecurringPaymentTemplate template : templates) {
             PendingPaymentEntity pending = new PendingPaymentEntity(
                     template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType());
@@ -236,6 +240,7 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
+    // TODO remove duplication. Maybe add a new repository method for payment id's
     public MonthlyExpenseEntity payPendingPayment(Long pendingId, LocalDate date, double amount) {
         MonthlyExpenseEntity entity = repository.findAll().stream()
                 .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
@@ -309,4 +314,11 @@ public class ExpenseManager {
         }
         return dto;
     }
+
+    @NonNull
+    private MonthlyExpenseEntity getEntity(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
+    }
+
 }
