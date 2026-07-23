@@ -8,6 +8,17 @@
 
 - Find a specific payment across all months
 - Filter by description, category, amount range, date range
+- **Implement with jOOQ** — type-safe, dynamic query building for the optional filters
+  (description / category / amount range / date range). Good technical fit *and* a deliberate learning goal (jOOQ is a sought-after skill; hobby
+  project = safe place to learn it).
+    - Prerequisite: **introduce Flyway first**. Flyway makes SQL the schema source of truth,
+      which is what jOOQ generates its type-safe classes from. Steps: add `flyway-core` (+ H2
+      module), capture current schema as `V1__baseline.sql`, set
+      `spring.flyway.baseline-on-migrate=true`, switch `spring.jpa.hibernate.ddl-auto` from
+      `update` → `validate`.
+    - Order of adoption: **Flyway → jOOQ codegen (off the migrations) → build search with jOOQ.**
+    - Bonus: once Flyway is in, the Dynamic Categories change and any future column drops become ordinary versioned migrations (things
+      `ddl-auto=update` can't do).
 
 ## Tags & Notes
 
@@ -68,11 +79,6 @@ Decisions / caveats:
 
 - PDF/CSV export for tax or personal review
 - Monthly/yearly summary reports
-
-## Search
-
-- Find a specific payment across all months
-- Filter by description, category, amount range, date range
 
 ## DB Management (UI)
 
