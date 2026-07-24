@@ -171,6 +171,17 @@ public class ExpenseWebController {
         return "redirect:/month/" + ym;
     }
 
+    @PostMapping("/month/adjustbudget/{yearMonth}")
+    public String adjustBudget(@PathVariable YearMonth yearMonth, @RequestParam PaymentType type,
+            @RequestParam double value, RedirectAttributes redirectAttributes) {
+        try {
+            expenseManager.adjustBudget(yearMonth, type, value);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/month/" + yearMonth;
+    }
+
     @PostMapping("/month/addsaving/{yearMonth}")
     public String addSaving(@PathVariable YearMonth yearMonth, @RequestParam String name,
             @RequestParam double percentage, RedirectAttributes redirectAttributes) {

@@ -113,7 +113,7 @@ public class MonthlyExpenseEntity {
         return leisureBudget;
     }
 
-    public void addToBudget(PendingPaymentEntity pending) {
+    public void adjustBudget(PendingPaymentEntity pending) {
         switch (pending.getType()) {
             case FIXED -> fixedBudget += pending.getAmount();
             case LEISURE -> leisureBudget += pending.getAmount();
@@ -122,7 +122,7 @@ public class MonthlyExpenseEntity {
         }
     }
 
-    public void addToBudget(PaymentType paymentType, double newValue) {
+    public void adjustBudget(PaymentType paymentType, double newValue) {
         switch (paymentType) {
             case FIXED -> fixedBudget = newValue;
             case LEISURE -> leisureBudget = newValue;

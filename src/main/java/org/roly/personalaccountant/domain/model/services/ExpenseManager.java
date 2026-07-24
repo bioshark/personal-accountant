@@ -201,10 +201,10 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
-    public MonthlyExpenseEntity addToBudget(YearMonth yearMonth, PaymentType paymentType, double newValue) {
+    public void adjustBudget(YearMonth yearMonth, PaymentType paymentType, double newValue) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
-        entity.addToBudget(paymentType, newValue);
-        return repository.save(entity);
+        entity.adjustBudget(paymentType, newValue);
+        repository.save(entity);
     }
 
     public MonthlyExpenseEntity removeSavingById(Long savingId) {
@@ -235,7 +235,7 @@ public class ExpenseManager {
             PendingPaymentEntity pending = new PendingPaymentEntity(
                     template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType());
             entity.addPendingPayment(pending);
-            entity.addToBudget(pending);
+            entity.adjustBudget(pending);
         }
         return repository.save(entity);
     }
