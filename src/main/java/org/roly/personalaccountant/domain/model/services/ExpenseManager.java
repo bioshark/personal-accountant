@@ -251,15 +251,9 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
-    // TODO remove duplication. Maybe add a new repository method for payment id's
     public MonthlyExpenseEntity payPendingPayment(Long pendingId, LocalDate date, double amount) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
-        PendingPaymentEntity pending = entity.getPendingPayments().stream()
-                .filter(p -> p.getId().equals(pendingId))
-                .findFirst().orElseThrow();
+        MonthlyExpenseEntity entity = getEntityById(pendingId);
+        PendingPaymentEntity pending = getPendingFromEntity(pendingId, entity);
         validatePaymentDateInMonth(entity, date);
         entity.addPayment(new PaymentEntity(pending.getName(), pending.getCategory(), pending.getType(), amount, date));
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
@@ -267,13 +261,8 @@ public class ExpenseManager {
     }
 
     public MonthlyExpenseEntity removePendingPayment(Long pendingId) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
-        PendingPaymentEntity pending = entity.getPendingPayments().stream()
-                .filter(p -> p.getId().equals(pendingId))
-                .findFirst().orElseThrow();
+        MonthlyExpenseEntity entity = getEntityById(pendingId);
+        PendingPaymentEntity pending = getPendingFromEntity(pendingId, entity);
         entity.removeFromBudget(pending);
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
@@ -331,6 +320,21 @@ public class ExpenseManager {
     private MonthlyExpenseEntity getEntity(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
+    }
+
+    @NonNull
+    private MonthlyExpenseEntity getEntityById(Long pendingId) {
+        return repository.findAll().stream()
+                .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
+    }
+
+    @NonNull
+    private static PendingPaymentEntity getPendingFromEntity(Long pendingId, MonthlyExpenseEntity entity) {
+        return entity.getPendingPayments().stream()
+                .filter(p -> p.getId().equals(pendingId))
+                .findFirst().orElseThrow();
     }
 
     private static LocalDate effectiveEndDate(MonthlyExpenseEntity entity) {

@@ -3,7 +3,6 @@
 ## General
 
 - Change colors of living
-- add budget edit/adjustment.
 
 ## Foundation: Flyway + jOOQ [DO FIRST — NEXT SESSION]
 

@@ -41,6 +41,8 @@
 - [ ] `isWeekEnd` — Saturday/Sunday true, weekdays false
 - [ ] `isSaturday` — only Saturday
 - [ ] Daily allocation values (weekday vs weekend)
+- [ ] `allocationFor` (static) — default allowance on weekdays, larger on Saturday
+- [ ] `totalAllocation` (static) — correct sum across a mixed weekday/weekend range (no DTO built)
 
 ### 3. PaymentsGenerator (Unit Tests) — Critical for date correctness
 
@@ -71,6 +73,8 @@
 - [ ] `removePaymentById` — non-existent payment throws
 - [ ] `editPayment` — successful field update
 - [ ] `editPayment` — non-existent payment throws
+- [ ] `editPayment` — date outside month range throws
+- [ ] `editPayment` — date on month boundary succeeds
 
 #### Income CRUD
 
@@ -97,10 +101,22 @@
 #### Recurring/Pending Payments
 
 - [ ] `pullTemplatesIntoMonth` — templates become pending payments
+- [ ] `pullTemplatesIntoMonth` — increments FIXED/LEISURE/SAVING budgets per template type
 - [ ] `payPendingPayment` — converts to real payment, removes pending
+- [ ] `payPendingPayment` — date outside month range throws (no corruption)
 - [ ] `removePendingPayment` — removes without creating payment
+- [ ] `removePendingPayment` — decrements the type's budget
 - [ ] `getPendingPayments` — returns correct list
 - [ ] `getTotalPendingPayments` — returns correct sum
+
+#### Budgets
+
+- [ ] `adjustBudget` — sets FIXED budget to the given value (overwrite)
+- [ ] `adjustBudget` — sets LEISURE budget
+- [ ] `adjustBudget` — sets SAVING budget
+- [ ] `adjustBudget` — DAILY throws (no daily budget)
+- [ ] `getFixedBudget` / `getLeisureBudget` / `getSavingBudget` — return stored value (0.0 default)
+- [ ] `getProjectedSpendings` — budgets + total daily allocation, computed without building a DTO
 
 ### 5. RecurringPaymentService (Integration Tests)
 
@@ -132,3 +148,14 @@
 - [x] `findByDateInRange` — matches on end-date boundary (inclusive)
 - [x] `findByDateInRange` — empty for a date before range
 - [x] `findByDateInRange` — empty for a date after range
+
+### 9. ExpenseWebController (Web/MVC Tests)
+
+- [ ] `detail` — exposes `projectedCashLeft` = totalIncome − projectedSpendings
+- [ ] `defaultDate` — today when it falls within the month range
+- [ ] `defaultDate` — clamped to start date when today is before the range
+- [ ] `defaultDate` — clamped to end date when today is after the range
+- [ ] `adjustBudget` — updates the budget and redirects to the month
+- [ ] `adjustBudget` — DAILY (invalid) flashes an error, no crash
+- [ ] `addPayment` / `addIncome` — out-of-range date flashes an error (no 500, no corruption)
+- [ ] `editPayment` / `payPendingPayment` — out-of-range date flashes an error, redirects back
