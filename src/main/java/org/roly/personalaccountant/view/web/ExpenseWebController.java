@@ -17,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -56,9 +57,17 @@ public class ExpenseWebController {
         model.addAttribute("fixedBudget", expenseManager.getFixedBudget(yearMonth));
         model.addAttribute("leisureBudget", expenseManager.getLeisureBudget(yearMonth));
         model.addAttribute("savingBudget", expenseManager.getSavingBudget(yearMonth));
+        double projectedSpendings = expenseManager.getProjectedSpending(yearMonth);
+        double totalIncome = expense != null ? expense.getStatistics().getCashTotal() : 0.0;
+        model.addAttribute("projectedSpendings", projectedSpendings);
+        model.addAttribute("projectedCashLeft", totalIncome - projectedSpendings);
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         model.addAttribute("defaultDate", defaultDateFor(expense));
         return "detail";
+    }
+
+    private String redirectBack(String referer) {
+        return "redirect:" + (referer != null && !referer.isBlank() ? referer : "/");
     }
 
     /**
@@ -82,10 +91,16 @@ public class ExpenseWebController {
 
     @PostMapping("/month/addincome")
     public String addIncome(@RequestParam String source, @RequestParam LocalDate date,
-            @RequestParam double value) {
-        MonthlyExpenseEntity entity = expenseManager.addIncome(new Income(null, source, date, value));
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+            @RequestParam double value, @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.addIncome(new Income(null, source, date, value));
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return "redirect:/month/" + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/removeincome/{incomeId}")
@@ -124,10 +139,17 @@ public class ExpenseWebController {
 
     @PostMapping("/month/addpayment")
     public String addPayment(@RequestParam String description, @RequestParam Category category,
-            @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date) {
-        MonthlyExpenseEntity entity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+            @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return "redirect:/month/" + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/removepayment/{paymentId}")
@@ -140,10 +162,17 @@ public class ExpenseWebController {
     @PostMapping("/month/editpayment/{paymentId}")
     public String editPayment(@PathVariable Long paymentId, @RequestParam String description,
             @RequestParam Category category, @RequestParam PaymentType type,
-            @RequestParam double amount, @RequestParam LocalDate date) {
-        MonthlyExpenseEntity entity = expenseManager.editPayment(paymentId, description, date, amount, type, category);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+            @RequestParam double amount, @RequestParam LocalDate date,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.editPayment(paymentId, description, date, amount, type, category);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return "redirect:/month/" + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/delete/{yearMonth}")
@@ -220,10 +249,16 @@ public class ExpenseWebController {
 
     @PostMapping("/month/paypending/{pendingId}")
     public String payPendingPayment(@PathVariable Long pendingId, @RequestParam LocalDate date,
-            @RequestParam double amount) {
-        MonthlyExpenseEntity entity = expenseManager.payPendingPayment(pendingId, date, amount);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+            @RequestParam double amount, @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.payPendingPayment(pendingId, date, amount);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return "redirect:/month/" + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/skippending/{pendingId}")

@@ -75,6 +75,44 @@
           </table>
         </div>
       </div>
+      <!-- Projected Cash Left -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Projected Cash Left</h6>
+        </div>
+        <div class="card-body p-2">
+          <div class="text-center mb-2">
+            <span class="fs-5 fw-bold"
+                  th:classappend="${projectedCashLeft >= 0} ? 'text-success' : 'text-danger'"
+                  th:text="${#numbers.formatDecimal(projectedCashLeft, 1, 2)}"></span>
+            <div class="small text-muted">
+              income <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span>
+              &minus; budgets <span th:text="${#numbers.formatDecimal(projectedSpendings, 1, 2)}"></span>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Projected</span>
+            <span th:text="${#numbers.formatDecimal(projectedCashLeft, 1, 2)}"></span>
+          </div>
+          <div class="progress mb-2" style="height: 1.1rem;">
+            <div class="progress-bar"
+                 th:classappend="${projectedCashLeft >= 0} ? 'bg-success' : 'bg-danger'"
+                 role="progressbar"
+                 th:style="'width: ' + ${expense.statistics.cashTotal > 0 ? T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, (projectedCashLeft / expense.statistics.cashTotal) * 100.0)) : 0.0} + '%'">
+            </div>
+          </div>
+          <div class="d-flex justify-content-between small mb-1">
+            <span>Now (actual)</span>
+            <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span>
+          </div>
+          <div class="progress" style="height: 1.1rem;">
+            <div class="progress-bar bg-info"
+                 role="progressbar"
+                 th:style="'width: ' + ${expense.statistics.cashTotal > 0 ? T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, (expense.statistics.cashLeft / expense.statistics.cashTotal) * 100.0)) : 0.0} + '%'">
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Spending Pie Chart -->
       <div class="card mt-3">
         <div class="card-header">

@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.roly.personalaccountant.domain.model.dto.DailyStatistics;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
@@ -106,6 +107,7 @@ public class ExpenseManager {
         PaymentEntity payment = entity.getPayments().stream()
                 .filter(p -> p.getId().equals(paymentId))
                 .findFirst().orElseThrow();
+        validatePaymentDateInMonth(entity, date);
         payment.setDescription(description);
         payment.setDate(date);
         payment.setAmount(amount);
@@ -207,6 +209,15 @@ public class ExpenseManager {
         repository.save(entity);
     }
 
+    public double getProjectedSpending(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(entity -> entity.getFixedBudget() +
+                        entity.getLeisureBudget() +
+                        entity.getSavingBudget() +
+                        DailyStatistics.totalAllocation(entity.getStartDate(), effectiveEndDate(entity)))
+                .orElse(0.0);
+    }
+
     public MonthlyExpenseEntity removeSavingById(Long savingId) {
         MonthlyExpenseEntity entity = repository.findAll().stream()
                 .filter(e -> e.getSavings().stream().anyMatch(s -> s.getId().equals(savingId)))
@@ -249,6 +260,7 @@ public class ExpenseManager {
         PendingPaymentEntity pending = entity.getPendingPayments().stream()
                 .filter(p -> p.getId().equals(pendingId))
                 .findFirst().orElseThrow();
+        validatePaymentDateInMonth(entity, date);
         entity.addPayment(new PaymentEntity(pending.getName(), pending.getCategory(), pending.getType(), amount, date));
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
@@ -319,6 +331,21 @@ public class ExpenseManager {
     private MonthlyExpenseEntity getEntity(YearMonth yearMonth) {
         return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
                 .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
+    }
+
+    private static LocalDate effectiveEndDate(MonthlyExpenseEntity entity) {
+        return entity.getEndDate() != null
+                ? entity.getEndDate()
+                : PaymentsGenerator.resolveEndDate(entity.getStartDate(), null);
+    }
+
+    private static void validatePaymentDateInMonth(MonthlyExpenseEntity entity, LocalDate date) {
+        LocalDate start = entity.getStartDate();
+        LocalDate end = effectiveEndDate(entity);
+        if (date.isBefore(start) || date.isAfter(end)) {
+            throw new IllegalArgumentException(
+                    "Date " + date + " is outside the month range (" + start + " to " + end + ")");
+        }
     }
 
 }

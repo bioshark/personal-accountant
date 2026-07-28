@@ -16,7 +16,19 @@ public class DailyStatistics {
 
     public DailyStatistics(LocalDate date) {
         this.date = date;
-        this.dailyMaxAllocation = isSaturday() ? SATURDAY_MAX_ALLOCATION : DEFAULT_MAX_ALLOCATION;
+        this.dailyMaxAllocation = allocationFor(date);
+    }
+
+    public static double allocationFor(LocalDate date) {
+        return date.getDayOfWeek() == DayOfWeek.SATURDAY ? SATURDAY_MAX_ALLOCATION : DEFAULT_MAX_ALLOCATION;
+    }
+
+    public static double totalAllocation(LocalDate startInclusive, LocalDate endInclusive) {
+        double total = 0d;
+        for (LocalDate day = startInclusive; !day.isAfter(endInclusive); day = day.plusDays(1)) {
+            total += allocationFor(day);
+        }
+        return total;
     }
 
     public LocalDate getDate() {
