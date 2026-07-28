@@ -37,102 +37,34 @@
   <h1 th:text="${expense.expenseName}"></h1>
 
   <div class="row">
-    <!-- Left Column: Savings -->
+    <!-- Left Column -->
     <div class="col-md-2 mt-4 pt-2">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Savings</h6>
-          <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+</button>
-        </div>
-        <div class="card-body p-2">
-          <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted small">No savings.</div>
-          <table th:if="${!expense.statistics.savings.isEmpty()}" class="table table-sm mb-0 small">
-            <thead>
-            <tr>
-              <th>Name</th>
-              <th class="text-end">%</th>
-              <th class="text-end">Val</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="saving, sIter : ${expense.statistics.savings}"
-                th:classappend="${saving.name == 'Unallocated'} ? 'table-info' : ''">
-              <td th:text="${saving.name}"></td>
-              <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 1)}"></td>
-              <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
-              <td class="text-end text-nowrap">
-                <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
-                        th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
-                </button>
-                <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
-                      onsubmit="return confirm('Delete this saving?');">
-                  <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1">&times;</button>
-                </form>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
       <!-- Projected Cash Left -->
-      <div class="card mt-3">
-        <div class="card-header">
+      <div class="card"
+           th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'border-success' : 'border-danger'">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Projected Cash Left</h6>
+          <span class="badge"
+                th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'text-bg-success' : 'text-bg-danger'"
+                th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? 'On track' : 'Over budget'"></span>
         </div>
         <div class="card-body p-2">
-          <div class="text-center mb-2">
-            <span class="fs-5 fw-bold"
-                  th:classappend="${projectedCashLeft >= 0} ? 'text-success' : 'text-danger'"
-                  th:text="${#numbers.formatDecimal(projectedCashLeft, 1, 2)}"></span>
-            <div class="small text-muted">
-              income <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span>
-              &minus; budgets <span th:text="${#numbers.formatDecimal(projectedSpendings, 1, 2)}"></span>
-            </div>
-          </div>
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Projected</span>
+          <div class="d-flex justify-content-between small">
+            <span class="text-muted">Projected (income &minus; budgets)</span>
             <span th:text="${#numbers.formatDecimal(projectedCashLeft, 1, 2)}"></span>
           </div>
-          <div class="progress mb-2" style="height: 1.1rem;">
-            <div class="progress-bar"
-                 th:classappend="${projectedCashLeft >= 0} ? 'bg-success' : 'bg-danger'"
-                 role="progressbar"
-                 th:style="'width: ' + ${expense.statistics.cashTotal > 0 ? T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, (projectedCashLeft / expense.statistics.cashTotal) * 100.0)) : 0.0} + '%'">
-            </div>
+          <div class="d-flex justify-content-between align-items-baseline mt-1">
+            <span class="fw-bold">Actual cash left</span>
+            <span class="fs-5 fw-bold"
+                  th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'text-success' : 'text-danger'"
+                  th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span>
           </div>
-          <div class="d-flex justify-content-between small mb-1">
-            <span>Now (actual)</span>
-            <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span>
-          </div>
-          <div class="progress" style="height: 1.1rem;">
-            <div class="progress-bar bg-info"
-                 role="progressbar"
-                 th:style="'width: ' + ${expense.statistics.cashTotal > 0 ? T(java.lang.Math).max(0.0, T(java.lang.Math).min(100.0, (expense.statistics.cashLeft / expense.statistics.cashTotal) * 100.0)) : 0.0} + '%'">
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Spending Pie Chart -->
-      <div class="card mt-3">
-        <div class="card-header">
-          <h6 class="mb-0">Spending Split</h6>
-        </div>
-        <div class="card-body p-2 text-center">
-          <div class="mx-auto rounded-circle"
-               style="width: 100px; height: 100px;"
-               th:style="'width: 100px; height: 100px; background: conic-gradient(#0dcaf0 0% ' + ${expense.statistics.percentages.corePercentage} + '%, #ffc107 ' + ${expense.statistics.percentages.corePercentage} + '% ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '%, #198754 ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '% 100%);'">
-          </div>
-          <div class="mt-2 small text-start">
-            <div><span style="color: #0dcaf0;">&#9632;</span> Living: <span
-                th:text="${#numbers.formatDecimal(expense.statistics.percentages.corePercentage, 1, 1)}"></span>%
-            </div>
-            <div><span style="color: #ffc107;">&#9632;</span> Leisure: <span
-                th:text="${#numbers.formatDecimal(expense.statistics.percentages.wantPercentage, 1, 1)}"></span>%
-            </div>
-            <div><span style="color: #198754;">&#9632;</span> Saving: <span
-                th:text="${#numbers.formatDecimal(expense.statistics.percentages.savePercentage, 1, 1)}"></span>%
-            </div>
+          <hr class="my-1">
+          <div class="text-center small"
+               th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'text-success' : 'text-danger'">
+            <span th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? '&#9650;' : '&#9660;'"></span>
+            <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft - projectedCashLeft, 1, 2)}"></span>
+            <span th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? 'ahead of plan' : 'behind plan'"></span>
           </div>
         </div>
       </div>
@@ -223,6 +155,66 @@
                  th:text="${#numbers.formatDecimal(savingBudget - expense.statistics.savingExpenseTotal, 1, 2)} + ' left'">
             </div>
           </div>
+        </div>
+      </div>
+      <!-- Spending Pie Chart -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0">Spending Split</h6>
+        </div>
+        <div class="card-body p-2 text-center">
+          <div class="mx-auto rounded-circle"
+               style="width: 100px; height: 100px;"
+               th:style="'width: 100px; height: 100px; background: conic-gradient(#0dcaf0 0% ' + ${expense.statistics.percentages.corePercentage} + '%, #ffc107 ' + ${expense.statistics.percentages.corePercentage} + '% ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '%, #198754 ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '% 100%);'">
+          </div>
+          <div class="mt-2 small text-start">
+            <div><span style="color: #0dcaf0;">&#9632;</span> Living: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.corePercentage, 1, 1)}"></span>%
+            </div>
+            <div><span style="color: #ffc107;">&#9632;</span> Leisure: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.wantPercentage, 1, 1)}"></span>%
+            </div>
+            <div><span style="color: #198754;">&#9632;</span> Saving: <span
+                th:text="${#numbers.formatDecimal(expense.statistics.percentages.savePercentage, 1, 1)}"></span>%
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Savings -->
+      <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Savings</h6>
+          <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+</button>
+        </div>
+        <div class="card-body p-2">
+          <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted small">No savings.</div>
+          <table th:if="${!expense.statistics.savings.isEmpty()}" class="table table-sm mb-0 small">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-end">%</th>
+              <th class="text-end">Val</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="saving, sIter : ${expense.statistics.savings}"
+                th:classappend="${saving.name == 'Unallocated'} ? 'table-info' : ''">
+              <td th:text="${saving.name}"></td>
+              <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 1)}"></td>
+              <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
+              <td class="text-end text-nowrap">
+                <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
+                </button>
+                <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
+                      onsubmit="return confirm('Delete this saving?');">
+                  <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1">&times;</button>
+                </form>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
