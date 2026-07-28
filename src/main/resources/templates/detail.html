@@ -29,6 +29,27 @@
       background-color: #198754;
       border-color: #198754;
     }
+
+    :root {
+      --theme-green: #198754;
+      --theme-teal: #0dcaf0;
+      --theme-yellow: #ffc107;
+    }
+
+    .theme-income {
+      background-color: var(--theme-green) !important;
+      color: #fff !important;
+    }
+
+    .theme-cashleft {
+      background-color: var(--theme-teal) !important;
+      color: #000 !important;
+    }
+
+    .theme-expenses {
+      background-color: var(--theme-yellow) !important;
+      color: #000 !important;
+    }
   </style>
 </head>
 <body class="bg-light">
@@ -165,16 +186,16 @@
         <div class="card-body p-2 text-center">
           <div class="mx-auto rounded-circle"
                style="width: 100px; height: 100px;"
-               th:style="'width: 100px; height: 100px; background: conic-gradient(#0dcaf0 0% ' + ${expense.statistics.percentages.corePercentage} + '%, #ffc107 ' + ${expense.statistics.percentages.corePercentage} + '% ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '%, #198754 ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '% 100%);'">
+               th:style="'width: 100px; height: 100px; background: conic-gradient(var(--theme-teal) 0% ' + ${expense.statistics.percentages.corePercentage} + '%, var(--theme-yellow) ' + ${expense.statistics.percentages.corePercentage} + '% ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '%, var(--theme-green) ' + ${expense.statistics.percentages.corePercentage + expense.statistics.percentages.wantPercentage} + '% 100%);'">
           </div>
           <div class="mt-2 small text-start">
-            <div><span style="color: #0dcaf0;">&#9632;</span> Living: <span
+            <div><span style="color: var(--theme-teal);">&#9632;</span> Living: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.corePercentage, 1, 1)}"></span>%
             </div>
-            <div><span style="color: #ffc107;">&#9632;</span> Leisure: <span
+            <div><span style="color: var(--theme-yellow);">&#9632;</span> Leisure: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.wantPercentage, 1, 1)}"></span>%
             </div>
-            <div><span style="color: #198754;">&#9632;</span> Saving: <span
+            <div><span style="color: var(--theme-green);">&#9632;</span> Saving: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.savePercentage, 1, 1)}"></span>%
             </div>
           </div>
@@ -230,7 +251,7 @@
       <!-- Summary -->
   <div class="row g-3 my-3">
     <div class="col-md-3">
-      <div class="card text-bg-success h-100">
+      <div class="card theme-income h-100">
         <div class="card-body">
           <h6 class="card-title text-center">Total Income</h6>
           <hr class="my-2">
@@ -239,7 +260,7 @@
       </div>
     </div>
     <div class="col-md-3">
-      <div class="card text-bg-info h-100">
+      <div class="card theme-cashleft h-100">
         <div class="card-body">
           <h6 class="card-title text-center">Cash Left</h6>
           <hr class="my-2">
@@ -248,7 +269,7 @@
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card text-bg-warning h-100">
+      <div class="card theme-expenses h-100">
         <div class="card-body">
           <h6 class="card-title text-center">Expenses</h6>
           <hr class="my-2">
@@ -395,7 +416,7 @@
       <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Fixed Expenses</h6>
-          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span>
+          <span class="badge theme-expenses" th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span>
         </div>
         <div class="card-body p-1">
           <div class="accordion accordion-flush" id="fixedAccordion">
@@ -431,7 +452,7 @@
       <div class="card mb-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Leisure Expenses</h6>
-          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.leisureExpenseTotal, 1, 2)}"></span>
+          <span class="badge theme-expenses" th:text="${#numbers.formatDecimal(expense.statistics.leisureExpenseTotal, 1, 2)}"></span>
         </div>
         <div class="card-body p-1">
           <div class="accordion accordion-flush" id="leisureAccordion">
@@ -467,7 +488,7 @@
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Saving Expenses</h6>
-          <span class="badge bg-warning text-dark" th:text="${#numbers.formatDecimal(expense.statistics.savingExpenseTotal, 1, 2)}"></span>
+          <span class="badge theme-expenses" th:text="${#numbers.formatDecimal(expense.statistics.savingExpenseTotal, 1, 2)}"></span>
         </div>
         <div class="card-body p-1">
           <div class="accordion accordion-flush" id="savingAccordion">
@@ -888,6 +909,24 @@
   </div>
 </div>
 
+<!-- Theme color pickers -->
+<div class="position-fixed bottom-0 end-0 m-3 card shadow-sm p-2" style="z-index: 1050; width: 15rem;">
+  <div class="small fw-bold mb-1">Theme colors</div>
+  <label class="d-flex align-items-center justify-content-between small mb-1">
+    <span>Income / Saving</span>
+    <input type="color" id="themeGreen" value="#198754">
+  </label>
+  <label class="d-flex align-items-center justify-content-between small mb-1">
+    <span>Cash Left / Living</span>
+    <input type="color" id="themeTeal" value="#0dcaf0">
+  </label>
+  <label class="d-flex align-items-center justify-content-between small mb-1">
+    <span>Expenses / Leisure</span>
+    <input type="color" id="themeYellow" value="#ffc107">
+  </label>
+  <button type="button" class="btn btn-sm btn-outline-secondary mt-1" id="themeReset">Reset to defaults</button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   function validateBudget(form) {
@@ -898,6 +937,53 @@
     alert('Budget cannot be negative.');
     return false;
   }
+
+  (function () {
+    var defaults = {'--theme-green': '#198754', '--theme-teal': '#0dcaf0', '--theme-yellow': '#ffc107'};
+    var pickers = {'--theme-green': 'themeGreen', '--theme-teal': 'themeTeal', '--theme-yellow': 'themeYellow'};
+
+    function apply(varName, value) {
+      document.documentElement.style.setProperty(varName, value);
+    }
+
+    function init() {
+      Object.keys(pickers).forEach(function (varName) {
+        var input = document.getElementById(pickers[varName]);
+        var saved = localStorage.getItem('pa' + varName);
+        if (saved) {
+          apply(varName, saved);
+          if (input) {
+            input.value = saved;
+          }
+        }
+        if (input) {
+          input.addEventListener('input', function () {
+            apply(varName, input.value);
+            localStorage.setItem('pa' + varName, input.value);
+          });
+        }
+      });
+      var reset = document.getElementById('themeReset');
+      if (reset) {
+        reset.addEventListener('click', function () {
+          Object.keys(defaults).forEach(function (varName) {
+            apply(varName, defaults[varName]);
+            localStorage.removeItem('pa' + varName);
+            var input = document.getElementById(pickers[varName]);
+            if (input) {
+              input.value = defaults[varName];
+            }
+          });
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
 </script>
 </body>
 </html>
