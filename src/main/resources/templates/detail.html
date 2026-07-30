@@ -587,7 +587,8 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Amount</label>
-                <input type="number" step="0.01" class="form-control" name="amount" th:value="${payment.amount}" required>
+                <input type="number" step="0.01" min="0" class="form-control" name="amount"
+                       th:value="${#numbers.formatDecimal(payment.amount, 1, 'NONE', 2, 'POINT')}" required>
               </div>
               <div class="mb-3">
                 <label class="form-label">Date</label>
@@ -626,7 +627,8 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Amount</label>
-              <input type="number" step="0.01" class="form-control" name="value" th:value="${income.value}" required>
+              <input type="number" step="0.01" min="0" class="form-control" name="value"
+                     th:value="${#numbers.formatDecimal(income.value, 1, 'NONE', 2, 'POINT')}" required>
             </div>
           </div>
           <div class="modal-footer">
@@ -684,7 +686,8 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Budget amount</label>
-            <input type="number" step="0.01" class="form-control" name="value" th:value="${fixedBudget}" required>
+            <input type="number" step="0.01" min="0" class="form-control" name="value"
+                   th:value="${#numbers.formatDecimal(fixedBudget, 1, 'NONE', 2, 'POINT')}" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -709,7 +712,8 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Budget amount</label>
-            <input type="number" step="0.01" class="form-control" name="value" th:value="${leisureBudget}" required>
+            <input type="number" step="0.01" min="0" class="form-control" name="value"
+                   th:value="${#numbers.formatDecimal(leisureBudget, 1, 'NONE', 2, 'POINT')}" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -734,7 +738,8 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Budget amount</label>
-            <input type="number" step="0.01" class="form-control" name="value" th:value="${savingBudget}" required>
+            <input type="number" step="0.01" min="0" class="form-control" name="value"
+                   th:value="${#numbers.formatDecimal(savingBudget, 1, 'NONE', 2, 'POINT')}" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -850,7 +855,8 @@
             </div>
             <div class="mb-3">
               <label class="form-label">Percentage</label>
-              <input type="number" step="0.01" class="form-control" name="percentage" th:value="${saving.percentage}" required>
+              <input type="number" step="0.01" min="0" class="form-control" name="percentage"
+                     th:value="${#numbers.formatDecimal(saving.percentage, 1, 'NONE', 2, 'POINT')}" required>
             </div>
           </div>
           <div class="modal-footer">

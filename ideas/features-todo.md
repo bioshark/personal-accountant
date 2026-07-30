@@ -17,6 +17,9 @@ Agreed prerequisite for the Category change (and later Search). Sequence:
    schema matches; Flyway owns changes).
 3. **Then** do the Category change below.
 
+> **Also here:** migrate money from `double` → `BigDecimal` (DECIMAL columns). Doubles drift
+> (e.g. `3678.5600000000002`); currently worked around in the UI only. Do it as Flyway migrations.
+
 ## Dynamic Categories (unlock the enum) — Option A [depends on Foundation]
 
 Goal: keep Category **one-to-one** with a Payment (never in 2 categories, sums stay a clean
