@@ -36,13 +36,13 @@
 
 ### 2. DailyStatistics (Unit Tests) — Small unit, quick wins
 
-- [ ] `getDailyDifference` — returns 0 when day not done
-- [ ] `getDailyDifference` — returns allocation - expenditure when done
-- [ ] `isWeekEnd` — Saturday/Sunday true, weekdays false
-- [ ] `isSaturday` — only Saturday
-- [ ] Daily allocation values (weekday vs weekend)
-- [ ] `allocationFor` (static) — default allowance on weekdays, larger on Saturday
-- [ ] `totalAllocation` (static) — correct sum across a mixed weekday/weekend range (no DTO built)
+- [x] `getDailyDifference` — returns 0 when day not done
+- [x] `getDailyDifference` — returns allocation - expenditure when done
+- [x] `isWeekEnd` — Saturday/Sunday true, weekdays false
+- [x] `isSaturday` — only Saturday
+- [x] Daily allocation values (weekday vs weekend)
+- [x] `allocationFor` (static) — default allowance on weekdays, larger on Saturday
+- [x] `totalAllocation` (static) — correct sum across a mixed weekday/weekend range (no DTO built)
 
 ### 3. PaymentsGenerator (Unit Tests) — Critical for date correctness
 

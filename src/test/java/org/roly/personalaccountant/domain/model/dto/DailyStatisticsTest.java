@@ -44,4 +44,59 @@ class DailyStatisticsTest {
         dailyStatistics = new DailyStatistics(TEST_DATE.plusDays(2));
         assertThat(dailyStatistics.isWeekEnd()).isTrue();
     }
+
+    @Test
+    void shouldReturnAllocationMinusExpenditureWhenDayDone() {
+        dailyStatistics.setDayDone(true);
+        dailyStatistics.addDailyExpenditure(4);
+
+        assertThat(dailyStatistics.getDailyDifference()).isEqualTo(6);
+    }
+
+    @Test
+    void shouldReturnDefaultAllocationOnWeekday() {
+        assertThat(dailyStatistics.getDailyMaxAllocation()).isEqualTo(10);
+    }
+
+    @Test
+    void shouldReturnHigherAllocationOnSaturday() {
+        dailyStatistics = new DailyStatistics(TEST_DATE.plusDays(2));
+
+        assertThat(dailyStatistics.getDailyMaxAllocation()).isEqualTo(100);
+    }
+
+    @Test
+    void shouldAccumulateDailyExpenditure() {
+        dailyStatistics.addDailyExpenditure(3);
+        dailyStatistics.addDailyExpenditure(2);
+
+        assertThat(dailyStatistics.getDailyTotalExpenditure()).isEqualTo(5);
+    }
+
+    @Test
+    void shouldBeSaturdayOnlyOnSaturday() {
+        assertThat(dailyStatistics.isSaturday()).isFalse();
+        assertThat(new DailyStatistics(TEST_DATE.plusDays(2)).isSaturday()).isTrue();
+        assertThat(new DailyStatistics(TEST_DATE.plusDays(3)).isSaturday()).isFalse();
+    }
+
+    @Test
+    void shouldCheckIfItsWeekEndOnSunday() {
+        dailyStatistics = new DailyStatistics(TEST_DATE.plusDays(3));
+
+        assertThat(dailyStatistics.isWeekEnd()).isTrue();
+    }
+
+    @Test
+    void shouldReturnAllocationForGivenDate() {
+        assertThat(DailyStatistics.allocationFor(TEST_DATE)).isEqualTo(10);
+        assertThat(DailyStatistics.allocationFor(TEST_DATE.plusDays(2))).isEqualTo(100);
+    }
+
+    @Test
+    void shouldSumTotalAllocationAcrossRange() {
+        assertThat(DailyStatistics.totalAllocation(TEST_DATE, TEST_DATE)).isEqualTo(10);
+        // 2026-01-01 (Thu) .. 2026-01-07 (Wed): six weekdays (10 each) + one Saturday (100)
+        assertThat(DailyStatistics.totalAllocation(TEST_DATE, TEST_DATE.plusDays(6))).isEqualTo(160);
+    }
 }

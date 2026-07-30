@@ -2,8 +2,6 @@
 
 ## General
 
-- Change colors of living
-
 ## Foundation: Flyway + jOOQ [DO FIRST — NEXT SESSION]
 
 Agreed prerequisite for the Category change (and later Search). Sequence:
