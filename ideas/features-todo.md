@@ -1,24 +1,12 @@
 # Feature Ideas
 
-## General
+## Dynamic Categories (unlock the enum) — Option A
 
-## Foundation: Flyway + jOOQ [DO FIRST — NEXT SESSION]
-
-Agreed prerequisite for the Category change (and later Search). Sequence:
-
-1. **Add dependencies**: Flyway (`flyway-core` + H2 module if required) and jOOQ
-   (`spring-boot-starter-jooq`). jOOQ can go in **as just a dependency for now** — full
-   codegen wiring can come when we build Search.
-2. **Create the baseline**: capture the current schema as `V1__baseline.sql`, set
-   `spring.flyway.baseline-on-migrate=true` (baseline-version=1), and switch
-   `spring.jpa.hibernate.ddl-auto` from `update` → `validate` (Hibernate now only checks the
-   schema matches; Flyway owns changes).
-3. **Then** do the Category change below.
-
-> **Also here:** migrate money from `double` → `BigDecimal` (DECIMAL columns). Doubles drift
-> (e.g. `3678.5600000000002`); currently worked around in the UI only. Do it as Flyway migrations.
-
-## Dynamic Categories (unlock the enum) — Option A [depends on Foundation]
+> **Migration notes (carry-over from the Flyway foundation, now in place):**
+> - Existing DBs have drifted native `ENUM` category/type columns (missing newer values);
+    > `validate` tolerates them, but normalize to VARCHAR via a migration during this change.
+> - Also migrate money `double` → `BigDecimal` (DECIMAL columns) — doubles drift
+    > (e.g. `3678.5600000000002`), currently only worked around in the UI.
 
 Goal: keep Category **one-to-one** with a Payment (never in 2 categories, sums stay a clean
 partition), but allow **adding categories on the fly** and **pre-defining** a list — i.e.
@@ -64,13 +52,10 @@ Decisions / caveats:
 - Find a specific payment across all months
 - Filter by description, category, amount range, date range
 - **Implement with jOOQ** — type-safe, dynamic query building for the optional filters
-  (description / category / amount range / date range). Good technical fit *and* a deliberate learning goal (jOOQ is a sought-after skill; hobby
-  project = safe place to learn it).
-    - Prerequisite: **introduce Flyway first** (see Foundation section above). Flyway makes
-      SQL the schema source of truth, which is what jOOQ generates its type-safe classes from.
-    - Order of adoption: **Flyway → jOOQ codegen (off the migrations) → build search with jOOQ.**
-    - Bonus: once Flyway is in, the Dynamic Categories change and any future column drops become ordinary versioned migrations (things
-      `ddl-auto=update` can't do).
+  (description / category / amount range / date range). Good technical fit *and* a deliberate
+  learning goal (jOOQ is a sought-after skill; hobby project = safe place to learn it).
+    - Flyway + the jOOQ dependency are already in place. Remaining: wire jOOQ **codegen off
+      the migrations**, then build the search query with jOOQ.
 
 ## Tags & Notes
 
