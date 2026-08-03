@@ -33,6 +33,7 @@
 - [x] `getTotalDailyAllocation` — correct sum of all day allocations
 - [x] `getTotalDailyDiff` — correct total (only for done days)
 - [x] `getPercentages` — correct core/want/save split
+- [ ] `getPercentages` — zero income never produces `NaN`/infinity
 
 ### 2. DailyStatistics (Unit Tests) — Small unit, quick wins
 
@@ -56,9 +57,11 @@
 
 - [ ] `editMonthDates` — successful date change
 - [ ] `editMonthDates` — validation error when payments exist outside new range
+- [ ] `editMonthDates` — rejects overlap with another month range
 - [ ] `deleteMonthlyExpense` — successful delete
 - [ ] `deleteMonthlyExpense` — delete non-existent month returns false
 - [ ] `addNewMonthlyExpense` — duplicate month throws exception
+- [ ] `addNewMonthlyExpense` — rejects overlap with another month range
 
 #### Date Range Lookup & End Date
 
@@ -68,7 +71,7 @@
 
 #### Payment CRUD
 
-- [ ] `removePayment` — by fields
+- [ ] `removePayment` — by fields actually removes the persisted payment
 - [ ] `removePaymentById` — successful removal
 - [ ] `removePaymentById` — non-existent payment throws
 - [ ] `editPayment` — successful field update
@@ -83,6 +86,8 @@
 - [ ] `removeIncomeById` — non-existent income throws
 - [ ] `editIncome` — successful field update
 - [ ] `editIncome` — non-existent income throws
+- [ ] `editIncome` — date outside month range throws
+- [ ] `editIncome` — date on month boundary succeeds
 
 #### Day Done Toggle
 
@@ -97,11 +102,13 @@
 - [ ] `removeSavingById` — successful removal
 - [ ] `editSaving` — successful update
 - [ ] Savings values computed correctly (percentage of cashLeft)
+- [ ] Saving percentage — rejects negative or over-100 values server-side
 
 #### Recurring/Pending Payments
 
 - [ ] `pullTemplatesIntoMonth` — templates become pending payments
 - [ ] `pullTemplatesIntoMonth` — increments FIXED/LEISURE/SAVING budgets per template type
+- [ ] `pullTemplatesIntoMonth` — duplicate template behavior is enforced as designed
 - [ ] `payPendingPayment` — converts to real payment, removes pending
 - [ ] `payPendingPayment` — date outside month range throws (no corruption)
 - [ ] `removePendingPayment` — removes without creating payment
@@ -115,6 +122,7 @@
 - [ ] `adjustBudget` — sets LEISURE budget
 - [ ] `adjustBudget` — sets SAVING budget
 - [ ] `adjustBudget` — DAILY throws (no daily budget)
+- [ ] `adjustBudget` — rejects a negative value server-side
 - [ ] `getFixedBudget` / `getLeisureBudget` / `getSavingBudget` — return stored value (0.0 default)
 - [ ] `getProjectedSpendings` — budgets + total daily allocation, computed without building a DTO
 
@@ -128,26 +136,32 @@
 
 ### 6. ExpenseController (Unit Tests - extend existing)
 
+- [ ] `generateNewExpense` — real successful create returns `201 Created` (not `404`)
 - [ ] `deleteExpense` — success
 - [ ] `deleteExpense` — not found
 - [ ] `addIncome` / `removeIncome` / `editIncome`
 - [ ] `addPayment` / `removePayment` / `editPayment`
+- [ ] `removePayment` — response is successful only after the payment is removed
 - [ ] `addSaving` / `removeSaving` / `editSaving`
 
 ### 7. MonthlyExpenses (Unit Tests)
 
 - [ ] `computeMonth` — derives correct YearMonth from middle date
 - [ ] `getEndDate` — returns last day from payments map
+- [ ] `addPayment` — unknown day throws a clear validation error (not NPE)
 - [ ] `getPaymentsTypePerCategory` — groups correctly by category for given type
 - [ ] `getSumsTypePerCategory` — computes correct sums per category
 
 ### 8. MonthlyExpenseRepository (Integration Tests)
 
-- [x] `findByDateInRange` — returns month for a date within range
-- [x] `findByDateInRange` — matches on start-date boundary (inclusive)
-- [x] `findByDateInRange` — matches on end-date boundary (inclusive)
-- [x] `findByDateInRange` — empty for a date before range
-- [x] `findByDateInRange` — empty for a date after range
+> The plan previously marked these done, but `MonthlyExpenseRepositoryTest.java` is absent from
+> the current checkout; restore/add the test source before marking them complete.
+
+- [ ] `findByDateInRange` — returns month for a date within range
+- [ ] `findByDateInRange` — matches on start-date boundary (inclusive)
+- [ ] `findByDateInRange` — matches on end-date boundary (inclusive)
+- [ ] `findByDateInRange` — empty for a date before range
+- [ ] `findByDateInRange` — empty for a date after range
 
 ### 9. ExpenseWebController (Web/MVC Tests)
 
@@ -159,3 +173,14 @@
 - [ ] `adjustBudget` — DAILY (invalid) flashes an error, no crash
 - [ ] `addPayment` / `addIncome` — out-of-range date flashes an error (no 500, no corruption)
 - [ ] `editPayment` / `payPendingPayment` — out-of-range date flashes an error, redirects back
+- [ ] `editIncome` — out-of-range date flashes an error, redirects back
+
+### 10. Flyway Migration (Integration Tests)
+
+- [ ] Fresh H2 database — Flyway applies V1 and Hibernate `validate` passes
+- [ ] Migration history — a baselined existing database records V1 without re-running it
+
+### 11. ReactiveList (Unit Tests)
+
+- [ ] Listener failure — mutation fails rather than silently persisting inconsistent statistics
+

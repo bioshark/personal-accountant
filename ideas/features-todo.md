@@ -91,6 +91,35 @@ category; no FK integrity between `payment.category` and the lookup table (a ren
 cascade — would need an UPDATE). Option B (FK entity + backfill + drop column) remains the
 alternative if integrity ever matters.
 
+## Correctness & Reliability Follow-ups
+
+- [ ] REST: return `201 Created` after creating a month; current success path returns `404`.
+- [ ] REST: fix remove-payment-by-fields; remove the managed payment, not a new entity instance.
+- [ ] Reject overlapping month date ranges on create and edit (date lookup must be unambiguous).
+- [ ] Validate edited income dates stay inside the owning month.
+- [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).
+- [ ] Do not swallow `ReactiveList` listener failures; fail the mutation atomically.
+- [ ] Define/enforce duplicate recurring-template pull behavior per month.
+- [ ] Define zero-income percentage behavior; never render `NaN`/infinity.
+- [ ] Enforce server-side non-negative budget/amount values and valid saving percentages.
+- [ ] Clarify manual budget overwrite vs pending-template add/skip semantics.
+
+## Persistence & Architecture Follow-ups
+
+- [ ] Add a Flyway-enabled migration integration test for a fresh DB (V1 and future migrations).
+- [ ] Restore/add the missing `MonthlyExpenseRepositoryTest`; test plan currently marks it done.
+- [ ] Move `EndDateBackfillRunner` into a versioned Flyway data migration, then remove the runner.
+- [ ] Replace `findAll()` child-ID scans with targeted repository/jOOQ queries before Search grows.
+- [ ] Add optimistic locking (`@Version`) to month writes if multi-tab/device use is supported.
+- [ ] Migrate money from `double` to `BigDecimal` in a dedicated Flyway-backed change.
+- [ ] Extract repeated detail-page cards/modals and inline CSS/JS into fragments/static assets.
+
+## Operational Follow-ups
+
+- [ ] Improve `.gitignore` for DB/build/IDE/local chat artifacts; decide whether templates/fragments is tracked.
+- [ ] Expand README: setup, DB backup, migration/release, and local-only security notes.
+- [ ] Keep H2 console/local server bound to localhost outside development; add auth before any remote use.
+
 ## Search
 
 - Find a specific payment across all months
