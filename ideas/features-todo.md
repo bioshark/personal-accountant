@@ -13,39 +13,83 @@ partition), but allow **adding categories on the fly** and **pre-defining** a li
 remove the compile-time lock of the `Category` enum. (This is the chosen approach over the
 many-to-many "flexible labeling" idea above, for the Payment case. Incomes: decide later.)
 
-Key insight: the `CATEGORY` column is already stored as VARCHAR (per
-`preferred_enum_jdbc_type=VARCHAR` + the `ALTER ... VARCHAR(255)` already applied), so the DB
-holds plain strings like "FOOD". The lock is only in the Java enum → **no column drop / data
-migration needed**.
+Key insight: the `CATEGORY` column already stores plain strings (VARCHAR per
+`preferred_enum_jdbc_type=VARCHAR`), so the lock is only in the Java enum — **no column-type
+change or drop needed**. We only add a lookup table and a light value-normalization `UPDATE`
+(pretty names) in the V2 migration.
 
-Plan (Option A — String + managed lookup list):
+Decisions (resolved):
 
-1. Change `PaymentEntity.category` (and `RecurringPaymentTemplate`, `PendingPaymentEntity`)
-   from the `Category` enum to `String`. Column stays VARCHAR — no schema change, existing
-   rows keep working.
-2. Change the `Payment` DTO's `category` from enum to `String`.
-3. Add a `category` table (`id`, `name` unique, `archived` flag) that powers the picker,
-   **created and seeded (the 23 current enum values) via a Flyway migration, accessed via
-   jOOQ — no JPA entity/repository** (decided: a lookup list of strings doesn't warrant a
-   full entity, and jOOQ is already in the stack). Since `payment.category` is a free String
-   (no FK), this table is a suggestion/known-names list, not an enforced relationship.
-4. UI (`detail.html`, `recurring.html`): dropdown sourced from the lookup table + allow
-   typing a new name; a new name is saved on the payment and (optionally) added to the list.
-5. Update grouping (`MonthlyExpenses.getSumsTypePerCategory` /
-   `getPaymentsTypePerCategory`) and controllers to key by the String instead of the enum.
-6. Remove the `Payment.Category` enum once nothing references it.
+- **Stored value format:** convert existing category values to pretty display names
+  (`CREDIT_CARD` → "Credit card") via an `UPDATE` **inside the V2 Flyway migration** — not a
+  manual console command. New free-typed names are stored as-is.
+- **jOOQ:** no codegen for now — use the auto-configured `DSLContext` with manual refs
+  (`DSL.table("category")`) for the lookup table. Add jOOQ codegen when building Search.
+- `PaymentType` stays an enum — only `Category` changes.
 
-Decisions / caveats:
+Code-change checklist:
 
-- Normalize on add (trim, unique constraint; consider case-folding) to avoid "Food" vs
-  "food" duplicates.
-- **Archive** instead of delete for retiring a category, so historical payments keep it.
-- Keep a display-name convention (old enum prettified `CREDIT_CARD` → "Credit card"); with
-  free-form names, store the display string directly.
-- Trade-off accepted: no FK integrity between `payment.category` (string) and the lookup
-  table — a later rename won't cascade to old payments (would need an update query). Fine for
-  a personal app; Option B (FK entity + Flyway backfill + drop column) is the alternative if
-  integrity becomes important.
+### Phase 1 — Flyway migration `V2__dynamic_categories.sql`
+
+- [ ] Create `category` table: `id` identity PK, `name varchar(255)` unique not null,
+  `archived boolean default false`.
+- [ ] Seed it with the 23 current values (pretty names).
+- [ ] Normalize drift: `ALTER` `pending_payment_entity.category` and
+  `recurring_payment_template.category` (native `ENUM`) to `varchar(255)`
+  (`payment_entity.category` is already VARCHAR).
+- [ ] `UPDATE` existing category values in `payment_entity` / `pending_payment_entity` /
+  `recurring_payment_template` to the pretty form.
+
+### Phase 2 — Domain: enum → String
+
+- [ ] `Payment` record: `Category category` → `String category` (keep enum until Phase 7).
+- [ ] `PaymentEntity`, `PendingPaymentEntity`, `RecurringPaymentTemplate`: field + constructor
+  params + accessors `Category` → `String`.
+- [ ] `MonthlyExpenses.getPaymentsTypePerCategory` / `getSumsTypePerCategory` → `Map<String, …>`.
+
+### Phase 3 — Services
+
+- [ ] `ExpenseManager.editPayment(...)`: `Category` param → `String`.
+- [ ] `RecurringPaymentService.addTemplate` / `editTemplate`: `Category` params → `String`.
+
+### Phase 4 — Controllers (`@RequestParam Category` → `String`)
+
+- [ ] `ExpenseWebController`: `addPayment`, `editPayment`.
+- [ ] `RecurringPaymentWebController`: add/edit template.
+- [ ] `view/rs/controller/ExpenseController` (REST): `addPayment`, `editPayment`, `removePayment`.
+
+### Phase 5 — Category lookup access + wiring
+
+- [ ] `CategoryService` (uses `DSLContext`): `listActive()`, `addIfAbsent(name)` (trim/dedup),
+  optional `archive(name)`.
+- [ ] Call `addIfAbsent(category)` on add/edit payment and add/edit template (add-on-the-fly).
+- [ ] Add a `categories` model attribute in `ExpenseWebController.detail(...)` and the
+  recurring page mapping.
+
+### Phase 6 — Templates
+
+- [ ] `detail.html`: Add/Edit Payment modals — replace the enum `<select>` with
+  `<input list="categoryOptions"> + <datalist>` sourced from `${categories}` (pick or type).
+- [ ] `detail.html`: `payment.category.displayName` → `payment.category`; expense breakdown
+  badges (`catEntry.key`, `getSumsTypePerCategory[...]`) now String-keyed — drop `.displayName`.
+- [ ] `recurring.html`: same datalist change; `template.category.displayName` → `template.category`.
+
+### Phase 7 — Remove enum + tests
+
+- [ ] Delete `Payment.Category` enum (keep `PaymentType`); trim the Category branch from
+  `Payment.getDisplayName`.
+- [ ] Update tests referencing `Category.FOOD` etc. (`ExpenseManagerTest`) to plain strings.
+- [ ] Add `CategoryService` tests (list, add-on-the-fly, dedup/normalize).
+- [ ] Verify: full suite green; boot fresh DB (V1+V2) and a copy of the real DB (baseline→V2)
+  → `validate` passes, categories load.
+
+> Deploy Phase 1 (migration) and Phase 2 (String change) together, since `validate` checks the
+> String field against the columns.
+
+Caveats: normalize on add (trim, unique); **archive** instead of delete so history keeps its
+category; no FK integrity between `payment.category` and the lookup table (a rename won't
+cascade — would need an UPDATE). Option B (FK entity + backfill + drop column) remains the
+alternative if integrity ever matters.
 
 ## Search
 
