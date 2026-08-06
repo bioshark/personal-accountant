@@ -212,8 +212,8 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/addsaving/{yearMonth}")
-    public String addSaving(@PathVariable YearMonth yearMonth, @RequestParam String name,
-            @RequestParam double percentage, RedirectAttributes redirectAttributes) {
+    public String addSaving(@PathVariable YearMonth yearMonth, @RequestParam String name, @RequestParam double percentage,
+            RedirectAttributes redirectAttributes) {
         try {
             expenseManager.addSaving(yearMonth, name, percentage);
         } catch (IllegalArgumentException e) {

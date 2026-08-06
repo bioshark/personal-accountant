@@ -31,9 +31,9 @@ Code-change checklist:
 
 ### Phase 1 — Flyway migration `V2__dynamic_categories.sql`
 
-- [ ] Create `category` table: `id` identity PK, `name varchar(255)` unique not null,
+- [x] Create `category` table: `id` identity PK, `name varchar(255)` unique not null,
   `archived boolean default false`.
-- [ ] Seed it with the 23 current values (pretty names).
+- [x] Seed it with the 23 current values (pretty names).
 - [ ] Normalize drift: `ALTER` `pending_payment_entity.category` and
   `recurring_payment_template.category` (native `ENUM`) to `varchar(255)`
   (`payment_entity.category` is already VARCHAR).
