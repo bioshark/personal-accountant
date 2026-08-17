@@ -34,10 +34,10 @@ Code-change checklist:
 - [x] Create `category` table: `id` identity PK, `name varchar(255)` unique not null,
   `archived boolean default false`.
 - [x] Seed it with the 23 current values (pretty names).
-- [ ] Normalize drift: `ALTER` `pending_payment_entity.category` and
+- [x] Normalize drift: `ALTER` `pending_payment_entity.category` and
   `recurring_payment_template.category` (native `ENUM`) to `varchar(255)`
   (`payment_entity.category` is already VARCHAR).
-- [ ] `UPDATE` existing category values in `payment_entity` / `pending_payment_entity` /
+- [x] `UPDATE` existing category values in `payment_entity` / `pending_payment_entity` /
   `recurring_payment_template` to the pretty form.
 
 ### Phase 2 — Domain: enum → String
@@ -119,6 +119,11 @@ alternative if integrity ever matters.
 - [ ] Improve `.gitignore` for DB/build/IDE/local chat artifacts; decide whether templates/fragments is tracked.
 - [ ] Expand README: setup, DB backup, migration/release, and local-only security notes.
 - [ ] Keep H2 console/local server bound to localhost outside development; add auth before any remote use.
+
+## General improvements.
+
+- when adding a recurring payment, one could change the value of the payment on the fly.
+-
 
 ## Search
 

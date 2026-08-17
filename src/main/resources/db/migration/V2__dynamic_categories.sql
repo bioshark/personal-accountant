@@ -37,3 +37,27 @@ values ('Food'),
        ('Cat'),
        ('Electricity'),
        ('Credit card');
+
+-- Normalise the drifted enum columns to VARCHAR so they can hold free-form category names.
+-- payment_entity.category is already VARCHAR. On a fresh database these columns are created
+-- as VARCHAR by V1, so these statements are harmless no-ops there; on an existing (baselined)
+-- database they perform the real ENUM -> VARCHAR conversion. PaymentType stays an enum, so the
+-- TYPE columns are intentionally left unchanged.
+alter table pending_payment_entity
+    alter column category set data type varchar(255);
+alter table recurring_payment_template
+    alter column category set data type varchar(255);
+
+-- Convert existing stored category values from raw enum names to the pretty display form used
+-- by the seed data and getDisplayName() (e.g. PAY_OFF -> 'Pay off', FOOD -> 'Food'): replace
+-- underscores with spaces, then capitalise only the first letter. Idempotent for already-pretty
+-- values. Runs against the drifted columns only after they are VARCHAR (above).
+update payment_entity
+set category = concat(upper(substring(replace(category, '_', ' '), 1, 1)),
+                      lower(substring(replace(category, '_', ' '), 2)));
+update pending_payment_entity
+set category = concat(upper(substring(replace(category, '_', ' '), 1, 1)),
+                      lower(substring(replace(category, '_', ' '), 2)));
+update recurring_payment_template
+set category = concat(upper(substring(replace(category, '_', ' '), 1, 1)),
+                      lower(substring(replace(category, '_', ' '), 2)));
