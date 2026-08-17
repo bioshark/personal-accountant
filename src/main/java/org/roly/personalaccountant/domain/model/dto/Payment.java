@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public record Payment(
         Long id,
         String description,
-        Category category,
+        String category,
         PaymentType type,
         Double amount,
         LocalDate date

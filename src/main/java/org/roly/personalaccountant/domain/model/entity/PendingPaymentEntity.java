@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 
 @Entity
@@ -20,8 +19,7 @@ public class PendingPaymentEntity {
     private String name;
     private double amount;
 
-    @Enumerated(EnumType.STRING)
-    private Category category;
+    private String category;
 
     @Enumerated(EnumType.STRING)
     private PaymentType type;
@@ -32,7 +30,7 @@ public class PendingPaymentEntity {
     protected PendingPaymentEntity() {
     }
 
-    public PendingPaymentEntity(String name, double amount, Category category, PaymentType type) {
+    public PendingPaymentEntity(String name, double amount, String category, PaymentType type) {
         this.name = name;
         this.amount = amount;
         this.category = category;
@@ -59,11 +57,11 @@ public class PendingPaymentEntity {
         this.amount = amount;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 

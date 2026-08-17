@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 
 @Entity
@@ -20,8 +19,7 @@ public class PaymentEntity {
 
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    private Category category;
+    private String category;
 
     @Enumerated(EnumType.STRING)
     private PaymentType type;
@@ -35,7 +33,7 @@ public class PaymentEntity {
     protected PaymentEntity() {
     }
 
-    public PaymentEntity(String description, Category category, PaymentType type, Double amount, LocalDate date) {
+    public PaymentEntity(String description, String category, PaymentType type, Double amount, LocalDate date) {
         this.description = description;
         this.category = category;
         this.type = type;
@@ -59,11 +57,11 @@ public class PaymentEntity {
         this.description = description;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 

@@ -10,7 +10,6 @@ import org.roly.personalaccountant.domain.model.dto.DailyStatistics;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.dto.Saving;
 import org.roly.personalaccountant.domain.model.entity.IncomeEntity;
@@ -99,7 +98,7 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
-    public MonthlyExpenseEntity editPayment(Long paymentId, String description, LocalDate date, double amount, PaymentType type, Category category) {
+    public MonthlyExpenseEntity editPayment(Long paymentId, String description, LocalDate date, double amount, PaymentType type, String category) {
         MonthlyExpenseEntity entity = repository.findAll().stream()
                 .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
                 .findFirst()

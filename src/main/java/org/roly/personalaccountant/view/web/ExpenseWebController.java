@@ -7,7 +7,6 @@ import java.util.List;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
@@ -138,7 +137,7 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/addpayment")
-    public String addPayment(@RequestParam String description, @RequestParam Category category,
+    public String addPayment(@RequestParam String description, @RequestParam String category,
             @RequestParam PaymentType type, @RequestParam double amount, @RequestParam LocalDate date,
             @RequestHeader(value = "Referer", required = false) String referer,
             RedirectAttributes redirectAttributes) {
@@ -161,7 +160,7 @@ public class ExpenseWebController {
 
     @PostMapping("/month/editpayment/{paymentId}")
     public String editPayment(@PathVariable Long paymentId, @RequestParam String description,
-            @RequestParam Category category, @RequestParam PaymentType type,
+            @RequestParam String category, @RequestParam PaymentType type,
             @RequestParam double amount, @RequestParam LocalDate date,
             @RequestHeader(value = "Referer", required = false) String referer,
             RedirectAttributes redirectAttributes) {

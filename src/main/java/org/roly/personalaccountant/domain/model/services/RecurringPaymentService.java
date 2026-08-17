@@ -1,7 +1,6 @@
 package org.roly.personalaccountant.domain.model.services;
 
 import java.util.List;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.repository.RecurringPaymentTemplateRepository;
@@ -20,11 +19,11 @@ public class RecurringPaymentService {
         return repository.findAll();
     }
 
-    public RecurringPaymentTemplate addTemplate(String name, double defaultAmount, Category category, PaymentType type) {
+    public RecurringPaymentTemplate addTemplate(String name, double defaultAmount, String category, PaymentType type) {
         return repository.save(new RecurringPaymentTemplate(name, defaultAmount, category, type));
     }
 
-    public RecurringPaymentTemplate editTemplate(Long id, String name, double defaultAmount, Category category, PaymentType type) {
+    public RecurringPaymentTemplate editTemplate(Long id, String name, double defaultAmount, String category, PaymentType type) {
         RecurringPaymentTemplate template = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Template not found: " + id));
         template.setName(name);

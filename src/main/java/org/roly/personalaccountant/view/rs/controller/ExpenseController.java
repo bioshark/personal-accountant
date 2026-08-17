@@ -7,7 +7,6 @@ import java.util.Map;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
@@ -100,7 +99,7 @@ public class ExpenseController {
 
     @PostMapping("/addpayment")
     public ResponseEntity<Void> addPayment(@RequestParam("description") String description,
-            @RequestParam("category") Category category,
+            @RequestParam("category") String category,
             @RequestParam("type") PaymentType type,
             @RequestParam("amount") double amount,
             @RequestParam("date") LocalDate date) {
@@ -113,7 +112,7 @@ public class ExpenseController {
 
     @PostMapping("/removePayment")
     public ResponseEntity<Void> removePayment(@RequestParam("description") String description,
-            @RequestParam("category") Category category,
+            @RequestParam("category") String category,
             @RequestParam("type") PaymentType type,
             @RequestParam("amount") double amount,
             @RequestParam("date") LocalDate date) {
@@ -127,7 +126,7 @@ public class ExpenseController {
     @PostMapping("/editPayment")
     public ResponseEntity<Void> editPayment(@RequestParam("id") Long id,
             @RequestParam("description") String description,
-            @RequestParam("category") Category category,
+            @RequestParam("category") String category,
             @RequestParam("type") PaymentType type,
             @RequestParam("amount") double amount,
             @RequestParam("date") LocalDate date) {

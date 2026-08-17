@@ -42,21 +42,21 @@ Code-change checklist:
 
 ### Phase 2 — Domain: enum → String
 
-- [ ] `Payment` record: `Category category` → `String category` (keep enum until Phase 7).
-- [ ] `PaymentEntity`, `PendingPaymentEntity`, `RecurringPaymentTemplate`: field + constructor
+- [x] `Payment` record: `Category category` → `String category` (keep enum until Phase 7).
+- [x] `PaymentEntity`, `PendingPaymentEntity`, `RecurringPaymentTemplate`: field + constructor
   params + accessors `Category` → `String`.
-- [ ] `MonthlyExpenses.getPaymentsTypePerCategory` / `getSumsTypePerCategory` → `Map<String, …>`.
+- [x] `MonthlyExpenses.getPaymentsTypePerCategory` / `getSumsTypePerCategory` → `Map<String, …>`.
 
 ### Phase 3 — Services
 
-- [ ] `ExpenseManager.editPayment(...)`: `Category` param → `String`.
-- [ ] `RecurringPaymentService.addTemplate` / `editTemplate`: `Category` params → `String`.
+- [x] `ExpenseManager.editPayment(...)`: `Category` param → `String`.
+- [x] `RecurringPaymentService.addTemplate` / `editTemplate`: `Category` params → `String`.
 
 ### Phase 4 — Controllers (`@RequestParam Category` → `String`)
 
-- [ ] `ExpenseWebController`: `addPayment`, `editPayment`.
-- [ ] `RecurringPaymentWebController`: add/edit template.
-- [ ] `view/rs/controller/ExpenseController` (REST): `addPayment`, `editPayment`, `removePayment`.
+- [x] `ExpenseWebController`: `addPayment`, `editPayment`.
+- [x] `RecurringPaymentWebController`: add/edit template.
+- [x] `view/rs/controller/ExpenseController` (REST): `addPayment`, `editPayment`, `removePayment`.
 
 ### Phase 5 — Category lookup access + wiring
 

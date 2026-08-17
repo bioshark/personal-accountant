@@ -6,7 +6,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 
 @Entity
@@ -19,8 +18,7 @@ public class RecurringPaymentTemplate {
     private String name;
     private double defaultAmount;
 
-    @Enumerated(EnumType.STRING)
-    private Category category;
+    private String category;
 
     @Enumerated(EnumType.STRING)
     private PaymentType type;
@@ -28,7 +26,7 @@ public class RecurringPaymentTemplate {
     protected RecurringPaymentTemplate() {
     }
 
-    public RecurringPaymentTemplate(String name, double defaultAmount, Category category, PaymentType type) {
+    public RecurringPaymentTemplate(String name, double defaultAmount, String category, PaymentType type) {
         this.name = name;
         this.defaultAmount = defaultAmount;
         this.category = category;
@@ -55,11 +53,11 @@ public class RecurringPaymentTemplate {
         this.defaultAmount = defaultAmount;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 

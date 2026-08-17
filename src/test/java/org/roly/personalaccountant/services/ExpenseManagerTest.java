@@ -55,7 +55,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentToExpense() {
-        Payment payment = new Payment(null, "food", FOOD, FIXED, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
@@ -68,7 +68,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldNotAddPaymentToFixedExpense() {
-        Payment payment = new Payment(null, "food", MEDIA, LEISURE, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, "food", MEDIA.toString(), LEISURE, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
@@ -81,7 +81,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldNotAddPaymentToNonExistentExpenseDay() {
-        Payment payment = new Payment(null, "food", FOOD, DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
+        Payment payment = new Payment(null, "food", FOOD.toString(), DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
 
         assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
     }
@@ -113,7 +113,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentOnStartDateBoundary() {
-        Payment payment = new Payment(null, "food", FOOD, FIXED, 5.0d, START_DATE);
+        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 5.0d, START_DATE);
 
         manager.addPayment(payment);
 
@@ -124,7 +124,7 @@ class ExpenseManagerTest {
     @Test
     void shouldAddPaymentOnEndDateBoundary() {
         LocalDate endDate = LocalDate.of(2025, 6, 27);
-        Payment payment = new Payment(null, "food", FOOD, FIXED, 5.0d, endDate);
+        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 5.0d, endDate);
 
         manager.addPayment(payment);
 

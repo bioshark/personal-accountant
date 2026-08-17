@@ -1,6 +1,5 @@
 package org.roly.personalaccountant.view.web;
 
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.services.RecurringPaymentService;
 import org.springframework.stereotype.Controller;
@@ -27,14 +26,14 @@ public class RecurringPaymentWebController {
 
     @PostMapping("/recurring/add")
     public String addTemplate(@RequestParam String name, @RequestParam double defaultAmount,
-            @RequestParam Category category, @RequestParam PaymentType type) {
+            @RequestParam String category, @RequestParam PaymentType type) {
         recurringPaymentService.addTemplate(name, defaultAmount, category, type);
         return "redirect:/recurring";
     }
 
     @PostMapping("/recurring/edit/{id}")
     public String editTemplate(@PathVariable Long id, @RequestParam String name,
-            @RequestParam double defaultAmount, @RequestParam Category category, @RequestParam PaymentType type) {
+            @RequestParam double defaultAmount, @RequestParam String category, @RequestParam PaymentType type) {
         recurringPaymentService.editTemplate(id, name, defaultAmount, category, type);
         return "redirect:/recurring";
     }
