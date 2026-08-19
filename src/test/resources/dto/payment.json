@@ -1,6 +1,6 @@
 {
   "description": "food",
-  "category": "FOOD",
+  "category": "food",
   "type": "FIXED",
   "amount": 11.3,
   "date": "2025-06-10"

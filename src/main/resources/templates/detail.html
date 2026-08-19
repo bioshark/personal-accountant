@@ -53,6 +53,9 @@
   </style>
 </head>
 <body class="bg-light">
+<datalist id="categoryOptions">
+  <option th:each="c : ${categories}" th:value="${c}"></option>
+</datalist>
 <div class="container-fluid py-4 px-4">
   <a href="/" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back</a>
   <h1 th:text="${expense.expenseName}"></h1>
@@ -387,7 +390,7 @@
             <tbody>
             <tr th:each="payment, pIter : ${entry.value}">
               <td th:text="${payment.description}"></td>
-              <td th:text="${payment.category.displayName}"></td>
+              <td th:text="${payment.category}"></td>
               <td th:text="${payment.type.displayName}"></td>
               <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
               <td class="text-end text-nowrap">
@@ -426,7 +429,7 @@
                 <button class="accordion-button collapsed py-1 px-2 small" type="button"
                         data-bs-toggle="collapse"
                         th:attr="data-bs-target='#fixed-cat-' + ${cIter.index}"
-                        th:text="${catEntry.key.displayName}">
+                        th:text="${catEntry.key}">
                 </button>
                 <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
                       style="right: 2rem; z-index: 3; font-size: 0.7rem;"
@@ -462,7 +465,7 @@
                 <button class="accordion-button collapsed py-1 px-2 small" type="button"
                         data-bs-toggle="collapse"
                         th:attr="data-bs-target='#leisure-cat-' + ${cIter.index}"
-                        th:text="${catEntry.key.displayName}">
+                        th:text="${catEntry.key}">
                 </button>
                 <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
                       style="right: 2rem; z-index: 3; font-size: 0.7rem;"
@@ -498,7 +501,7 @@
                 <button class="accordion-button collapsed py-1 px-2 small" type="button"
                         data-bs-toggle="collapse"
                         th:attr="data-bs-target='#saving-cat-' + ${cIter.index}"
-                        th:text="${catEntry.key.displayName}">
+                        th:text="${catEntry.key}">
                 </button>
                 <span class="badge bg-secondary position-absolute top-50 translate-middle-y small"
                       style="right: 2rem; z-index: 3; font-size: 0.7rem;"
@@ -573,10 +576,8 @@
               </div>
               <div class="mb-3">
                 <label class="form-label">Category</label>
-                <select class="form-select" name="category" required>
-                  <option th:each="cat : ${T(org.roly.personalaccountant.domain.model.dto.Payment.Category).values()}"
-                          th:value="${cat}" th:text="${cat.displayName}" th:selected="${cat == payment.category}"></option>
-                </select>
+                <input class="form-control" name="category" list="categoryOptions" required
+                       autocomplete="off" th:value="${payment.category}">
               </div>
               <div class="mb-3">
                 <label class="form-label">Type</label>
@@ -885,10 +886,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label">Category</label>
-            <select class="form-select" name="category" required>
-              <option th:each="cat : ${T(org.roly.personalaccountant.domain.model.dto.Payment.Category).values()}"
-                      th:value="${cat}" th:text="${cat.displayName}"></option>
-            </select>
+            <input class="form-control" name="category" list="categoryOptions" required autocomplete="off">
           </div>
           <div class="mb-3">
             <label class="form-label">Type</label>

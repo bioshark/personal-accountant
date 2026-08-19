@@ -22,36 +22,6 @@ public record Payment(
         }
     }
 
-    public enum Category {
-        FOOD,
-        MEDIA,
-        INVOICE,
-        INSURANCE,
-        HEALTH,
-        FUEL,
-        TRAVEL,
-        VACATION,
-        TELCO,
-        FUN,
-        GIFT,
-        ETF,
-        PAY_OFF,
-        GARDEN,
-        HOUSE,
-        OTHER,
-        TOBACCO,
-        CLOTHES,
-        MORTGAGE,
-        LEASING,
-        CAT,
-        ELECTRICITY,
-        CREDIT_CARD;
-
-        public String getDisplayName() {
-            return Payment.getDisplayName(this);
-        }
-    }
-
     public boolean isFixed() {
         return type == PaymentType.FIXED;
     }

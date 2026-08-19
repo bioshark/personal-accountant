@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.roly.personalaccountant.domain.model.dto.Payment.Category;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 
 class OverallSumsTrackerTest {
@@ -18,12 +17,16 @@ class OverallSumsTrackerTest {
     private static final Set<LocalDate> DATES = IntStream.range(0, 30)
             .mapToObj(i -> LocalDate.now().plusDays(i))
             .collect(LinkedHashSet::new, LinkedHashSet::add, LinkedHashSet::addAll);
-    private static final Payment FIXED_PAYMENT_MORTGAGE = new Payment(1L, "House", Category.MORTGAGE.toString(), PaymentType.FIXED, 1000D,
+    private static final String MORTGAGE = "mortgage";
+    private static final Payment FIXED_PAYMENT_MORTGAGE = new Payment(1L, "House", MORTGAGE, PaymentType.FIXED, 1000D,
             LocalDate.now());
-    private static final Payment DAILY_PAYMENT_FOOD = new Payment(1L, "Food", Category.FOOD.toString(), PaymentType.DAILY, 12.3D, LocalDate.now());
-    private static final Payment LEISURE_PAYMENT_MUSIC = new Payment(1L, "Music", Category.MEDIA.toString(), PaymentType.LEISURE, 44.9D,
+    private static final String FOOD = "food";
+    private static final Payment DAILY_PAYMENT_FOOD = new Payment(1L, "Food", FOOD, PaymentType.DAILY, 12.3D, LocalDate.now());
+    private static final String MEDIA = "media";
+    private static final Payment LEISURE_PAYMENT_MUSIC = new Payment(1L, "Music", MEDIA, PaymentType.LEISURE, 44.9D,
             LocalDate.now());
-    private static final Payment SAVING_PAYMENT_ETF = new Payment(1L, "Etf", Category.ETF.toString(), PaymentType.SAVING, 150D, LocalDate.now());
+    private static final String ETF = "etf";
+    private static final Payment SAVING_PAYMENT_ETF = new Payment(1L, "Etf", ETF, PaymentType.SAVING, 150D, LocalDate.now());
     private static final Income WAGE_INCOME = new Income(null, "Wage", LocalDate.now(), 3000D);
 
     private OverallSumsTracker overallSumsTracker;

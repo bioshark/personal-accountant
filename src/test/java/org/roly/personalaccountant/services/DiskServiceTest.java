@@ -1,7 +1,6 @@
 package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.roly.personalaccountant.domain.model.dto.Payment.Category.FOOD;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +25,7 @@ import org.springframework.boot.test.json.JsonContent;
 class DiskServiceTest {
 
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
-    private static final Payment PAYMENT = new Payment(null, "food", FOOD.toString(), FIXED, 11.3d, PAYMENT_DATE);
+    private static final Payment PAYMENT = new Payment(null, "food", "food", FIXED, 11.3d, PAYMENT_DATE);
     private static final String FILE_PATH = "./Payment-TEST.json";
 
     @Autowired

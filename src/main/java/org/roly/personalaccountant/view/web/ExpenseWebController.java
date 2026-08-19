@@ -9,8 +9,10 @@ import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
+import org.roly.personalaccountant.domain.model.services.CategoryService;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.domain.model.services.RecurringPaymentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +27,13 @@ public class ExpenseWebController {
 
     private final ExpenseManager expenseManager;
     private final RecurringPaymentService recurringPaymentService;
+    private final CategoryService categoryService;
 
-    public ExpenseWebController(ExpenseManager expenseManager, RecurringPaymentService recurringPaymentService) {
+    @Autowired
+    public ExpenseWebController(ExpenseManager expenseManager, RecurringPaymentService recurringPaymentService, CategoryService categoryService) {
         this.expenseManager = expenseManager;
         this.recurringPaymentService = recurringPaymentService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("/")
@@ -62,6 +67,7 @@ public class ExpenseWebController {
         model.addAttribute("projectedCashLeft", totalIncome - projectedSpendings);
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
         model.addAttribute("defaultDate", defaultDateFor(expense));
+        model.addAttribute("categories", categoryService.listActive());
         return "detail";
     }
 
@@ -143,6 +149,7 @@ public class ExpenseWebController {
             RedirectAttributes redirectAttributes) {
         try {
             MonthlyExpenseEntity entity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
+            categoryService.addIfAbsent(category);
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
             return "redirect:/month/" + ym;
         } catch (IllegalArgumentException e) {
@@ -166,6 +173,7 @@ public class ExpenseWebController {
             RedirectAttributes redirectAttributes) {
         try {
             MonthlyExpenseEntity entity = expenseManager.editPayment(paymentId, description, date, amount, type, category);
+            categoryService.addIfAbsent(category);
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
             return "redirect:/month/" + ym;
         } catch (IllegalArgumentException e) {

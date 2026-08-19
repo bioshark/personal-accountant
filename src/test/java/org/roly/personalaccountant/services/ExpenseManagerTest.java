@@ -2,8 +2,6 @@ package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.roly.personalaccountant.domain.model.dto.Payment.Category.FOOD;
-import static org.roly.personalaccountant.domain.model.dto.Payment.Category.MEDIA;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.LEISURE;
@@ -30,6 +28,8 @@ class ExpenseManagerTest {
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
     private static final String EXPENSE_MONTH_NAME = "June 2025";
+    private static final String FOOD = "food";
+    private static final String MEDIA = "media";
 
     @Autowired
     private ExpenseManager manager;
@@ -55,7 +55,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentToExpense() {
-        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, FOOD, FOOD, FIXED, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
@@ -68,7 +68,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldNotAddPaymentToFixedExpense() {
-        Payment payment = new Payment(null, "food", MEDIA.toString(), LEISURE, 11.3d, PAYMENT_DATE);
+        Payment payment = new Payment(null, FOOD, MEDIA, LEISURE, 11.3d, PAYMENT_DATE);
 
         manager.addPayment(payment);
 
@@ -81,7 +81,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldNotAddPaymentToNonExistentExpenseDay() {
-        Payment payment = new Payment(null, "food", FOOD.toString(), DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
+        Payment payment = new Payment(null, FOOD, FOOD, DAILY, 11.3d, PAYMENT_DATE.minusDays(100));
 
         assertThrows(IllegalArgumentException.class, () -> manager.addPayment(payment));
     }
@@ -113,22 +113,22 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentOnStartDateBoundary() {
-        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 5.0d, START_DATE);
+        Payment payment = new Payment(null, FOOD, FOOD, FIXED, 5.0d, START_DATE);
 
         manager.addPayment(payment);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(START_DATE))
-                .anyMatch(p -> ((Payment) p).description().equals("food"));
+                .anyMatch(p -> ((Payment) p).description().equals(FOOD));
     }
 
     @Test
     void shouldAddPaymentOnEndDateBoundary() {
         LocalDate endDate = LocalDate.of(2025, 6, 27);
-        Payment payment = new Payment(null, "food", FOOD.toString(), FIXED, 5.0d, endDate);
+        Payment payment = new Payment(null, FOOD, FOOD, FIXED, 5.0d, endDate);
 
         manager.addPayment(payment);
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(endDate))
-                .anyMatch(p -> ((Payment) p).description().equals("food"));
+                .anyMatch(p -> ((Payment) p).description().equals(FOOD));
     }
 }
