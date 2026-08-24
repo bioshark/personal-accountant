@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.roly</groupId>
   <artifactId>personal-accountant</artifactId>
-  <version>1.1.8-SNAPSHOT</version>
+  <version>1.1.8</version>
   <name>personal-accountant</name>
   <description>personal-accountant</description>
   <url />
@@ -22,7 +22,7 @@
   <scm>
     <connection>scm:git:git@github.com:bioshark/personal-accountant.git</connection>
     <developerConnection>scm:git:git@github.com:bioshark/personal-accountant.git</developerConnection>
-    <tag>v1.0.1</tag>
+    <tag>v1.1.8</tag>
     <url>https://github.com/bioshark/personal-accountant</url>
   </scm>
 
