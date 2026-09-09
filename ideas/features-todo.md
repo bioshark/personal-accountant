@@ -1,5 +1,9 @@
 # Feature Ideas
 
+## General improvements.
+
+1. mark month as done. in the overview page, color different the month tickets that are done, highlighting the remaining cash.
+
 ## Correctness & Reliability Follow-ups
 
 - [ ] REST: return `201 Created` after creating a month; current success path returns `404`.
@@ -16,7 +20,7 @@
 ## Persistence & Architecture Follow-ups
 
 - [ ] Add a Flyway-enabled migration integration test for a fresh DB (V1 and future migrations).
-- [ ] Restore/add the missing `MonthlyExpenseRepositoryTest`; test plan currently marks it done.
+- [ ] Add the missing `MonthlyExpenseRepositoryTest` (see test plan §7).
 - [ ] Move `EndDateBackfillRunner` into a versioned Flyway data migration, then remove the runner.
 - [ ] Replace `findAll()` child-ID scans with targeted repository/jOOQ queries before Search grows.
 - [ ] Add optimistic locking (`@Version`) to month writes if multi-tab/device use is supported.
@@ -28,13 +32,6 @@
 - [ ] Improve `.gitignore` for DB/build/IDE/local chat artifacts; decide whether templates/fragments is tracked.
 - [ ] Expand README: setup, DB backup, migration/release, and local-only security notes.
 - [ ] Keep H2 console/local server bound to localhost outside development; add auth before any remote use.
-
-## General improvements.
-
-- now that category is dynamic, when adding a new payment, one should be able to either add a category, or choose from existing ones.
-- when adding a recurring payment, one could change the value of the payment on the fly.
-- add a button on detail page to add expense, not only in the actual day. When pressing it, the default date should be "today".
-- mark month as done. in the overview page, color different the month tickets that are done, highlighting the remaining cash.
 
 ## Search
 
