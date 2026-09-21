@@ -3,6 +3,9 @@
 ## General improvements.
 
 1. mark month as done. in the overview page, color different the month tickets that are done, highlighting the remaining cash.
+2. Spending split - add the sums in parentheses after the percentages.
+3. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
+4. recurring payments & pull recurring payments, should have tabs for the type of recurring payment: fixed, savings, leisure
 
 ## Correctness & Reliability Follow-ups
 
