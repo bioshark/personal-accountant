@@ -1,6 +1,7 @@
 package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
@@ -9,13 +10,20 @@ import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.L
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
+import org.roly.personalaccountant.domain.model.services.MonthClosedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -130,5 +138,68 @@ class ExpenseManagerTest {
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(endDate))
                 .anyMatch(p -> ((Payment) p).description().equals(FOOD));
+    }
+
+    @Test
+    void shouldCreateMonthNotDone() {
+        assertThat(manager.getExpense(EXPENSE_MONTH).isDone()).isFalse();
+    }
+
+    @Test
+    void shouldMarkMonthAsDone() {
+        manager.toggleMonthDone(EXPENSE_MONTH);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).isDone()).isTrue();
+    }
+
+    @Test
+    void shouldReopenMonthWhenToggledTwice() {
+        manager.toggleMonthDone(EXPENSE_MONTH);
+        manager.toggleMonthDone(EXPENSE_MONTH);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).isDone()).isFalse();
+    }
+
+    @Test
+    void shouldExposeDoneFlagInExpensesOverview() {
+        manager.toggleMonthDone(EXPENSE_MONTH);
+
+        assertThat(manager.getExpenses().get(EXPENSE_MONTH).isDone()).isTrue();
+    }
+
+    @Test
+    void shouldRejectTogglingNonExistentMonth() {
+        YearMonth missing = YearMonth.of(2030, Month.JANUARY);
+
+        assertThrows(IllegalArgumentException.class, () -> manager.toggleMonthDone(missing));
+    }
+
+    @ParameterizedTest
+    @MethodSource("monthMutations")
+    void shouldRejectChangesWhileMonthIsDone(Consumer<ExpenseManager> mutation) {
+        manager.toggleMonthDone(EXPENSE_MONTH);
+
+        assertThatThrownBy(() -> mutation.accept(manager)).isInstanceOf(MonthClosedException.class);
+    }
+
+    @Test
+    void shouldAcceptChangesAfterMonthIsReopened() {
+        manager.toggleMonthDone(EXPENSE_MONTH);
+        manager.toggleMonthDone(EXPENSE_MONTH);
+
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 5.0d, PAYMENT_DATE));
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(5.0d);
+    }
+
+    private static Stream<Named<Consumer<ExpenseManager>>> monthMutations() {
+        return Stream.of(
+                Named.of("addPayment", m -> m.addPayment(new Payment(null, FOOD, FOOD, FIXED, 5.0d, PAYMENT_DATE))),
+                Named.of("addIncome", m -> m.addIncome(WAGE_INCOME)),
+                Named.of("toggleDayDone", m -> m.toggleDayDone(PAYMENT_DATE)),
+                Named.of("addSaving", m -> m.addSaving(EXPENSE_MONTH, "Emergency", 10)),
+                Named.of("adjustBudget", m -> m.adjustBudget(EXPENSE_MONTH, FIXED, 100)),
+                Named.of("pullTemplatesIntoMonth", m -> m.pullTemplatesIntoMonth(EXPENSE_MONTH, List.of())),
+                Named.of("editMonthDates", m -> m.editMonthDates(EXPENSE_MONTH, START_DATE, null)));
     }
 }

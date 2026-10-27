@@ -44,21 +44,33 @@
          role="tabpanel">
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <div class="col" th:each="expense : ${yearEntry.value}">
-          <div class="card h-100 shadow-sm">
+          <div class="card h-100 shadow-sm"
+               th:classappend="${expense.done} ? (${expense.statistics.cashLeft >= 0} ? 'border-success bg-success-subtle' : 'border-danger bg-danger-subtle') : ''">
             <a th:href="@{/month/{ym}(ym=${expense.yearMonth})}" class="text-decoration-none text-body">
               <div class="card-body">
-                <h5 class="card-title" th:text="${expense.expenseName}"
-                    data-bs-toggle="tooltip" data-bs-placement="top"
-                    th:title="${#temporals.format(expense.startDate, 'dd MMM')} + ' → ' + ${#temporals.format(expense.endDate, 'dd MMM')}"></h5>
+                <div class="d-flex justify-content-between align-items-start">
+                  <h5 class="card-title" th:text="${expense.expenseName}"
+                      data-bs-toggle="tooltip" data-bs-placement="top"
+                      th:title="${#temporals.format(expense.startDate, 'dd MMM')} + ' → ' + ${#temporals.format(expense.endDate, 'dd MMM')}"></h5>
+                  <span th:if="${expense.done}" class="badge text-bg-secondary">Done</span>
+                </div>
                 <ul class="list-unstyled mb-0">
                   <li><strong>Income:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashTotal, 1, 2)}"></span></li>
-                  <li><strong>Cash Left:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span></li>
+                  <li><strong>Cash Left:</strong>
+                    <span
+                        th:classappend="${expense.done} ? (${expense.statistics.cashLeft >= 0} ? 'fw-bold text-success' : 'fw-bold text-danger') : ''"
+                        th:text="${#numbers.formatDecimal(expense.statistics.cashLeft, 1, 2)}"></span></li>
                   <li><strong>Fixed:</strong> <span th:text="${#numbers.formatDecimal(expense.statistics.fixedExpenseTotal, 1, 2)}"></span></li>
                 </ul>
               </div>
             </a>
             <div class="card-footer bg-transparent border-0 text-end">
-              <button class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
+              <form th:action="@{/month/toggledone/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-sm me-1"
+                        th:classappend="${expense.done} ? 'btn-outline-secondary' : 'btn-outline-success'"
+                        th:text="${expense.done} ? 'Reopen' : 'Mark done'"></button>
+              </form>
+              <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
                       th:attr="data-bs-target='#editDatesModal-' + ${expense.yearMonth}">Edit Dates
               </button>
               <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;"

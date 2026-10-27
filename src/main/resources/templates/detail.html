@@ -63,7 +63,16 @@
 </datalist>
 <div class="container-fluid py-4 px-4">
   <a href="/" class="btn btn-outline-secondary btn-sm mb-3">&larr; Back</a>
-  <h1 th:text="${expense.expenseName}"></h1>
+  <div class="d-flex align-items-center gap-3 mb-2">
+    <h1 class="mb-0" th:text="${expense.expenseName}"></h1>
+    <span th:if="${expense.done}" class="badge text-bg-success fs-6">Done</span>
+    <form method="post" th:action="@{/month/toggledone/{ym}(ym=${expense.yearMonth})}" class="ms-auto">
+      <button type="submit" class="btn btn-sm"
+              th:classappend="${expense.done} ? 'btn-outline-secondary' : 'btn-outline-success'"
+              th:text="${expense.done} ? 'Reopen month' : 'Mark month as done'"></button>
+    </form>
+  </div>
+  <div th:if="${expense.done}" class="alert alert-secondary py-2 small">This month is closed. Reopen it to make changes.</div>
 
   <div class="row">
     <!-- Left Column -->
@@ -121,7 +130,7 @@
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Fixed Budget</h6>
-          <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+          <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
                   data-bs-target="#adjustFixedBudgetModal" title="Edit budget">&#9998;
           </button>
         </div>
@@ -144,7 +153,7 @@
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Leisure Budget</h6>
-          <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+          <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
                   data-bs-target="#adjustLeisureBudgetModal" title="Edit budget">&#9998;
           </button>
         </div>
@@ -167,7 +176,7 @@
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Saving Budget</h6>
-          <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+          <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
                   data-bs-target="#adjustSavingBudgetModal" title="Edit budget">&#9998;
           </button>
         </div>
@@ -213,7 +222,7 @@
       <div class="card mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Savings</h6>
-          <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+</button>
+          <button th:unless="${expense.done}" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addSavingModal">+</button>
         </div>
         <div class="card-body p-2">
           <div th:if="${expense.statistics.savings.isEmpty()}" class="text-muted small">No savings.</div>
@@ -233,10 +242,10 @@
               <td class="text-end" th:text="${#numbers.formatDecimal(saving.percentage, 1, 1)}"></td>
               <td class="text-end" th:text="${#numbers.formatDecimal(saving.value, 1, 2)}"></td>
               <td class="text-end text-nowrap">
-                <button class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
+                <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary py-0 px-1" data-bs-toggle="modal"
                         th:attr="data-bs-target='#editSavingModal-' + ${sIter.index}">&#9998;
                 </button>
-                <form method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
+                <form th:unless="${expense.done}" method="post" th:action="@{/month/removesaving/{id}(id=${saving.id})}" style="display:inline;"
                       onsubmit="return confirm('Delete this saving?');">
                   <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1">&times;</button>
                 </form>
@@ -310,7 +319,7 @@
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <h5 class="mb-0">Incomes</h5>
-      <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addIncomeModal">+ Add Income</button>
+      <button th:unless="${expense.done}" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addIncomeModal">+ Add Income</button>
     </div>
     <div class="card-body" id="income-list">
       <div th:if="${expense.incomes.isEmpty()}" class="text-muted">No incomes recorded.</div>
@@ -329,10 +338,10 @@
           <td th:text="${income.date}"></td>
           <td class="text-end" th:text="${#numbers.formatDecimal(income.value, 1, 2)}"></td>
           <td class="text-end text-nowrap">
-            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+            <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                     th:attr="data-bs-target='#editIncomeModal-' + ${iter.index}">&#9998;
             </button>
-            <form method="post" th:action="@{/month/removeincome/{id}(id=${income.id})}" style="display:inline;"
+            <form th:unless="${expense.done}" method="post" th:action="@{/month/removeincome/{id}(id=${income.id})}" style="display:inline;"
                   onsubmit="return confirm('Delete this income?');">
               <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
             </form>
@@ -348,7 +357,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
           <div class="d-flex align-items-center gap-2">
             <h5 class="mb-0">Payments</h5>
-            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+            <button th:unless="${expense.done}" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
                     th:attr="onclick='document.getElementById(\'paymentDate\').value = \'' + ${defaultDate} + '\''">+ Add Payment
             </button>
           </div>
@@ -374,7 +383,7 @@
         <form method="post" action="/month/toggleday" class="position-absolute top-50 translate-middle-y d-flex align-items-center form-switch"
               style="right: 3.2rem; z-index: 3;">
           <input type="hidden" name="date" th:value="${entry.key}">
-          <input type="checkbox" class="form-check-input" role="switch" onchange="this.form.submit()"
+          <input type="checkbox" class="form-check-input" role="switch" onchange="this.form.submit()" th:disabled="${expense.done}"
                  th:checked="${expense.statistics.dailyPayments[entry.key]?.dayDone}">
         </form>
         <span class="position-absolute top-50 translate-middle-y d-flex"
@@ -406,10 +415,10 @@
               <td th:text="${payment.type.displayName}"></td>
               <td class="text-end" th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></td>
               <td class="text-end text-nowrap">
-                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
                         th:attr="data-bs-target='#editPaymentModal-' + ${iter.index} + '-' + ${pIter.index}">&#9998;
                 </button>
-                <form method="post" th:action="@{/month/removepayment/{id}(id=${payment.id})}" style="display:inline;"
+                <form th:unless="${expense.done}" method="post" th:action="@{/month/removepayment/{id}(id=${payment.id})}" style="display:inline;"
                       onsubmit="return confirm('Delete this payment?');">
                   <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
                 </form>
@@ -417,7 +426,7 @@
             </tr>
             </tbody>
           </table>
-          <button class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+          <button th:unless="${expense.done}" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addPaymentModal"
                   th:attr="onclick='document.getElementById(\'paymentDate\').value = \'' + ${entry.key} + '\''">+ Add Payment
           </button>
         </div>
@@ -543,7 +552,9 @@
           <h6 class="mb-0">Pending</h6>
           <div>
             <span class="badge bg-secondary me-1" th:text="${#numbers.formatDecimal(totalPendingPayments, 1, 2)}"></span>
-            <button class="btn btn-sm btn-success py-0 px-1" data-bs-toggle="modal" data-bs-target="#pullRecurringModal">+</button>
+            <button th:unless="${expense.done}" class="btn btn-sm btn-success py-0 px-1" data-bs-toggle="modal" data-bs-target="#pullRecurringModal">
+              +
+            </button>
           </div>
         </div>
         <div class="card-body p-2">
@@ -554,10 +565,10 @@
               <td th:text="${pending.name}"></td>
               <td class="text-end" th:text="${#numbers.formatDecimal(pending.amount, 1, 2)}"></td>
               <td class="text-end text-nowrap">
-                <button class="btn btn-sm btn-outline-success py-0 px-1" data-bs-toggle="modal"
+                <button th:unless="${expense.done}" class="btn btn-sm btn-outline-success py-0 px-1" data-bs-toggle="modal"
                         th:attr="data-bs-target='#payPendingModal-' + ${pIter.index}">Pay
                 </button>
-                <form method="post" th:action="@{/month/skippending/{id}(id=${pending.id})}" style="display:inline;"
+                <form th:unless="${expense.done}" method="post" th:action="@{/month/skippending/{id}(id=${pending.id})}" style="display:inline;"
                       onsubmit="return confirm('Skip this payment?');">
                   <button type="submit" class="btn btn-sm btn-outline-warning py-0 px-1">Skip</button>
                 </form>

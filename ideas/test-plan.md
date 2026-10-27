@@ -7,7 +7,10 @@
   `totalAllocation`.
 - `ExpenseManagerTest` (integration, @SpringBootTest) — create month; add payment (fixed → statistics); add payment (leisure → not fixed); add payment
   to non-existent day (error); add income (statistics); add income to non-existent expense (error); resolved `endDate`
-  persisted when none provided; add payment on start-date and end-date boundaries.
+  persisted when none provided; add payment on start-date and end-date boundaries; month done
+  flag (new month not done, mark done, toggle twice reopens, exposed in overview, unknown month
+  throws); closed month rejects changes (add payment/income, toggle day, add saving, adjust
+  budget, pull templates, edit dates) and a reopened month accepts them again.
 - `CategoryServiceTest` (integration, @SpringBootTest, jOOQ) — `listActive` ordering and archived-exclusion; `addIfAbsent` insert /
   idempotent+case-insensitive / trim / null-blank no-op; `archive` hides from active list.
 - `ExpenseControllerTest` (unit, Mockito) — generate new expense (success / failure).
@@ -60,6 +63,12 @@
 - [ ] `editIncome` — non-existent income throws
 - [ ] `editIncome` — date outside month range throws
 - [ ] `editIncome` — date on month boundary succeeds
+
+#### Closed Month Lock
+
+- [ ] By-id mutations (`editPayment`, `removePaymentById`, `editIncome`,
+  `removeIncomeById`, `editSaving`, `removeSavingById`, `payPendingPayment`,
+  `removePendingPayment`) throw `MonthClosedException`
 
 #### Day Done Toggle
 
@@ -153,6 +162,10 @@
 - [ ] `addPayment` / `addIncome` — out-of-range date flashes an error (no 500, no corruption)
 - [ ] `editPayment` / `payPendingPayment` — out-of-range date flashes an error, redirects back
 - [ ] `editIncome` — out-of-range date flashes an error, redirects back
+- [ ] `toggleMonthDone` — redirects back to the referring page (overview or detail)
+- [ ] `toggleMonthDone` — unknown month flashes an error, no 500
+- [ ] Closed month — any blocked action flashes the "marked as done" error and redirects back (no 500)
+- [ ] Closed month — detail page hides add/edit/remove/pay/skip controls and disables day switches
 
 ### 10. RecurringPaymentWebController (Web/MVC Tests)
 
@@ -161,7 +174,8 @@
 
 ### 11. Flyway Migration (Integration Tests)
 
-- [ ] Fresh H2 database — applies V1 + V2 + V3 and Hibernate `validate` passes
+- [ ] Fresh H2 database — applies V1 through V4 and Hibernate `validate` passes
+- [ ] V4 — existing months get `month_done = false`
 - [ ] V2 — `category` lookup table created and seeded; drifted `pending_payment_entity` /
   `recurring_payment_template` category columns normalized to VARCHAR + pretty values
 - [ ] V3 — a native `ENUM` `payment_entity.category` (as in the 1.1.6 production DB) is converted to VARCHAR with pretty values, and `validate` then

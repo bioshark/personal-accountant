@@ -1,5 +1,6 @@
 package org.roly.personalaccountant.view.web;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Comparator;
@@ -11,20 +12,26 @@ import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.services.CategoryService;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
+import org.roly.personalaccountant.domain.model.services.MonthClosedException;
 import org.roly.personalaccountant.domain.model.services.RecurringPaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 @Controller
 public class ExpenseWebController {
 
+    private static final String REDIRECT = "redirect:/";
+    private static final String REDIRECT_MONTH = "redirect:/month/";
+    private static final String ERROR = "error";
     private final ExpenseManager expenseManager;
     private final RecurringPaymentService recurringPaymentService;
     private final CategoryService categoryService;
@@ -75,6 +82,12 @@ public class ExpenseWebController {
         return "redirect:" + (referer != null && !referer.isBlank() ? referer : "/");
     }
 
+    @ExceptionHandler(MonthClosedException.class)
+    public String handleMonthClosed(MonthClosedException e, HttpServletRequest request) {
+        RequestContextUtils.getOutputFlashMap(request).put(ERROR, e.getMessage());
+        return redirectBack(request.getHeader("Referer"));
+    }
+
     /**
      * Default date to pre-fill in the "add" forms: today when it falls within the month's range, otherwise the closest boundary (start or end).
      */
@@ -101,9 +114,9 @@ public class ExpenseWebController {
         try {
             MonthlyExpenseEntity entity = expenseManager.addIncome(new Income(null, source, date, value));
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-            return "redirect:/month/" + ym;
+            return REDIRECT_MONTH + ym;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
             return redirectBack(referer);
         }
     }
@@ -112,7 +125,7 @@ public class ExpenseWebController {
     public String removeIncome(@PathVariable Long incomeId) {
         MonthlyExpenseEntity entity = expenseManager.removeIncomeById(incomeId);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 
     @PostMapping("/month/editincome/{incomeId}")
@@ -120,7 +133,7 @@ public class ExpenseWebController {
             @RequestParam LocalDate date, @RequestParam double value) {
         MonthlyExpenseEntity entity = expenseManager.editIncome(incomeId, source, date, value);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 
     @PostMapping("/month/generate")
@@ -137,9 +150,9 @@ public class ExpenseWebController {
                 expenseManager.pullTemplatesIntoMonth(monthlyExpenses.getYearMonth(), templates);
             }
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
-        return "redirect:/";
+        return REDIRECT;
     }
 
     @PostMapping("/month/addpayment")
@@ -151,9 +164,9 @@ public class ExpenseWebController {
             MonthlyExpenseEntity entity = expenseManager.addPayment(new Payment(null, description, category, type, amount, date));
             categoryService.addIfAbsent(category);
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-            return "redirect:/month/" + ym;
+            return REDIRECT_MONTH + ym;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
             return redirectBack(referer);
         }
     }
@@ -162,7 +175,7 @@ public class ExpenseWebController {
     public String removePayment(@PathVariable Long paymentId) {
         MonthlyExpenseEntity entity = expenseManager.removePaymentById(paymentId);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 
     @PostMapping("/month/editpayment/{paymentId}")
@@ -175,9 +188,9 @@ public class ExpenseWebController {
             MonthlyExpenseEntity entity = expenseManager.editPayment(paymentId, description, date, amount, type, category);
             categoryService.addIfAbsent(category);
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-            return "redirect:/month/" + ym;
+            return REDIRECT_MONTH + ym;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
             return redirectBack(referer);
         }
     }
@@ -185,7 +198,7 @@ public class ExpenseWebController {
     @PostMapping("/month/delete/{yearMonth}")
     public String deleteExpense(@PathVariable YearMonth yearMonth) {
         expenseManager.deleteMonthlyExpense(yearMonth);
-        return "redirect:/";
+        return REDIRECT;
     }
 
     @PostMapping("/month/editdates/{yearMonth}")
@@ -195,16 +208,27 @@ public class ExpenseWebController {
         try {
             expenseManager.editMonthDates(yearMonth, startDate, endDate);
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
-        return "redirect:/";
+        return REDIRECT;
     }
 
     @PostMapping("/month/toggleday")
     public String toggleDayDone(@RequestParam LocalDate date) {
         MonthlyExpenseEntity entity = expenseManager.toggleDayDone(date);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
+    }
+
+    @PostMapping("/month/toggledone/{yearMonth}")
+    public String toggleMonthDone(@PathVariable YearMonth yearMonth, @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            expenseManager.toggleMonthDone(yearMonth);
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+        }
+        return redirectBack(referer);
     }
 
     @PostMapping("/month/adjustbudget/{yearMonth}")
@@ -213,9 +237,9 @@ public class ExpenseWebController {
         try {
             expenseManager.adjustBudget(yearMonth, type, value);
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
-        return "redirect:/month/" + yearMonth;
+        return REDIRECT_MONTH + yearMonth;
     }
 
     @PostMapping("/month/addsaving/{yearMonth}")
@@ -224,16 +248,16 @@ public class ExpenseWebController {
         try {
             expenseManager.addSaving(yearMonth, name, percentage);
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
-        return "redirect:/month/" + yearMonth;
+        return REDIRECT_MONTH + yearMonth;
     }
 
     @PostMapping("/month/removesaving/{savingId}")
     public String removeSaving(@PathVariable Long savingId) {
         MonthlyExpenseEntity entity = expenseManager.removeSavingById(savingId);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 
     @PostMapping("/month/editsaving/{savingId}")
@@ -241,7 +265,7 @@ public class ExpenseWebController {
             @RequestParam double percentage) {
         MonthlyExpenseEntity entity = expenseManager.editSaving(savingId, name, percentage);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 
     @PostMapping("/month/pullrecurring/{yearMonth}")
@@ -251,7 +275,7 @@ public class ExpenseWebController {
                 .filter(t -> templateIds.contains(t.getId()))
                 .toList();
         expenseManager.pullTemplatesIntoMonth(yearMonth, templates);
-        return "redirect:/month/" + yearMonth;
+        return REDIRECT_MONTH + yearMonth;
     }
 
     @PostMapping("/month/paypending/{pendingId}")
@@ -261,9 +285,9 @@ public class ExpenseWebController {
         try {
             MonthlyExpenseEntity entity = expenseManager.payPendingPayment(pendingId, date, amount);
             YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-            return "redirect:/month/" + ym;
+            return REDIRECT_MONTH + ym;
         } catch (IllegalArgumentException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
             return redirectBack(referer);
         }
     }
@@ -272,6 +296,6 @@ public class ExpenseWebController {
     public String skipPendingPayment(@PathVariable Long pendingId) {
         MonthlyExpenseEntity entity = expenseManager.removePendingPayment(pendingId);
         YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return "redirect:/month/" + ym;
+        return REDIRECT_MONTH + ym;
     }
 }

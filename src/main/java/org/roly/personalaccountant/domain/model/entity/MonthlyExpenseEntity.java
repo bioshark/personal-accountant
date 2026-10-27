@@ -42,6 +42,8 @@ public class MonthlyExpenseEntity {
     private double leisureBudget;
     @ColumnDefault("0")
     private double savingBudget;
+    @ColumnDefault("false")
+    private boolean monthDone;
 
     @OneToMany(mappedBy = "monthlyExpense", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private final List<PaymentEntity> payments = new ArrayList<>();
@@ -192,5 +194,13 @@ public class MonthlyExpenseEntity {
         if (!doneDays.remove(date)) {
             doneDays.add(date);
         }
+    }
+
+    public boolean isMonthDone() {
+        return monthDone;
+    }
+
+    public void toggleMonthDone() {
+        monthDone = !monthDone;
     }
 }

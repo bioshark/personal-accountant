@@ -53,6 +53,7 @@ public class ExpenseManager {
     @Transactional
     public MonthlyExpenseEntity editMonthDates(YearMonth yearMonth, LocalDate newStartDate, LocalDate newEndDate) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
+        requireOpen(entity);
 
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
         for (PaymentEntity payment : entity.getPayments()) {
@@ -79,12 +80,14 @@ public class ExpenseManager {
     public MonthlyExpenseEntity addPayment(Payment payment) {
         LocalDate paymentDate = payment.date();
         MonthlyExpenseEntity entity = findExpenseForDate(paymentDate);
+        requireOpen(entity);
         entity.addPayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity removePayment(Payment payment) {
         MonthlyExpenseEntity entity = findExpenseForDate(payment.date());
+        requireOpen(entity);
         entity.removePayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
         return repository.save(entity);
     }
@@ -94,6 +97,7 @@ public class ExpenseManager {
                 .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+        requireOpen(entity);
         entity.getPayments().removeIf(i -> i.getId().equals(paymentId));
         return repository.save(entity);
     }
@@ -103,6 +107,7 @@ public class ExpenseManager {
                 .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+        requireOpen(entity);
         PaymentEntity payment = entity.getPayments().stream()
                 .filter(p -> p.getId().equals(paymentId))
                 .findFirst().orElseThrow();
@@ -117,12 +122,14 @@ public class ExpenseManager {
 
     public MonthlyExpenseEntity addIncome(Income income) {
         MonthlyExpenseEntity entity = findExpenseForDate(income.date());
+        requireOpen(entity);
         entity.addIncome(new IncomeEntity(income.source(), income.date(), income.value()));
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity removeIncome(Income income) {
         MonthlyExpenseEntity entity = findExpenseForDate(income.date());
+        requireOpen(entity);
         entity.removeIncome(new IncomeEntity(income.source(), income.date(), income.value()));
         return repository.save(entity);
     }
@@ -132,6 +139,7 @@ public class ExpenseManager {
                 .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
+        requireOpen(entity);
         entity.getIncomes().removeIf(i -> i.getId().equals(incomeId));
         return repository.save(entity);
     }
@@ -141,6 +149,7 @@ public class ExpenseManager {
                 .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
+        requireOpen(entity);
         IncomeEntity income = entity.getIncomes().stream()
                 .filter(i -> i.getId().equals(incomeId))
                 .findFirst().orElseThrow();
@@ -190,12 +199,20 @@ public class ExpenseManager {
 
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
         MonthlyExpenseEntity entity = findExpenseForDate(date);
+        requireOpen(entity);
         entity.toggleDayDone(date);
+        return repository.save(entity);
+    }
+
+    public MonthlyExpenseEntity toggleMonthDone(YearMonth yearMonth) {
+        MonthlyExpenseEntity entity = getEntity(yearMonth);
+        entity.toggleMonthDone();
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity addSaving(YearMonth yearMonth, String name, double percentage) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
+        requireOpen(entity);
         MonthlyExpenses dto = toDto(entity);
         dto.getStatistics().addSaving(new Saving(null, name, percentage));
         entity.addSaving(new SavingEntity(name, percentage));
@@ -204,6 +221,7 @@ public class ExpenseManager {
 
     public void adjustBudget(YearMonth yearMonth, PaymentType paymentType, double newValue) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
+        requireOpen(entity);
         entity.adjustBudget(paymentType, newValue);
         repository.save(entity);
     }
@@ -222,6 +240,7 @@ public class ExpenseManager {
                 .filter(e -> e.getSavings().stream().anyMatch(s -> s.getId().equals(savingId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Saving not found: " + savingId));
+        requireOpen(entity);
         entity.getSavings().removeIf(s -> s.getId().equals(savingId));
         return repository.save(entity);
     }
@@ -231,6 +250,7 @@ public class ExpenseManager {
                 .filter(e -> e.getSavings().stream().anyMatch(s -> s.getId().equals(savingId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Saving not found: " + savingId));
+        requireOpen(entity);
         SavingEntity saving = entity.getSavings().stream()
                 .filter(s -> s.getId().equals(savingId))
                 .findFirst().orElseThrow();
@@ -241,6 +261,7 @@ public class ExpenseManager {
 
     public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
+        requireOpen(entity);
         for (RecurringPaymentTemplate template : templates) {
             PendingPaymentEntity pending = new PendingPaymentEntity(
                     template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType());
@@ -253,6 +274,7 @@ public class ExpenseManager {
     public MonthlyExpenseEntity payPendingPayment(Long pendingId, LocalDate date, double amount) {
         MonthlyExpenseEntity entity = getEntityById(pendingId);
         PendingPaymentEntity pending = getPendingFromEntity(pendingId, entity);
+        requireOpen(entity);
         validatePaymentDateInMonth(entity, date);
         entity.addPayment(new PaymentEntity(pending.getName(), pending.getCategory(), pending.getType(), amount, date));
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
@@ -262,6 +284,7 @@ public class ExpenseManager {
     public MonthlyExpenseEntity removePendingPayment(Long pendingId) {
         MonthlyExpenseEntity entity = getEntityById(pendingId);
         PendingPaymentEntity pending = getPendingFromEntity(pendingId, entity);
+        requireOpen(entity);
         entity.removeFromBudget(pending);
         entity.getPendingPayments().removeIf(p -> p.getId().equals(pendingId));
         return repository.save(entity);
@@ -287,6 +310,7 @@ public class ExpenseManager {
 
     private MonthlyExpenses toDto(MonthlyExpenseEntity entity) {
         MonthlyExpenses dto = getMonthlyExpenses(entity);
+        dto.setDone(entity.isMonthDone());
         for (SavingEntity saving : entity.getSavings()) {
             dto.getStatistics().addSaving(new Saving(saving.getId(), saving.getName(), saving.getPercentage()));
         }
@@ -340,6 +364,12 @@ public class ExpenseManager {
         return entity.getEndDate() != null
                 ? entity.getEndDate()
                 : PaymentsGenerator.resolveEndDate(entity.getStartDate(), null);
+    }
+
+    private static void requireOpen(MonthlyExpenseEntity entity) {
+        if (entity.isMonthDone()) {
+            throw new MonthClosedException(YearMonth.of(entity.getYear(), entity.getMonth()));
+        }
     }
 
     private static void validatePaymentDateInMonth(MonthlyExpenseEntity entity, LocalDate date) {

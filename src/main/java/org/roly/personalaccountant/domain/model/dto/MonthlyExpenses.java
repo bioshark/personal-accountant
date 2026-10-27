@@ -23,6 +23,7 @@ public class MonthlyExpenses {
     private final YearMonth yearMonth;
     private final OverallSumsTracker statistics;
     private final String expenseName;
+    private boolean done;
 
     public MonthlyExpenses(String expenseName, LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
@@ -82,6 +83,14 @@ public class MonthlyExpenses {
 
     public String getExpenseName() {
         return expenseName;
+    }
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
     }
 
     public Map<String, List<Payment>> getPaymentsTypePerCategory(PaymentType type) {
