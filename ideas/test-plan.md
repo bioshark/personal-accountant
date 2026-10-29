@@ -2,7 +2,8 @@
 
 ## Currently Covered
 
-- `OverallSumsTrackerTest` (unit) — payment/income statistics, savings allocation, daily allocation/diff totals, core/want/save percentages.
+- `OverallSumsTrackerTest` (unit) — payment/income statistics, savings allocation, daily allocation/diff totals, core/want/save percentages,
+  core/want/save sums (add up to income and match the percentages).
 - `DailyStatisticsTest` (unit) — daily difference, weekend/Saturday detection, weekday vs weekend allocation, static `allocationFor` /
   `totalAllocation`.
 - `ExpenseManagerTest` (integration, @SpringBootTest) — create month; add payment (fixed → statistics); add payment (leisure → not fixed); add payment

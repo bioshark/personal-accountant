@@ -208,12 +208,15 @@
           <div class="mt-2 small text-start">
             <div><span style="color: var(--split-core);">&#9632;</span> Living: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.corePercentage, 1, 1)}"></span>%
+              <span class="text-muted" th:text="'(' + ${#numbers.formatDecimal(expense.statistics.coreTotal, 1, 2)} + ')'"></span>
             </div>
             <div><span style="color: var(--split-want);">&#9632;</span> Leisure: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.wantPercentage, 1, 1)}"></span>%
+              <span class="text-muted" th:text="'(' + ${#numbers.formatDecimal(expense.statistics.wantTotal, 1, 2)} + ')'"></span>
             </div>
             <div><span style="color: var(--split-save);">&#9632;</span> Saving: <span
                 th:text="${#numbers.formatDecimal(expense.statistics.percentages.savePercentage, 1, 1)}"></span>%
+              <span class="text-muted" th:text="'(' + ${#numbers.formatDecimal(expense.statistics.saveTotal, 1, 2)} + ')'"></span>
             </div>
           </div>
         </div>

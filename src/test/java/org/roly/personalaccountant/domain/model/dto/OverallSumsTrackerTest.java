@@ -139,6 +139,24 @@ class OverallSumsTrackerTest {
     }
 
     @Test
+    void shouldComputeSplitTotalsMatchingPercentages() {
+        overallSumsTracker.onAdd(WAGE_INCOME);
+        overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);
+        overallSumsTracker.onAdd(DAILY_PAYMENT_FOOD);
+        overallSumsTracker.onAdd(LEISURE_PAYMENT_MUSIC);
+        overallSumsTracker.onAdd(SAVING_PAYMENT_ETF);
+        double cashLeft = 3000D - 1000D - 12.3D - 44.9D - 150D;
+
+        assertThat(overallSumsTracker.getCoreTotal()).isCloseTo(1000D + 12.3D, within(0.001));
+        assertThat(overallSumsTracker.getWantTotal()).isCloseTo(44.9D, within(0.001));
+        assertThat(overallSumsTracker.getSaveTotal()).isCloseTo(150D + cashLeft, within(0.001));
+        assertThat(overallSumsTracker.getCoreTotal() + overallSumsTracker.getWantTotal() + overallSumsTracker.getSaveTotal())
+                .isCloseTo(3000D, within(0.001));
+        assertThat(overallSumsTracker.getPercentages().getCorePercentage())
+                .isCloseTo(overallSumsTracker.getCoreTotal() / 3000D * 100, within(0.001));
+    }
+
+    @Test
     void shouldComputePercentagesCorrectly() {
         overallSumsTracker.onAdd(WAGE_INCOME);
         overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);
