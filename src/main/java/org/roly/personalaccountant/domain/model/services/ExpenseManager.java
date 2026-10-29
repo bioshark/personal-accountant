@@ -51,9 +51,12 @@ public class ExpenseManager {
     }
 
     @Transactional
-    public MonthlyExpenseEntity editMonthDates(YearMonth yearMonth, LocalDate newStartDate, LocalDate newEndDate) {
+    public MonthlyExpenseEntity editMonth(YearMonth yearMonth, String newName, LocalDate newStartDate, LocalDate newEndDate) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
         requireOpen(entity);
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("Month name must not be empty");
+        }
 
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
         for (PaymentEntity payment : entity.getPayments()) {
@@ -62,6 +65,7 @@ public class ExpenseManager {
             }
         }
 
+        entity.setExpenseName(newName.trim());
         entity.setStartDate(newStartDate);
         entity.setEndDate(effectiveEnd);
         return repository.save(entity);

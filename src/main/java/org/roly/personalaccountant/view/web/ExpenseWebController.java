@@ -201,12 +201,12 @@ public class ExpenseWebController {
         return REDIRECT;
     }
 
-    @PostMapping("/month/editdates/{yearMonth}")
-    public String editMonthDates(@PathVariable YearMonth yearMonth,
+    @PostMapping("/month/edit/{yearMonth}")
+    public String editMonth(@PathVariable YearMonth yearMonth, @RequestParam String expenseName,
             @RequestParam LocalDate startDate, @RequestParam(required = false) LocalDate endDate,
             RedirectAttributes redirectAttributes) {
         try {
-            expenseManager.editMonthDates(yearMonth, startDate, endDate);
+            expenseManager.editMonth(yearMonth, expenseName, startDate, endDate);
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }

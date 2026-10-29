@@ -103,6 +103,10 @@ public class MonthlyExpenseEntity {
         return expenseName;
     }
 
+    public void setExpenseName(String expenseName) {
+        this.expenseName = expenseName;
+    }
+
     public double getFixedBudget() {
         return fixedBudget;
     }

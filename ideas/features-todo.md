@@ -3,8 +3,8 @@
 ## General improvements.
 
 1. Spending split - add the sums in parentheses after the percentages.
-2. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
-3. recurring payments & pull recurring payments, should have tabs for the type of recurring payment: fixed, savings, leisure
+2. recurring payments & pull recurring payments, should have tabs for the type of recurring payment: fixed, savings, leisure
+3. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
 
 ## Correctness & Reliability Follow-ups
 

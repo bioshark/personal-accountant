@@ -10,7 +10,8 @@
   persisted when none provided; add payment on start-date and end-date boundaries; month done
   flag (new month not done, mark done, toggle twice reopens, exposed in overview, unknown month
   throws); closed month rejects changes (add payment/income, toggle day, add saving, adjust
-  budget, pull templates, edit dates) and a reopened month accepts them again.
+  budget, pull templates, edit month) and a reopened month accepts them again; `editMonth`
+  rename (renames, trims, rejects null/empty/blank and keeps the old name, rename + date change).
 - `CategoryServiceTest` (integration, @SpringBootTest, jOOQ) — `listActive` ordering and archived-exclusion; `addIfAbsent` insert /
   idempotent+case-insensitive / trim / null-blank no-op; `archive` hides from active list.
 - `ExpenseControllerTest` (unit, Mockito) — generate new expense (success / failure).
@@ -36,9 +37,9 @@
 
 #### Month Management
 
-- [ ] `editMonthDates` — successful date change
-- [ ] `editMonthDates` — validation error when payments exist outside new range
-- [ ] `editMonthDates` — rejects overlap with another month range
+- [ ] `editMonth` — successful date change
+- [ ] `editMonth` — validation error when payments exist outside new range
+- [ ] `editMonth` — rejects overlap with another month range
 - [ ] `deleteMonthlyExpense` — successful delete
 - [ ] `deleteMonthlyExpense` — delete non-existent month returns false
 - [ ] `addNewMonthlyExpense` — duplicate month throws exception

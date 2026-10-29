@@ -71,7 +71,7 @@
                         th:text="${expense.done} ? 'Reopen' : 'Mark done'"></button>
               </form>
               <button th:unless="${expense.done}" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal"
-                      th:attr="data-bs-target='#editDatesModal-' + ${expense.yearMonth}">Edit Dates
+                      th:attr="data-bs-target='#editMonthModal-' + ${expense.yearMonth}">Edit
               </button>
               <form th:action="@{/month/delete/{ym}(ym=${expense.yearMonth})}" method="post" style="display:inline;"
                     onsubmit="return confirm('Delete this month?');">
@@ -85,17 +85,22 @@
   </div>
 </div>
 
-<!-- Edit Dates Modals -->
+<!-- Edit Month Modals -->
 <div th:each="expense : ${expenses}">
-  <div class="modal fade" th:id="'editDatesModal-' + ${expense.yearMonth}" tabindex="-1">
+  <div class="modal fade" th:id="'editMonthModal-' + ${expense.yearMonth}" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="post" th:action="@{/month/editdates/{ym}(ym=${expense.yearMonth})}">
+        <form method="post" th:action="@{/month/edit/{ym}(ym=${expense.yearMonth})}">
           <div class="modal-header">
-            <h5 class="modal-title">Edit Period Dates</h5>
+            <h5 class="modal-title">Edit Month</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="expenseName" th:value="${expense.expenseName}"
+                     maxlength="255" required>
+            </div>
             <div class="mb-3">
               <label class="form-label">Start Date</label>
               <input type="date" class="form-control" name="startDate" th:value="${expense.startDate}" required>

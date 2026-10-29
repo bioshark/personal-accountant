@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
@@ -174,6 +176,39 @@ class ExpenseManagerTest {
         assertThrows(IllegalArgumentException.class, () -> manager.toggleMonthDone(missing));
     }
 
+    @Test
+    void shouldRenameMonthWhenEditing() {
+        manager.editMonth(EXPENSE_MONTH, "Holiday month", START_DATE, null);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getExpenseName()).isEqualTo("Holiday month");
+    }
+
+    @Test
+    void shouldTrimMonthNameWhenEditing() {
+        manager.editMonth(EXPENSE_MONTH, "  Holiday month  ", START_DATE, null);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getExpenseName()).isEqualTo("Holiday month");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    void shouldRejectBlankMonthNameAndKeepOriginal(String blankName) {
+        assertThrows(IllegalArgumentException.class, () -> manager.editMonth(EXPENSE_MONTH, blankName, START_DATE, null));
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getExpenseName()).isEqualTo(EXPENSE_MONTH_NAME);
+    }
+
+    @Test
+    void shouldRenameAndChangeDatesTogether() {
+        LocalDate newStart = START_DATE.plusDays(1);
+
+        manager.editMonth(EXPENSE_MONTH, "Shifted", newStart, null);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getExpenseName()).isEqualTo("Shifted");
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStartDate()).isEqualTo(newStart);
+    }
+
     @ParameterizedTest
     @MethodSource("monthMutations")
     void shouldRejectChangesWhileMonthIsDone(Consumer<ExpenseManager> mutation) {
@@ -200,6 +235,6 @@ class ExpenseManagerTest {
                 Named.of("addSaving", m -> m.addSaving(EXPENSE_MONTH, "Emergency", 10)),
                 Named.of("adjustBudget", m -> m.adjustBudget(EXPENSE_MONTH, FIXED, 100)),
                 Named.of("pullTemplatesIntoMonth", m -> m.pullTemplatesIntoMonth(EXPENSE_MONTH, List.of())),
-                Named.of("editMonthDates", m -> m.editMonthDates(EXPENSE_MONTH, START_DATE, null)));
+                Named.of("editMonth", m -> m.editMonth(EXPENSE_MONTH, EXPENSE_MONTH_NAME, START_DATE, null)));
     }
 }
