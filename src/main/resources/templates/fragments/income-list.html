@@ -1,0 +1,17 @@
+<div th:if="${expense.incomes.isEmpty()}" class="text-muted">No incomes recorded.</div>
+<table th:if="${!expense.incomes.isEmpty()}" class="table table-sm mb-0">
+  <thead>
+  <tr>
+    <th>Source</th>
+    <th>Date</th>
+    <th class="text-end">Amount</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="income : ${expense.incomes}">
+    <td th:text="${income.source}"></td>
+    <td th:text="${income.date}"></td>
+    <td class="text-end" th:text="${#numbers.formatDecimal(income.value, 1, 2)}"></td>
+  </tr>
+  </tbody>
+</table>

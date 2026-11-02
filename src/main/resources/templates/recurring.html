@@ -19,34 +19,53 @@
 
   <div th:if="${templates.isEmpty()}" class="alert alert-info">No recurring payments defined yet.</div>
 
-  <table th:if="${!templates.isEmpty()}" class="table table-sm">
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Default Amount</th>
-      <th>Category</th>
-      <th>Type</th>
-      <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="template, iter : ${templates}">
-      <td th:text="${template.name}"></td>
-      <td th:text="${#numbers.formatDecimal(template.defaultAmount, 1, 2)}"></td>
-      <td th:text="${template.category}"></td>
-      <td th:text="${template.type.displayName}"></td>
-      <td class="text-end text-nowrap">
-        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
-                th:attr="data-bs-target='#editTemplateModal-' + ${iter.index}">&#9998;
+  <div th:if="${!templates.isEmpty()}">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item" th:each="typeEntry, tIter : ${templatesByType}">
+        <button class="nav-link" th:classappend="${tIter.first} ? 'active' : ''" type="button" role="tab" data-bs-toggle="tab"
+                th:attr="data-bs-target='#rec-' + ${typeEntry.key.name().toLowerCase()}">
+          <span th:text="${typeEntry.key.displayName}"></span>
+          <span class="badge rounded-pill fw-normal ms-1" style="color: inherit; background: transparent; border: 1px solid currentColor;"
+                th:text="${typeEntry.value.size()}"></span>
         </button>
-        <form method="post" th:action="@{/recurring/delete/{id}(id=${template.id})}" style="display:inline;"
-              onsubmit="return confirm('Delete this template?');">
-          <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div th:each="typeEntry, tIter : ${templatesByType}" class="tab-pane fade" role="tabpanel"
+           th:classappend="${tIter.first} ? 'show active' : ''"
+           th:id="'rec-' + ${typeEntry.key.name().toLowerCase()}">
+        <div th:if="${typeEntry.value.isEmpty()}" class="text-muted">
+          No <span th:text="${typeEntry.key.displayName.toLowerCase()}"></span> recurring payments.
+        </div>
+        <table th:if="${!typeEntry.value.isEmpty()}" class="table table-sm">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Default Amount</th>
+            <th>Category</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="template : ${typeEntry.value}">
+            <td th:text="${template.name}"></td>
+            <td th:text="${#numbers.formatDecimal(template.defaultAmount, 1, 2)}"></td>
+            <td th:text="${template.category}"></td>
+            <td class="text-end text-nowrap">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal"
+                      th:attr="data-bs-target='#editTemplateModal-' + ${template.id}">&#9998;
+              </button>
+              <form method="post" th:action="@{/recurring/delete/{id}(id=${template.id})}" style="display:inline;"
+                    onsubmit="return confirm('Delete this template?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Add Template Modal -->
@@ -89,8 +108,8 @@
 </div>
 
 <!-- Edit Template Modals -->
-<div th:each="template, iter : ${templates}">
-  <div class="modal fade" th:id="'editTemplateModal-' + ${iter.index}" tabindex="-1">
+<div th:each="template : ${templates}">
+  <div class="modal fade" th:id="'editTemplateModal-' + ${template.id}" tabindex="-1">
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="post" th:action="@{/recurring/edit/{id}(id=${template.id})}">

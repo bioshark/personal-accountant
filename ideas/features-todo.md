@@ -2,8 +2,7 @@
 
 ## General improvements.
 
-1. recurring payments & pull recurring payments, should have tabs for the type of recurring payment: fixed, savings, leisure
-2. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
+1. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
 
 ## Correctness & Reliability Follow-ups
 

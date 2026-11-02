@@ -26,6 +26,7 @@ public class RecurringPaymentWebController {
     @GetMapping("/recurring")
     public String listTemplates(Model model) {
         model.addAttribute("templates", recurringPaymentService.getAllTemplates());
+        model.addAttribute("templatesByType", recurringPaymentService.getTemplatesByType());
         model.addAttribute("categories", categoryService.listActive());
         return "recurring";
     }

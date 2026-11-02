@@ -56,6 +56,7 @@ public class ExpenseWebController {
         model.addAttribute("expenses", expenses);
         model.addAttribute("expensesByYear", expensesByYear);
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
+        model.addAttribute("recurringByType", recurringPaymentService.getTemplatesByType());
         return "index";
     }
 
@@ -73,6 +74,7 @@ public class ExpenseWebController {
         model.addAttribute("projectedSpendings", projectedSpendings);
         model.addAttribute("projectedCashLeft", totalIncome - projectedSpendings);
         model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
+        model.addAttribute("recurringByType", recurringPaymentService.getTemplatesByType());
         model.addAttribute("defaultDate", defaultDateFor(expense));
         model.addAttribute("categories", categoryService.listActive());
         return "detail";
