@@ -1,8 +1,10 @@
 # Feature Ideas
 
-## General improvements.
+## General
 
-1. projected cash left - actual cash left - base it on the budgets left, and at the end of the month it should be equal to the cash left
+1. adding a payment, default date in the dialog should be the current date if it's between start and end (which I think is already the case), if
+   current date is outside the interval, it should default to the last day of the month. This works on the main Add Payment button, but not on the Pay
+   button of for the Pending payments.
 
 ## Correctness & Reliability Follow-ups
 

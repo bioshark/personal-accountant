@@ -2,6 +2,7 @@ package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.roly.personalaccountant.domain.model.dto.DailyStatistics;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
@@ -33,6 +35,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ExpenseManagerTest {
 
     private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
+    private static final LocalDate END_DATE = LocalDate.of(2025, 6, 27);
     public static final Income INVALID_INCOME = new Income(null, "salariu", START_DATE.minusDays(1), 1122.0d);
     public static final Income WAGE_INCOME = new Income(null, "Wage", START_DATE.plusDays(1), 1122.0d);
     private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
@@ -207,6 +210,56 @@ class ExpenseManagerTest {
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getExpenseName()).isEqualTo("Shifted");
         assertThat(manager.getExpense(EXPENSE_MONTH).getStartDate()).isEqualTo(newStart);
+    }
+
+    @Test
+    void shouldProjectFullDailyAllocationForFreshMonth() {
+        assertThat(manager.getProjectedSpending(EXPENSE_MONTH)).isCloseTo(DailyStatistics.totalAllocation(START_DATE, END_DATE), within(0.001));
+    }
+
+    @Test
+    void shouldProjectBudgetWhenUnderSpent() {
+        manager.adjustBudget(EXPENSE_MONTH, FIXED, 300);
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 100d, PAYMENT_DATE));
+
+        assertThat(manager.getProjectedSpending(EXPENSE_MONTH)).isCloseTo(300 + fullDailyAllocation(), within(0.001));
+    }
+
+    @Test
+    void shouldProjectSpentWhenOverSpent() {
+        manager.adjustBudget(EXPENSE_MONTH, FIXED, 300);
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 400d, PAYMENT_DATE));
+
+        assertThat(manager.getProjectedSpending(EXPENSE_MONTH)).isCloseTo(400 + fullDailyAllocation(), within(0.001));
+    }
+
+    @Test
+    void shouldProjectActualDailySpendForDoneDay() {
+        manager.addPayment(new Payment(null, FOOD, FOOD, DAILY, 4d, PAYMENT_DATE));
+        manager.toggleDayDone(PAYMENT_DATE);
+
+        double unusedAllocation = DailyStatistics.allocationFor(PAYMENT_DATE) - 4d;
+        assertThat(manager.getProjectedSpending(EXPENSE_MONTH)).isCloseTo(fullDailyAllocation() - unusedAllocation, within(0.001));
+    }
+
+    @Test
+    void shouldConvergeToActualCashLeftWhenBudgetsSpentAndAllDaysDone() {
+        manager.addIncome(WAGE_INCOME);
+        manager.adjustBudget(EXPENSE_MONTH, FIXED, 300);
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 300d, PAYMENT_DATE));
+        manager.addPayment(new Payment(null, FOOD, FOOD, DAILY, 25d, PAYMENT_DATE));
+        for (LocalDate day = START_DATE; !day.isAfter(END_DATE); day = day.plusDays(1)) {
+            manager.toggleDayDone(day);
+        }
+
+        var statistics = manager.getExpense(EXPENSE_MONTH).getStatistics();
+        double projectedCashLeft = statistics.getCashTotal() - manager.getProjectedSpending(EXPENSE_MONTH);
+
+        assertThat(projectedCashLeft).isCloseTo(statistics.getCashLeft(), within(0.001));
+    }
+
+    private static double fullDailyAllocation() {
+        return DailyStatistics.totalAllocation(START_DATE, END_DATE);
     }
 
     @ParameterizedTest

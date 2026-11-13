@@ -12,7 +12,10 @@
   flag (new month not done, mark done, toggle twice reopens, exposed in overview, unknown month
   throws); closed month rejects changes (add payment/income, toggle day, add saving, adjust
   budget, pull templates, edit month) and a reopened month accepts them again; `editMonth`
-  rename (renames, trims, rejects null/empty/blank and keeps the old name, rename + date change).
+  rename (renames, trims, rejects null/empty/blank and keeps the old name, rename + date change); `getProjectedSpending` (fresh month = full daily
+  allocation,
+  under-spent budget counts the budget, overspent counts the spend, done day counts actual daily
+  spend, converges to actual cash left when budgets are spent and all days are done).
 - `RecurringPaymentServiceTest` (integration, @SpringBootTest) — `getTemplatesByType`: Fixed/Saving/Leisure tabs always present in order; templates
   grouped by type; Daily tab only when Daily templates exist.
 - `CategoryServiceTest` (integration, @SpringBootTest, jOOQ) — `listActive` ordering and archived-exclusion; `addIfAbsent` insert /
@@ -110,7 +113,6 @@
 - [ ] `adjustBudget` — DAILY throws (no daily budget)
 - [ ] `adjustBudget` — rejects a negative value server-side
 - [ ] `getFixedBudget` / `getLeisureBudget` / `getSavingBudget` — return stored value (0.0 default)
-- [ ] `getProjectedSpending` — budgets + total daily allocation, computed without building a DTO
 
 ### 4. RecurringPaymentService (Integration Tests)
 

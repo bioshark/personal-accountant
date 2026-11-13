@@ -79,16 +79,16 @@
     <div class="col-md-2 mt-4 pt-2">
       <!-- Projected Cash Left -->
       <div class="card"
-           th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'border-success' : 'border-danger'">
+           th:classappend="${projectedCashLeft >= 0} ? 'border-success' : 'border-danger'">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h6 class="mb-0">Projected Cash Left</h6>
           <span class="badge"
-                th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'text-bg-success' : 'text-bg-danger'"
-                th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? 'On track' : 'Over budget'"></span>
+                th:classappend="${projectedCashLeft >= 0} ? 'text-bg-success' : 'text-bg-danger'"
+                th:text="${projectedCashLeft >= 0} ? 'On track' : 'Over budget'"></span>
         </div>
         <div class="card-body p-2">
           <div class="d-flex justify-content-between small">
-            <span class="text-muted">Projected (income &minus; budgets)</span>
+            <span class="text-muted">Projected (income &minus; budgets left)</span>
             <span th:text="${#numbers.formatDecimal(projectedCashLeft, 1, 2)}"></span>
           </div>
           <div class="d-flex justify-content-between align-items-baseline mt-1">
@@ -99,10 +99,9 @@
           </div>
           <hr class="my-1">
           <div class="text-center small"
-               th:classappend="${expense.statistics.cashLeft >= projectedCashLeft} ? 'text-success' : 'text-danger'">
-            <span th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? '&#9650;' : '&#9660;'"></span>
+               th:classappend="${projectedCashLeft >= 0} ? 'text-success' : 'text-danger'">
             <span th:text="${#numbers.formatDecimal(expense.statistics.cashLeft - projectedCashLeft, 1, 2)}"></span>
-            <span th:text="${expense.statistics.cashLeft >= projectedCashLeft} ? 'ahead of plan' : 'behind plan'"></span>
+            <span>still to be spent</span>
           </div>
         </div>
       </div>
@@ -816,7 +815,7 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Date</label>
-              <input type="date" class="form-control" name="date" th:value="${#temporals.format(T(java.time.LocalDate).now(), 'yyyy-MM-dd')}"
+              <input type="date" class="form-control" name="date" th:value="${defaultDate}"
                      required>
             </div>
             <div class="mb-3">
