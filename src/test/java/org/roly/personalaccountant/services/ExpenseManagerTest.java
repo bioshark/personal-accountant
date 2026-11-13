@@ -289,6 +289,26 @@ class ExpenseManagerTest {
     }
 
     @Test
+    void shouldRemoveStoredPaymentMatchingAllFields() {
+        Payment payment = new Payment(null, FOOD, FOOD, FIXED, 11.3d, PAYMENT_DATE);
+        manager.addPayment(payment);
+
+        manager.removePayment(payment);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE)).isEmpty();
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isZero();
+    }
+
+    @Test
+    void shouldRejectRemovingPaymentThatDoesNotMatchAnyStoredPayment() {
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 11.3d, PAYMENT_DATE));
+        Payment differentAmount = new Payment(null, FOOD, FOOD, FIXED, 12.0d, PAYMENT_DATE);
+
+        assertThatThrownBy(() -> manager.removePayment(differentAmount)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(11.3d);
+    }
+
+    @Test
     void shouldCreateMonthWithTemplatesAsPendingPaymentsAndBudgets() {
         manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, List.of(RENT, ETF));
 

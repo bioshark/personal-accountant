@@ -5,6 +5,7 @@ import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseManager {
 
     private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
+    private static final String PAYMENT_NOT_FOUND = "Payment not found: ";
+    private static final String PENDING_PAYMENT_NOT_FOUND = "Pending payment not found: ";
     private final MonthlyExpenseRepository repository;
 
     public ExpenseManager(MonthlyExpenseRepository repository) {
@@ -95,15 +98,30 @@ public class ExpenseManager {
     public MonthlyExpenseEntity removePayment(Payment payment) {
         MonthlyExpenseEntity entity = findExpenseForDate(payment.date());
         requireOpen(entity);
-        entity.removePayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
+        PaymentEntity stored = entity.getPayments().stream()
+                .filter(candidate -> matches(candidate, payment))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + payment.description() + " on " + payment.date()));
+        entity.removePayment(stored);
         return repository.save(entity);
+    }
+
+    /**
+     * {@code PaymentEntity} has no value-based equals, so a payment identified by its fields must be matched to the stored instance before removal.
+     */
+    private static boolean matches(PaymentEntity stored, Payment payment) {
+        return stored.getDate().equals(payment.date())
+                && stored.getType() == payment.type()
+                && Objects.equals(stored.getDescription(), payment.description())
+                && Objects.equals(stored.getCategory(), payment.category())
+                && Double.compare(stored.getAmount(), payment.amount()) == 0;
     }
 
     public MonthlyExpenseEntity removePaymentById(Long paymentId) {
         MonthlyExpenseEntity entity = repository.findAll().stream()
                 .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + paymentId));
         requireOpen(entity);
         entity.getPayments().removeIf(i -> i.getId().equals(paymentId));
         return repository.save(entity);
@@ -113,7 +131,7 @@ public class ExpenseManager {
         MonthlyExpenseEntity entity = repository.findAll().stream()
                 .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found: " + paymentId));
+                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + paymentId));
         requireOpen(entity);
         PaymentEntity payment = entity.getPayments().stream()
                 .filter(p -> p.getId().equals(paymentId))
@@ -378,7 +396,7 @@ public class ExpenseManager {
         return repository.findAll().stream()
                 .filter(e -> e.getPendingPayments().stream().anyMatch(p -> p.getId().equals(pendingId)))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Pending payment not found: " + pendingId));
+                .orElseThrow(() -> new IllegalArgumentException(PENDING_PAYMENT_NOT_FOUND + pendingId));
     }
 
     @NonNull
