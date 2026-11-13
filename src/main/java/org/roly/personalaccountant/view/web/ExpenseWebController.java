@@ -62,8 +62,12 @@ public class ExpenseWebController {
     }
 
     @GetMapping("/month/{yearMonth}")
-    public String detail(@PathVariable YearMonth yearMonth, Model model) {
+    public String detail(@PathVariable YearMonth yearMonth, Model model, RedirectAttributes redirectAttributes) {
         MonthlyExpenses expense = expenseManager.getExpense(yearMonth);
+        if (expense == null) {
+            redirectAttributes.addFlashAttribute(ERROR, "No month exists for " + yearMonth);
+            return REDIRECT;
+        }
         model.addAttribute("expense", expense);
         model.addAttribute("pendingPayments", expenseManager.getPendingPayments(yearMonth));
         model.addAttribute("totalPendingPayments", expenseManager.getTotalPendingPayments(yearMonth));
@@ -71,7 +75,7 @@ public class ExpenseWebController {
         model.addAttribute("leisureBudget", expenseManager.getLeisureBudget(yearMonth));
         model.addAttribute("savingBudget", expenseManager.getSavingBudget(yearMonth));
         double projectedSpendings = expenseManager.getProjectedSpending(yearMonth);
-        double totalIncome = expense != null ? expense.getStatistics().getCashTotal() : 0.0;
+        double totalIncome = expense.getStatistics().getCashTotal();
         model.addAttribute("projectedSpendings", projectedSpendings);
         model.addAttribute("projectedCashLeft", totalIncome - projectedSpendings);
         model.addAttribute("recurringTemplates", recurringPaymentService.getPullableTemplates());
@@ -96,9 +100,6 @@ public class ExpenseWebController {
      */
     private LocalDate defaultDateFor(MonthlyExpenses expense) {
         LocalDate today = LocalDate.now();
-        if (expense == null) {
-            return today;
-        }
         LocalDate start = expense.getStartDate();
         LocalDate end = expense.getEndDate();
         if (today.isBefore(start)) {

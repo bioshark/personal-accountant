@@ -4,8 +4,6 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] Opening `/month/{yearMonth}` for a month that doesn't exist returns 500 (`detail.html` dereferences a null `expense`); redirect home with an
-  error.
 - [ ] REST: return `201 Created` after creating a month; current success path returns `404`.
 - [ ] REST: fix remove-payment-by-fields; remove the managed payment, not a new entity instance.
 - [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).

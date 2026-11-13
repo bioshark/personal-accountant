@@ -51,7 +51,7 @@ class RecurringPaymentServiceTest {
     }
 
     @Test
-    void shouldAddDailyTabOnlyWhenLegacyDailyTemplatesExist() {
+    void shouldAddDailyTabOnlyWhenDailyTemplatesExist() {
         repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY));
 
         assertThat(service.getTemplatesByType().keySet()).containsExactly(FIXED, SAVING, LEISURE, DAILY);
@@ -59,7 +59,7 @@ class RecurringPaymentServiceTest {
     }
 
     @Test
-    void shouldExcludeLegacyDailyTemplatesFromPullableTemplates() {
+    void shouldExcludeDailyTemplatesFromPullableTemplates() {
         repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY));
         service.addTemplate("Rent", 900, "House", FIXED);
 
@@ -82,7 +82,7 @@ class RecurringPaymentServiceTest {
     }
 
     @Test
-    void shouldAllowEditingLegacyDailyTemplateWithoutChangingType() {
+    void shouldAllowEditingExistingDailyTemplateWithoutChangingType() {
         Long id = repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY)).getId();
 
         service.editTemplate(id, "Lunch", 12, "Food", DAILY);
