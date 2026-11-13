@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RecurringPaymentService {
 
-    private static final List<PaymentType> TAB_ORDER = List.of(PaymentType.FIXED, PaymentType.SAVING, PaymentType.LEISURE);
+    private static final List<PaymentType> TEMPLATE_TYPES = List.of(PaymentType.FIXED, PaymentType.SAVING, PaymentType.LEISURE);
 
     private final RecurringPaymentTemplateRepository repository;
 
@@ -24,26 +24,45 @@ public class RecurringPaymentService {
         return repository.findAll();
     }
 
+    public List<PaymentType> getTemplateTypes() {
+        return TEMPLATE_TYPES;
+    }
+
+    public List<RecurringPaymentTemplate> getPullableTemplates() {
+        return repository.findAll().stream()
+                .filter(template -> TEMPLATE_TYPES.contains(template.getType()))
+                .toList();
+    }
+
     /**
-     * Templates grouped for tabbed display: Fixed, Saving and Leisure are always present (possibly empty); Daily only appears when such templates
-     * exist, so none are ever hidden.
+     * Templates grouped for tabbed display: Fixed, Saving and Leisure are always present (possibly empty);
      */
     public Map<PaymentType, List<RecurringPaymentTemplate>> getTemplatesByType() {
         Map<PaymentType, List<RecurringPaymentTemplate>> byType = new LinkedHashMap<>();
-        TAB_ORDER.forEach(type -> byType.put(type, new ArrayList<>()));
+        TEMPLATE_TYPES.forEach(type -> byType.put(type, new ArrayList<>()));
         for (RecurringPaymentTemplate template : repository.findAll()) {
             byType.computeIfAbsent(template.getType(), type -> new ArrayList<>()).add(template);
         }
         return byType;
     }
 
+    public Map<PaymentType, List<RecurringPaymentTemplate>> getPullableTemplatesByType() {
+        Map<PaymentType, List<RecurringPaymentTemplate>> byType = getTemplatesByType();
+        byType.keySet().retainAll(TEMPLATE_TYPES);
+        return byType;
+    }
+
     public RecurringPaymentTemplate addTemplate(String name, double defaultAmount, String category, PaymentType type) {
+        requireTemplateType(type);
         return repository.save(new RecurringPaymentTemplate(name, defaultAmount, category, type));
     }
 
     public RecurringPaymentTemplate editTemplate(Long id, String name, double defaultAmount, String category, PaymentType type) {
         RecurringPaymentTemplate template = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Template not found: " + id));
+        if (type != template.getType()) {
+            requireTemplateType(type);
+        }
         template.setName(name);
         template.setDefaultAmount(defaultAmount);
         template.setCategory(category);
@@ -53,5 +72,11 @@ public class RecurringPaymentService {
 
     public void deleteTemplate(Long id) {
         repository.deleteById(id);
+    }
+
+    private static void requireTemplateType(PaymentType type) {
+        if (!TEMPLATE_TYPES.contains(type)) {
+            throw new IllegalArgumentException("Recurring payments cannot be of type " + type.getDisplayName());
+        }
     }
 }

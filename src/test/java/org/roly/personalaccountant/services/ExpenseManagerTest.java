@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.LEISURE;
+import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.SAVING;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -26,6 +27,8 @@ import org.roly.personalaccountant.domain.model.dto.DailyStatistics;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
+import org.roly.personalaccountant.domain.model.entity.PendingPaymentEntity;
+import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.domain.model.services.MonthClosedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +46,18 @@ class ExpenseManagerTest {
     private static final String EXPENSE_MONTH_NAME = "June 2025";
     private static final String FOOD = "food";
     private static final String MEDIA = "media";
+    private static final LocalDate NEXT_START_DATE = LocalDate.of(2025, 6, 28);
+    private static final YearMonth NEXT_MONTH = YearMonth.of(2025, Month.JULY);
+    private static final RecurringPaymentTemplate RENT = new RecurringPaymentTemplate("Rent", 900, "House", FIXED);
+    private static final RecurringPaymentTemplate ETF = new RecurringPaymentTemplate("ETF", 200, "Etf", SAVING);
+    private static final RecurringPaymentTemplate LUNCH = new RecurringPaymentTemplate("Lunch", 10, FOOD, DAILY);
 
     @Autowired
     private ExpenseManager manager;
 
     @BeforeEach
     void setUp() {
-        manager.addNewMonthlyExpense(null, START_DATE, null);
+        manager.addNewMonthlyExpense(null, START_DATE, null, List.of());
     }
 
     @AfterEach
@@ -278,6 +286,35 @@ class ExpenseManagerTest {
         manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 5.0d, PAYMENT_DATE));
 
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(5.0d);
+    }
+
+    @Test
+    void shouldCreateMonthWithTemplatesAsPendingPaymentsAndBudgets() {
+        manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, List.of(RENT, ETF));
+
+        assertThat(manager.getPendingPayments(NEXT_MONTH)).extracting(PendingPaymentEntity::getName).containsExactlyInAnyOrder("Rent", "ETF");
+        assertThat(manager.getFixedBudget(NEXT_MONTH)).isEqualTo(900.0d);
+        assertThat(manager.getSavingBudget(NEXT_MONTH)).isEqualTo(200.0d);
+    }
+
+    @Test
+    void shouldNotCreateMonthWhenDailyTemplateIsSelected() {
+        List<RecurringPaymentTemplate> templates = List.of(RENT, LUNCH);
+
+        assertThatThrownBy(() -> manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, templates))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Lunch");
+        assertThat(manager.getExpenses()).containsOnlyKeys(EXPENSE_MONTH);
+    }
+
+    @Test
+    void shouldNotPullAnyTemplateWhenDailyTemplateIsSelected() {
+        List<RecurringPaymentTemplate> templates = List.of(RENT, LUNCH, ETF);
+
+        assertThatThrownBy(() -> manager.pullTemplatesIntoMonth(EXPENSE_MONTH, templates)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getPendingPayments(EXPENSE_MONTH)).isEmpty();
+        assertThat(manager.getFixedBudget(EXPENSE_MONTH)).isZero();
+        assertThat(manager.getSavingBudget(EXPENSE_MONTH)).isZero();
     }
 
     private static Stream<Named<Consumer<ExpenseManager>>> monthMutations() {

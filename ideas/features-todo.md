@@ -1,41 +1,56 @@
 # Feature Ideas
 
-## General
+Priority order: bugs → data integrity → tech debt → operational → features. Clear tech debt before adding features.
 
-1. adding a payment, default date in the dialog should be the current date if it's between start and end (which I think is already the case), if
-   current date is outside the interval, it should default to the last day of the month. This works on the main Add Payment button, but not on the Pay
-   button of for the Pending payments.
+## 1. Bugs
 
-## Correctness & Reliability Follow-ups
-
+- [ ] Opening `/month/{yearMonth}` for a month that doesn't exist returns 500 (`detail.html` dereferences a null `expense`); redirect home with an
+  error.
 - [ ] REST: return `201 Created` after creating a month; current success path returns `404`.
 - [ ] REST: fix remove-payment-by-fields; remove the managed payment, not a new entity instance.
+- [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).
+- [ ] Define zero-income percentage behavior; never render `NaN`/infinity.
+- [ ] Do not swallow `ReactiveList` listener failures; fail the mutation atomically.
+
+## 2. Data Integrity & Validation
+
 - [ ] Reject overlapping month date ranges on create and edit (date lookup must be unambiguous).
 - [ ] Validate edited income dates stay inside the owning month.
-- [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).
-- [ ] Do not swallow `ReactiveList` listener failures; fail the mutation atomically.
+- [ ] Validate inputs at service and DB level: non-negative budgets/amounts, reject `NaN`/infinity, start ≤ end dates,
+  non-blank and length-bounded text, valid saving percentages.
 - [ ] Define/enforce duplicate recurring-template pull behavior per month.
-- [ ] Define zero-income percentage behavior; never render `NaN`/infinity.
-- [ ] Enforce server-side non-negative budget/amount values and valid saving percentages.
 - [ ] Clarify manual budget overwrite vs pending-template add/skip semantics.
+- [ ] Migrate money from `double` to `BigDecimal` in a dedicated Flyway-backed change.
 
-## Persistence & Architecture Follow-ups
+## 3. Tech Debt: Tests
 
 - [ ] Add a Flyway-enabled migration integration test for a fresh DB (V1 and future migrations).
+- [ ] Add MVC integration tests: real request/status behavior, invalid input, `MonthClosedException` handling.
 - [ ] Add the missing `MonthlyExpenseRepositoryTest` (see test plan §7).
+
+## 4. Tech Debt: Persistence & Architecture
+
 - [ ] Move `EndDateBackfillRunner` into a versioned Flyway data migration, then remove the runner.
 - [ ] Replace `findAll()` child-ID scans with targeted repository/jOOQ queries before Search grows.
-- [ ] Add optimistic locking (`@Version`) to month writes if multi-tab/device use is supported.
-- [ ] Migrate money from `double` to `BigDecimal` in a dedicated Flyway-backed change.
 - [ ] Extract repeated detail-page cards/modals and inline CSS/JS into fragments/static assets.
+- [ ] Remove unused `fragments/income-list.html` (or wire it in).
 
-## Operational Follow-ups
+## 5. Operational
 
-- [ ] Improve `.gitignore` for DB/build/IDE/local chat artifacts; decide whether templates/fragments is tracked.
-- [ ] Expand README: setup, DB backup, migration/release, and local-only security notes.
-- [ ] Keep H2 console/local server bound to localhost outside development; add auth before any remote use.
+- [ ] Improve `.gitignore`: `data/`, `.idea/`, `.DS_Store`, `*.ser`, JSON exports/chat artifacts, `.java-version`.
+- [ ] Expand README: setup, DB backup/recovery, migration/release, and local-only security notes.
+- [ ] Exclude `src/main/resources/db/migration` from IDE reformat-on-commit (avoids Flyway checksum mismatches).
 
-## Search
+## 6. Security (required before offering to others / any remote use)
+
+- [ ] Bind to `127.0.0.1` by default; disable the H2 console outside development.
+- [ ] Non-empty DB credentials.
+- [ ] Authentication + CSRF protection on all mutation endpoints.
+- Blocks: PWA distribution to others, remote DB, iOS companion.
+
+## 7. Features
+
+### Search
 
 - Find a specific payment across all months
 - Filter by description, category, amount range, date range
@@ -47,34 +62,34 @@
   - `CategoryService` is now a working example of manual jOOQ `DSLContext` usage
     (`DSL.table`/`DSL.field`, `fetchExists`, insert/update) to build on.
 
-## Tags & Notes
-
-- Flexible labeling beyond fixed categories
-- Free-text notes on payments
-
-## Multi-Month Views & Charts
-
-- Spending trends over time by category
-- Income growth visualization
-- Month-over-month comparison
-
-## Bank Import
-
-- CSV/OFX file import to avoid manual entry
-- Column mapping configuration
-
-## Reports & Export
-
-- PDF/CSV export for tax or personal review
-- Monthly/yearly summary reports
-
-## DB Management (UI)
+### DB Management (UI)
 
 - Load/switch database files from the main page
 - Backup/restore functionality
 - Export full data as JSON
 
-## Installable App (PWA)
+### Tags & Notes
+
+- Flexible labeling beyond fixed categories
+- Free-text notes on payments
+
+### Multi-Month Views & Charts
+
+- Spending trends over time by category
+- Income growth visualization
+- Month-over-month comparison
+
+### Bank Import
+
+- CSV/OFX file import to avoid manual entry
+- Column mapping configuration
+
+### Reports & Export
+
+- PDF/CSV export for tax or personal review
+- Monthly/yearly summary reports
+
+### Installable App (PWA)
 
 Make the existing Thymeleaf web UI installable so it opens as a standalone window with a
 dock/taskbar icon — an app-like feel without leaving the web stack or maintaining a second UI.
@@ -89,7 +104,7 @@ dock/taskbar icon — an app-like feel without leaving the web stack or maintain
   single codebase, no double UI maintenance. Mirrors how web-based finance apps (e.g. Actual
   Budget) deliver a desktop experience.
 
-## Idea - iOS app
+### Idea - iOS app
 
 - a companion app for iOS. Just to add expenses, simple app. Connects to a remote db and just able to record a payment. (So this would mean that a
   remote DB option has already been created)

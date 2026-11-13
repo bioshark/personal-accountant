@@ -10,6 +10,7 @@ import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
+import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.services.CategoryService;
 import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.domain.model.services.MonthClosedException;
@@ -55,8 +56,8 @@ public class ExpenseWebController {
                         java.util.stream.Collectors.toList()));
         model.addAttribute("expenses", expenses);
         model.addAttribute("expensesByYear", expensesByYear);
-        model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
-        model.addAttribute("recurringByType", recurringPaymentService.getTemplatesByType());
+        model.addAttribute("recurringTemplates", recurringPaymentService.getPullableTemplates());
+        model.addAttribute("recurringByType", recurringPaymentService.getPullableTemplatesByType());
         return "index";
     }
 
@@ -73,8 +74,8 @@ public class ExpenseWebController {
         double totalIncome = expense != null ? expense.getStatistics().getCashTotal() : 0.0;
         model.addAttribute("projectedSpendings", projectedSpendings);
         model.addAttribute("projectedCashLeft", totalIncome - projectedSpendings);
-        model.addAttribute("recurringTemplates", recurringPaymentService.getAllTemplates());
-        model.addAttribute("recurringByType", recurringPaymentService.getTemplatesByType());
+        model.addAttribute("recurringTemplates", recurringPaymentService.getPullableTemplates());
+        model.addAttribute("recurringByType", recurringPaymentService.getPullableTemplatesByType());
         model.addAttribute("defaultDate", defaultDateFor(expense));
         model.addAttribute("categories", categoryService.listActive());
         return "detail";
@@ -144,17 +145,20 @@ public class ExpenseWebController {
             @RequestParam(required = false) List<Long> templateIds,
             RedirectAttributes redirectAttributes) {
         try {
-            var monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
-            if (templateIds != null && !templateIds.isEmpty()) {
-                var templates = recurringPaymentService.getAllTemplates().stream()
-                        .filter(t -> templateIds.contains(t.getId()))
-                        .toList();
-                expenseManager.pullTemplatesIntoMonth(monthlyExpenses.getYearMonth(), templates);
-            }
+            expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate, selectedTemplates(templateIds));
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
         }
         return REDIRECT;
+    }
+
+    private List<RecurringPaymentTemplate> selectedTemplates(List<Long> templateIds) {
+        if (templateIds == null || templateIds.isEmpty()) {
+            return List.of();
+        }
+        return recurringPaymentService.getAllTemplates().stream()
+                .filter(t -> templateIds.contains(t.getId()))
+                .toList();
     }
 
     @PostMapping("/month/addpayment")
@@ -272,11 +276,12 @@ public class ExpenseWebController {
 
     @PostMapping("/month/pullrecurring/{yearMonth}")
     public String pullRecurringIntoMonth(@PathVariable YearMonth yearMonth,
-            @RequestParam List<Long> templateIds) {
-        var templates = recurringPaymentService.getAllTemplates().stream()
-                .filter(t -> templateIds.contains(t.getId()))
-                .toList();
-        expenseManager.pullTemplatesIntoMonth(yearMonth, templates);
+            @RequestParam List<Long> templateIds, RedirectAttributes redirectAttributes) {
+        try {
+            expenseManager.pullTemplatesIntoMonth(yearMonth, selectedTemplates(templateIds));
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+        }
         return REDIRECT_MONTH + yearMonth;
     }
 

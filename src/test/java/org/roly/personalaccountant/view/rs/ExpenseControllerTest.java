@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ class ExpenseControllerTest {
 
     @Test
     void shouldGenerateNewExpense() {
-        when(expenseManager.addNewMonthlyExpense(EXPENSE_NAME, START_DATE, null)).thenReturn(DUMMY_EXPENSE);
+        when(expenseManager.addNewMonthlyExpense(EXPENSE_NAME, START_DATE, null, List.of())).thenReturn(DUMMY_EXPENSE);
         when(expenseManager.getExpense(EXPENSE_MONTH)).thenReturn(DUMMY_EXPENSE);
 
         ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_NAME, START_DATE, null);
@@ -44,7 +45,7 @@ class ExpenseControllerTest {
 
     @Test
     void shouldHandleNonGeneratableExpense() {
-        when(expenseManager.addNewMonthlyExpense(EXPENSE_NAME, START_DATE, null)).thenReturn(DUMMY_EXPENSE);
+        when(expenseManager.addNewMonthlyExpense(EXPENSE_NAME, START_DATE, null, List.of())).thenReturn(DUMMY_EXPENSE);
         when(expenseManager.getExpense(EXPENSE_MONTH)).thenReturn(new MonthlyExpenses(EXPENSE_NAME, START_DATE.plusDays(1), null));
 
         ResponseEntity<Void> response = expenseController.generateNewExpense(EXPENSE_NAME, START_DATE, null);

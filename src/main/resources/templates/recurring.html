@@ -17,6 +17,11 @@
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTemplateModal">+ Add Template</button>
   </div>
 
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
   <div th:if="${templates.isEmpty()}" class="alert alert-info">No recurring payments defined yet.</div>
 
   <div th:if="${!templates.isEmpty()}">
@@ -93,7 +98,7 @@
           <div class="mb-3">
             <label class="form-label">Type</label>
             <select class="form-select" name="type" required>
-              <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
+              <option th:each="pt : ${templateTypes}"
                       th:value="${pt}" th:text="${pt.displayName}"></option>
             </select>
           </div>
@@ -134,8 +139,10 @@
             <div class="mb-3">
               <label class="form-label">Type</label>
               <select class="form-select" name="type" required>
-                <option th:each="pt : ${T(org.roly.personalaccountant.domain.model.dto.Payment.PaymentType).values()}"
+                <option th:each="pt : ${templateTypes}"
                         th:value="${pt}" th:text="${pt.displayName}" th:selected="${pt == template.type}"></option>
+                <option th:unless="${templateTypes.contains(template.type)}"
+                        th:value="${template.type}" th:text="${template.type.displayName}" selected></option>
               </select>
             </div>
           </div>

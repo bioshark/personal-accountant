@@ -38,7 +38,7 @@ public class ExpenseController {
     public ResponseEntity<Void> generateNewExpense(@PathVariable String expenseName,
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate) {
-        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate);
+        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate, List.of());
         if (expenseManager.getExpense(monthlyExpenses.getYearMonth()).equals(monthlyExpenses)) {
             return ResponseEntity.ok().build();
         }

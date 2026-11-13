@@ -1,6 +1,7 @@
 package org.roly.personalaccountant.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.DAILY;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.FIXED;
 import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.LEISURE;
@@ -50,10 +51,42 @@ class RecurringPaymentServiceTest {
     }
 
     @Test
-    void shouldAddDailyTabOnlyWhenDailyTemplatesExist() {
-        service.addTemplate("Lunch", 10, "Food", DAILY);
+    void shouldAddDailyTabOnlyWhenLegacyDailyTemplatesExist() {
+        repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY));
 
         assertThat(service.getTemplatesByType().keySet()).containsExactly(FIXED, SAVING, LEISURE, DAILY);
         assertThat(service.getTemplatesByType().get(DAILY)).extracting(RecurringPaymentTemplate::getName).containsExactly("Lunch");
+    }
+
+    @Test
+    void shouldExcludeLegacyDailyTemplatesFromPullableTemplates() {
+        repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY));
+        service.addTemplate("Rent", 900, "House", FIXED);
+
+        assertThat(service.getPullableTemplates()).extracting(RecurringPaymentTemplate::getName).containsExactly("Rent");
+        assertThat(service.getPullableTemplatesByType().keySet()).containsExactly(FIXED, SAVING, LEISURE);
+    }
+
+    @Test
+    void shouldRejectCreatingDailyTemplate() {
+        assertThatThrownBy(() -> service.addTemplate("Lunch", 10, "Food", DAILY)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(repository.findAll()).isEmpty();
+    }
+
+    @Test
+    void shouldRejectSwitchingTemplateToDaily() {
+        Long id = service.addTemplate("Rent", 900, "House", FIXED).getId();
+
+        assertThatThrownBy(() -> service.editTemplate(id, "Rent", 900, "House", DAILY)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(repository.findById(id)).get().extracting(RecurringPaymentTemplate::getType).isEqualTo(FIXED);
+    }
+
+    @Test
+    void shouldAllowEditingLegacyDailyTemplateWithoutChangingType() {
+        Long id = repository.save(new RecurringPaymentTemplate("Lunch", 10, "Food", DAILY)).getId();
+
+        service.editTemplate(id, "Lunch", 12, "Food", DAILY);
+
+        assertThat(repository.findById(id)).get().extracting(RecurringPaymentTemplate::getDefaultAmount).isEqualTo(12.0);
     }
 }

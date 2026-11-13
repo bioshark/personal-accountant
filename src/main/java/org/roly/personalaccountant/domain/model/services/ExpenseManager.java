@@ -34,7 +34,9 @@ public class ExpenseManager {
         this.repository = repository;
     }
 
-    public MonthlyExpenses addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate) {
+    @Transactional
+    public MonthlyExpenses addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate,
+            List<RecurringPaymentTemplate> templates) {
         MonthlyExpenses dto = new MonthlyExpenses(expenseName, startDate, endDate);
         if (repository.findByYearAndMonth(dto.getYearMonth().getYear(), dto.getYearMonth().getMonthValue()).isPresent()) {
             throw new IllegalArgumentException("An expense for " + dto.getYearMonth() + " already exists");
@@ -46,6 +48,7 @@ public class ExpenseManager {
                 dto.getEndDate(),
                 dto.getExpenseName()
         );
+        applyTemplates(entity, templates);
         repository.save(entity);
         return dto;
     }
@@ -270,16 +273,30 @@ public class ExpenseManager {
         return repository.save(entity);
     }
 
+    @Transactional
     public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
         requireOpen(entity);
+        applyTemplates(entity, templates);
+        return repository.save(entity);
+    }
+
+    /**
+     * Rejects DAILY templates before touching the month, so a bad selection never leaves some templates applied and others not.
+     */
+    private static void applyTemplates(MonthlyExpenseEntity entity, List<RecurringPaymentTemplate> templates) {
+        templates.stream()
+                .filter(template -> template.getType() == PaymentType.DAILY)
+                .findFirst()
+                .ifPresent(template -> {
+                    throw new IllegalArgumentException("Daily recurring payment cannot be pulled into a month: " + template.getName());
+                });
         for (RecurringPaymentTemplate template : templates) {
             PendingPaymentEntity pending = new PendingPaymentEntity(
                     template.getName(), template.getDefaultAmount(), template.getCategory(), template.getType());
             entity.addPendingPayment(pending);
             entity.adjustBudget(pending);
         }
-        return repository.save(entity);
     }
 
     public MonthlyExpenseEntity payPendingPayment(Long pendingId, LocalDate date, double amount) {
