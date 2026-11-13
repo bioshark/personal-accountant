@@ -4,7 +4,6 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] REST: return `201 Created` after creating a month; current success path returns `404`.
 - [ ] REST: fix remove-payment-by-fields; remove the managed payment, not a new entity instance.
 - [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).
 - [ ] Define zero-income percentage behavior; never render `NaN`/infinity.

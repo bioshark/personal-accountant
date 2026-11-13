@@ -13,6 +13,7 @@ import org.roly.personalaccountant.domain.model.services.ExpenseManager;
 import org.roly.personalaccountant.view.rs.dto.ExpenseResult;
 import org.roly.personalaccountant.view.rs.mapper.ExpenseConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,11 +39,8 @@ public class ExpenseController {
     public ResponseEntity<Void> generateNewExpense(@PathVariable String expenseName,
             @RequestParam("startDate") LocalDate startDate,
             @RequestParam("endDate") LocalDate endDate) {
-        MonthlyExpenses monthlyExpenses = expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate, List.of());
-        if (expenseManager.getExpense(monthlyExpenses.getYearMonth()).equals(monthlyExpenses)) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        expenseManager.addNewMonthlyExpense(expenseName, startDate, endDate, List.of());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/expense/delete/{yearMonth}")
