@@ -4,7 +4,6 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] Make `MonthlyExpenses.addPayment` reject an unknown day with a clear error (never NPE).
 - [ ] Define zero-income percentage behavior; never render `NaN`/infinity.
 - [ ] Do not swallow `ReactiveList` listener failures; fail the mutation atomically.
 

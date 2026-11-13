@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SequencedMap;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
@@ -54,10 +55,14 @@ public class MonthlyExpenses {
     }
 
     public void addPayment(Payment payment) {
-        payments.get(payment.date()).add(payment);
+        ReactiveList<BaseTransaction> day = payments.get(payment.date());
+        if (day == null) {
+            throw new IllegalArgumentException("Date " + payment.date() + " is outside the month range (" + startDate + " to " + getEndDate() + ")");
+        }
+        day.add(payment);
     }
 
-    public LinkedHashMap<LocalDate, List<BaseTransaction>> getPayments() {
+    public SequencedMap<LocalDate, List<BaseTransaction>> getPayments() {
         return new LinkedHashMap<>(payments);
     }
 
