@@ -4,18 +4,45 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] Define zero-income percentage behavior; never render `NaN`/infinity.
-- [ ] Do not swallow `ReactiveList` listener failures; fail the mutation atomically.
+- [ ] **`ReactiveList` swallows listener exceptions, leaving the list and the statistics out of sync.**
+    - Where: `ReactiveList.notifyListeners` catches every `RuntimeException` and logs it at DEBUG (invisible by default). `super.add` has
+      already run, so the element is in the list while `OverallSumsTracker` may be half-updated (e.g. `onAdd` decrements `cashLeft` first, then
+      fails on `dailyPayments.get(date)` for an unknown day, so `dailyExpenseTotal` is never increased).
+    - Effect: totals, cash left and percentages silently disagree with the listed payments; the real bug is hidden.
 
 ## 2. Data Integrity & Validation
 
-- [ ] Reject overlapping month date ranges on create and edit (date lookup must be unambiguous).
-- [ ] Validate edited income dates stay inside the owning month.
-- [ ] Validate inputs at service and DB level: non-negative budgets/amounts, reject `NaN`/infinity, start ≤ end dates,
-  non-blank and length-bounded text, valid saving percentages.
-- [ ] Define/enforce duplicate recurring-template pull behavior per month.
-- [ ] Clarify manual budget overwrite vs pending-template add/skip semantics.
-- [ ] Migrate money from `double` to `BigDecimal` in a dedicated Flyway-backed change.
+- [ ] **Reject overlapping month date ranges on create and edit.**
+    - Where: `addNewMonthlyExpense` only rejects a duplicate `yearMonth`; `editMonth` checks nothing. Two months with different `yearMonth`
+      can still share dates (e.g. editing one month's end past the next month's start).
+    - Effect: `MonthlyExpenseRepository.findByDateInRange` returns `Optional`, so two matches throw `IncorrectResultSizeDataAccessException`
+      (500) on every add/remove payment/income and toggle-day for those dates.
+- [ ] **Validate edited income dates stay inside the owning month.**
+    - Where: `editIncome` sets the date unchecked; `editPayment` already calls `validatePaymentDateInMonth`. `editMonth` also only checks that
+      payments still fit the new range, not incomes.
+    - Effect: an income can be dated outside its month; it still counts in that month, but date-based lookups (`removeIncome` by fields)
+      go to a different or no month.
+- [ ] **Validate inputs at service and DB level.**
+    - Amounts/budgets: negative values are accepted everywhere (`addPayment`, `addIncome`, `adjustBudget`, templates). Spring also binds the
+      strings `NaN` and `Infinity` to `double` params, which then poison every sum.
+    - Dates: an end date before the start date generates no days. On create this fails with the unclear "No dates found" from
+      `computeMonth`; on edit `PaymentsGenerator.resolveEndDate` calls `getLast()` on the empty list and throws `NoSuchElementException` (500).
+    - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500.
+    - Saving percentages: `addSaving` only checks against the unallocated share (negative passes); `editSaving` checks nothing, so savings
+      can sum past 100% or go negative.
+    - DB: no `CHECK` constraints exist, so the DB accepts any of the above.
+- [ ] **Define/enforce duplicate recurring-template pull behavior per month.**
+    - Where: `pullTemplatesIntoMonth` creates a new pending payment and adds its amount to the budget for every selected template, with no
+      check for what the month already has.
+    - Effect: pulling "Rent" twice gives two pending Rent entries and doubles the fixed budget.
+- [ ] **Clarify manual budget overwrite vs pending-template add/skip semantics.**
+    - Where: `adjustBudget(type, value)` overwrites the budget; pulling a template adds to it; skipping a pending payment (`removePendingPayment`)
+      subtracts from it.
+    - Effect: after a manual overwrite, skipping a pending payment subtracts from a number it was never part of, so the budget can end up
+      too low or negative.
+- [ ] **Migrate money from `double` to `BigDecimal`** in a dedicated Flyway-backed change.
+    - Why: binary floating point accumulates rounding errors in sums (`0.1 + 0.2 != 0.3`), and the projection compares totals.
+    - Scope: entity columns to `DECIMAL(19,2)`, DTOs, `OverallSumsTracker` arithmetic, controller params, templates' number formatting.
 
 ## 3. Tech Debt: Tests
 

@@ -157,6 +157,30 @@ class OverallSumsTrackerTest {
     }
 
     @Test
+    void shouldKeepPercentagesAtZeroWhenThereIsNoIncome() {
+        overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);
+        overallSumsTracker.onAdd(LEISURE_PAYMENT_MUSIC);
+
+        Percentages percentages = overallSumsTracker.getPercentages();
+
+        assertThat(percentages.getCorePercentage()).isZero();
+        assertThat(percentages.getWantPercentage()).isZero();
+        assertThat(percentages.getSavePercentage()).isZero();
+    }
+
+    @Test
+    void shouldComputePercentagesWhenIncomeIsFullySpent() {
+        overallSumsTracker.onAdd(new Income(null, "Wage", LocalDate.now(), 1000D));
+        overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);
+
+        Percentages percentages = overallSumsTracker.getPercentages();
+
+        assertThat(percentages.getCorePercentage()).isCloseTo(100D, within(0.001));
+        assertThat(percentages.getWantPercentage()).isZero();
+        assertThat(percentages.getSavePercentage()).isZero();
+    }
+
+    @Test
     void shouldComputePercentagesCorrectly() {
         overallSumsTracker.onAdd(WAGE_INCOME);
         overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);

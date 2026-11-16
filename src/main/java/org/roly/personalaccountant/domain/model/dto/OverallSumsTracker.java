@@ -61,9 +61,17 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     }
 
     private void adjustPercentages() {
-        percentages.setCorePercentage(getCoreTotal() / cashTotal * 100);
-        percentages.setWantPercentage(getWantTotal() / cashTotal * 100);
-        percentages.setSavePercentage(getSaveTotal() / cashTotal * 100);
+        double corePercentage = 0.0;
+        double wantPercentage = 0.0;
+        double savePercentage = 0.0;
+        if (cashTotal > 0) {
+            corePercentage = getCoreTotal() / cashTotal * 100;
+            wantPercentage = getWantTotal() / cashTotal * 100;
+            savePercentage = getSaveTotal() / cashTotal * 100;
+        }
+        percentages.setCorePercentage(corePercentage);
+        percentages.setWantPercentage(wantPercentage);
+        percentages.setSavePercentage(savePercentage);
     }
 
     public double getCoreTotal() {
