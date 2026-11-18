@@ -15,7 +15,7 @@ public class ReactiveList<T> extends ArrayList<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveList.class);
 
-    transient Set<Listener<T>> listeners = new HashSet<>();
+    private final transient Set<Listener<T>> listeners = new HashSet<>();
 
     public void registerListener(Listener<T> listener) {
         listeners.add(listener);
@@ -35,7 +35,7 @@ public class ReactiveList<T> extends ArrayList<T> {
         for (Listener<T> listener : listeners) {
             try {
                 listener.onAdd(element);
-            } catch (RuntimeException e) {
+            } catch (RuntimeException _) {
                 LOGGER.debug(ACTION_1_PARAMS, action("Listener notification exception"), key(listener));
             }
         }

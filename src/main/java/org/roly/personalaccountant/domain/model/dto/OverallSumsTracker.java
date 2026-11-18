@@ -18,11 +18,11 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OverallSumsTracker.class);
 
-    private final Map<LocalDate, DailyStatistics> dailyPayments = new HashMap<>();
-    private final List<Saving> savings = new ArrayList<>();
+    private Map<LocalDate, DailyStatistics> dailyPayments = new HashMap<>();
+    private List<Saving> savings = new ArrayList<>();
     private double unallocatedPercentage = 100L;
-    private final Saving defaultSaving = new Saving(null, "Unallocated", unallocatedPercentage);
-    private final Percentages percentages = new Percentages();
+    private Saving defaultSaving = new Saving(null, "Unallocated", unallocatedPercentage);
+    private Percentages percentages = new Percentages();
     private double cashTotal;
     private double cashLeft;
     private double fixedExpenseTotal;
@@ -37,27 +37,47 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
 
     @Override
     public void onAdd(BaseTransaction transaction) {
-        switch (transaction) {
-            case Payment payment -> {
-                cashLeft -= payment.amount();
-                switch (payment.type()) {
-                    case FIXED -> fixedExpenseTotal += payment.amount();
-                    case DAILY -> {
-                        dailyPayments.get(payment.date()).addDailyExpenditure(payment.amount());
-                        dailyExpenseTotal += payment.amount();
+        OverallSumsTracker backUp = this;
+        try {
+            switch (transaction) {
+                case Payment payment -> {
+                    cashLeft -= payment.amount();
+                    switch (payment.type()) {
+                        case FIXED -> fixedExpenseTotal += payment.amount();
+                        case DAILY -> {
+                            dailyPayments.get(payment.date()).addDailyExpenditure(payment.amount());
+                            dailyExpenseTotal += payment.amount();
+                        }
+                        case LEISURE -> leisureExpenseTotal += payment.amount();
+                        case SAVING -> savingExpenseTotal += payment.amount();
                     }
-                    case LEISURE -> leisureExpenseTotal += payment.amount();
-                    case SAVING -> savingExpenseTotal += payment.amount();
                 }
+                case Income income -> {
+                    cashTotal += income.value();
+                    cashLeft += income.value();
+                }
+                default -> LOGGER.error(ACTION_1_PARAMS, action("Transaction is of wrong type"), key(transaction));
             }
-            case Income income -> {
-                cashTotal += income.value();
-                cashLeft += income.value();
-            }
-            default -> LOGGER.error(ACTION_1_PARAMS, action("Transaction is of wrong type"), key(transaction));
+            adjustSavings(cashLeft);
+            adjustPercentages();
+        } catch (Exception e) {
+            undo(backUp);
+            throw e;
         }
-        adjustSavings(cashLeft);
-        adjustPercentages();
+    }
+
+    private void undo(OverallSumsTracker backUp) {
+        this.dailyPayments = backUp.dailyPayments;
+        this.savings = backUp.savings;
+        this.unallocatedPercentage = backUp.unallocatedPercentage;
+        this.defaultSaving = backUp.defaultSaving;
+        this.percentages = backUp.percentages;
+        this.cashTotal = backUp.cashTotal;
+        this.cashLeft = backUp.cashLeft;
+        this.fixedExpenseTotal = backUp.fixedExpenseTotal;
+        this.dailyExpenseTotal = backUp.dailyExpenseTotal;
+        this.leisureExpenseTotal = backUp.leisureExpenseTotal;
+        this.savingExpenseTotal = backUp.savingExpenseTotal;
     }
 
     private void adjustPercentages() {
@@ -79,7 +99,7 @@ public class OverallSumsTracker implements Listener<BaseTransaction> {
     }
 
     public double getWantTotal() {
-        return leisureExpenseTotal;
+        return getLeisureExpenseTotal();
     }
 
     public double getSaveTotal() {
