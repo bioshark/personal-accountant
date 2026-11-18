@@ -6,6 +6,7 @@ import static org.roly.personalaccountant.utils.StructuredLoggerHelper.key;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class ReactiveList<T> extends ArrayList<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveList.class);
 
-    Set<Listener<T>> listeners = new HashSet<>();
+    transient Set<Listener<T>> listeners = new HashSet<>();
 
     public void registerListener(Listener<T> listener) {
         listeners.add(listener);
@@ -38,5 +39,25 @@ public class ReactiveList<T> extends ArrayList<T> {
                 LOGGER.debug(ACTION_1_PARAMS, action("Listener notification exception"), key(listener));
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ReactiveList<?> that = (ReactiveList<?>) o;
+        return Objects.equals(listeners, that.listeners);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Objects.hashCode(listeners);
+        return result;
     }
 }
