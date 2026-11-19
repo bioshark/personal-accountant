@@ -181,6 +181,17 @@ class OverallSumsTrackerTest {
     }
 
     @Test
+    void shouldLeaveStatisticsUnchangedWhenDailyPaymentDayIsUnknown() {
+        overallSumsTracker.onAdd(WAGE_INCOME);
+        Payment unknownDay = new Payment(1L, "Food", FOOD, PaymentType.DAILY, 12.3D, LocalDate.now().minusDays(1));
+
+        assertThatThrownBy(() -> overallSumsTracker.onAdd(unknownDay)).isInstanceOf(NullPointerException.class);
+        assertThat(overallSumsTracker.getCashLeft()).isEqualTo(3000D);
+        assertThat(overallSumsTracker.getCashTotal()).isEqualTo(3000D);
+        assertThat(overallSumsTracker.getDailyExpenseTotal()).isZero();
+    }
+
+    @Test
     void shouldComputePercentagesCorrectly() {
         overallSumsTracker.onAdd(WAGE_INCOME);
         overallSumsTracker.onAdd(FIXED_PAYMENT_MORTGAGE);

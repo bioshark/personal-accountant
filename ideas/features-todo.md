@@ -4,11 +4,7 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] **`ReactiveList` swallows listener exceptions, leaving the list and the statistics out of sync.**
-    - Where: `ReactiveList.notifyListeners` catches every `RuntimeException` and logs it at DEBUG (invisible by default). `super.add` has
-      already run, so the element is in the list while `OverallSumsTracker` may be half-updated (e.g. `onAdd` decrements `cashLeft` first, then
-      fails on `dailyPayments.get(date)` for an unknown day, so `dailyExpenseTotal` is never increased).
-    - Effect: totals, cash left and percentages silently disagree with the listed payments; the real bug is hidden.
+None open.
 
 ## 2. Data Integrity & Validation
 

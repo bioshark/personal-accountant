@@ -35,8 +35,9 @@ public class ReactiveList<T> extends ArrayList<T> {
         for (Listener<T> listener : listeners) {
             try {
                 listener.onAdd(element);
-            } catch (RuntimeException _) {
+            } catch (RuntimeException e) {
                 LOGGER.debug(ACTION_1_PARAMS, action("Listener notification exception"), key(listener));
+                throw e;
             }
         }
     }
