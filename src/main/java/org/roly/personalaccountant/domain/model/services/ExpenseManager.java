@@ -38,7 +38,7 @@ public class ExpenseManager {
     }
 
     @Transactional
-    public MonthlyExpenses addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate,
+    public void addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate,
             List<RecurringPaymentTemplate> templates) {
         MonthlyExpenses dto = new MonthlyExpenses(expenseName, startDate, endDate);
         if (repository.findByYearAndMonth(dto.getYearMonth().getYear(), dto.getYearMonth().getMonthValue()).isPresent()) {
@@ -52,11 +52,10 @@ public class ExpenseManager {
                 dto.getExpenseName()
         );
         if (thereIsAnOverlap(entity)) {
-            throw new IllegalArgumentException("An expense already contains the boundaries " + dto.getYearMonth());
+            throw new IllegalArgumentException("An expense already contains the new boundaries");
         }
         applyTemplates(entity, templates);
         repository.save(entity);
-        return dto;
     }
 
     private boolean thereIsAnOverlap(MonthlyExpenseEntity entity) {
@@ -64,7 +63,7 @@ public class ExpenseManager {
     }
 
     @Transactional
-    public MonthlyExpenseEntity editMonth(YearMonth yearMonth, String newName, LocalDate newStartDate, LocalDate newEndDate) {
+    public void editMonth(YearMonth yearMonth, String newName, LocalDate newStartDate, LocalDate newEndDate) {
         MonthlyExpenseEntity entity = getEntity(yearMonth);
         requireOpen(entity);
         if (newName == null || newName.isBlank()) {
@@ -81,7 +80,10 @@ public class ExpenseManager {
         entity.setExpenseName(newName.trim());
         entity.setStartDate(newStartDate);
         entity.setEndDate(effectiveEnd);
-        return repository.save(entity);
+        if (thereIsAnOverlap(entity)) {
+            throw new IllegalArgumentException("An expense already contains the boundaries");
+        }
+        repository.save(entity);
     }
 
     public boolean deleteMonthlyExpense(YearMonth yearMonth) {
