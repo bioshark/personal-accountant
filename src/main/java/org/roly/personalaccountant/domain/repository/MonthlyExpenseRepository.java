@@ -13,4 +13,17 @@ public interface MonthlyExpenseRepository extends JpaRepository<MonthlyExpenseEn
 
     @Query("select m from MonthlyExpenseEntity m where :date >= m.startDate and :date <= m.endDate")
     Optional<MonthlyExpenseEntity> findByDateInRange(@Param("date") LocalDate date);
+
+    @Query("""
+            select (count(m) > 0)
+            from MonthlyExpenseEntity m
+            where (:id is null or m.id <> :id)
+                and (
+                    (:startDate < m.startDate and :endDate >= m.startDate)
+                 or (:startDate <= m.endDate and :endDate >= m.endDate)
+                 or (:startDate >= m.startDate and :endDate <= m.endDate)
+            )
+            """)
+    boolean existsOverlappingMonth(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, @Param("id") Long id);
+
 }

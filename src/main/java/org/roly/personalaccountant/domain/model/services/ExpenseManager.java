@@ -47,13 +47,20 @@ public class ExpenseManager {
         MonthlyExpenseEntity entity = new MonthlyExpenseEntity(
                 dto.getYearMonth().getYear(),
                 dto.getYearMonth().getMonthValue(),
-                startDate,
+                dto.getStartDate(),
                 dto.getEndDate(),
                 dto.getExpenseName()
         );
+        if (thereIsAnOverlap(entity)) {
+            throw new IllegalArgumentException("An expense already contains the boundaries " + dto.getYearMonth());
+        }
         applyTemplates(entity, templates);
         repository.save(entity);
         return dto;
+    }
+
+    private boolean thereIsAnOverlap(MonthlyExpenseEntity entity) {
+        return repository.existsOverlappingMonth(entity.getStartDate(), entity.getEndDate(), entity.getId());
     }
 
     @Transactional
