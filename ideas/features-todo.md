@@ -4,11 +4,7 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] **Reject overlapping month date ranges on create and edit.**
-    - Where: `addNewMonthlyExpense` only rejects a duplicate `yearMonth`; `editMonth` checks nothing. Two months with different `yearMonth`
-      can still share dates (e.g. editing one month's end past the next month's start).
-    - Effect: `MonthlyExpenseRepository.findByDateInRange` returns `Optional`, so two matches throw `IncorrectResultSizeDataAccessException`
-      (500) on every add/remove payment/income and toggle-day for those dates.
+None open.
 
 ## 2. Data Integrity & Validation
 
