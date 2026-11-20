@@ -71,11 +71,8 @@ public class ExpenseManager {
         }
 
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
-        for (PaymentEntity payment : entity.getPayments()) {
-            if (payment.getDate().isBefore(newStartDate) || payment.getDate().isAfter(effectiveEnd)) {
-                throw new IllegalArgumentException("Cannot change dates: payment exists on " + payment.getDate());
-            }
-        }
+        checkForLoosePayments(newStartDate, entity, effectiveEnd);
+        checkForLooseIncomes(newStartDate, entity, effectiveEnd);
 
         entity.setExpenseName(newName.trim());
         entity.setStartDate(newStartDate);
@@ -84,6 +81,22 @@ public class ExpenseManager {
             throw new IllegalArgumentException("An expense already contains the boundaries");
         }
         repository.save(entity);
+    }
+
+    private static void checkForLooseIncomes(LocalDate newStartDate, MonthlyExpenseEntity entity, LocalDate effectiveEnd) {
+        for (IncomeEntity income : entity.getIncomes()) {
+            if (income.getDate().isBefore(newStartDate) || income.getDate().isAfter(effectiveEnd)) {
+                throw new IllegalArgumentException("Cannot change dates: income exists on " + income.getDate());
+            }
+        }
+    }
+
+    private static void checkForLoosePayments(LocalDate newStartDate, MonthlyExpenseEntity entity, LocalDate effectiveEnd) {
+        for (PaymentEntity payment : entity.getPayments()) {
+            if (payment.getDate().isBefore(newStartDate) || payment.getDate().isAfter(effectiveEnd)) {
+                throw new IllegalArgumentException("Cannot change dates: payment exists on " + payment.getDate());
+            }
+        }
     }
 
     public boolean deleteMonthlyExpense(YearMonth yearMonth) {
@@ -142,10 +155,10 @@ public class ExpenseManager {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + paymentId));
         requireOpen(entity);
+        validatePaymentDateInMonth(entity, date);
         PaymentEntity payment = entity.getPayments().stream()
                 .filter(p -> p.getId().equals(paymentId))
                 .findFirst().orElseThrow();
-        validatePaymentDateInMonth(entity, date);
         payment.setDescription(description);
         payment.setDate(date);
         payment.setAmount(amount);
@@ -184,6 +197,7 @@ public class ExpenseManager {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
         requireOpen(entity);
+        validatePaymentDateInMonth(entity, date);
         IncomeEntity income = entity.getIncomes().stream()
                 .filter(i -> i.getId().equals(incomeId))
                 .findFirst().orElseThrow();

@@ -37,16 +37,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class ExpenseManagerTest {
 
-    private static final LocalDate START_DATE = LocalDate.of(2025, 5, 27);
-    private static final LocalDate END_DATE = LocalDate.of(2025, 6, 27);
+    private static final LocalDate START_DATE = LocalDate.of(2025, Month.MAY, 27);
+    private static final LocalDate END_DATE = LocalDate.of(2025, Month.JUNE, 27);
     public static final Income INVALID_INCOME = new Income(null, "salariu", START_DATE.minusDays(1), 1122.0d);
     public static final Income WAGE_INCOME = new Income(null, "Wage", START_DATE.plusDays(1), 1122.0d);
-    private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, 6, 10);
+    private static final LocalDate PAYMENT_DATE = LocalDate.of(2025, Month.JUNE, 10);
     private static final YearMonth EXPENSE_MONTH = YearMonth.of(2025, Month.JUNE);
     private static final String EXPENSE_MONTH_NAME = "June 2025";
     private static final String FOOD = "food";
     private static final String MEDIA = "media";
-    private static final LocalDate NEXT_START_DATE = LocalDate.of(2025, 6, 28);
+    private static final LocalDate NEXT_START_DATE = LocalDate.of(2025, Month.JUNE, 28);
     private static final YearMonth NEXT_MONTH = YearMonth.of(2025, Month.JULY);
     private static final RecurringPaymentTemplate RENT = new RecurringPaymentTemplate("Rent", 900, "House", FIXED);
     private static final RecurringPaymentTemplate ETF = new RecurringPaymentTemplate("ETF", 200, "Etf", SAVING);
@@ -129,7 +129,7 @@ class ExpenseManagerTest {
     @Test
     void shouldPersistResolvedEndDateWhenNoneProvided() {
         // START_DATE 2025-05-27 with null end date auto-resolves to 2025-06-27
-        assertThat(manager.getExpense(EXPENSE_MONTH).getEndDate()).isEqualTo(LocalDate.of(2025, 6, 27));
+        assertThat(manager.getExpense(EXPENSE_MONTH).getEndDate()).isEqualTo(LocalDate.of(2025, Month.JUNE, 27));
     }
 
     @Test
@@ -144,7 +144,7 @@ class ExpenseManagerTest {
 
     @Test
     void shouldAddPaymentOnEndDateBoundary() {
-        LocalDate endDate = LocalDate.of(2025, 6, 27);
+        LocalDate endDate = LocalDate.of(2025, Month.JUNE, 27);
         Payment payment = new Payment(null, FOOD, FOOD, FIXED, 5.0d, endDate);
 
         manager.addPayment(payment);
@@ -306,6 +306,60 @@ class ExpenseManagerTest {
 
         assertThatThrownBy(() -> manager.removePayment(differentAmount)).isInstanceOf(IllegalArgumentException.class);
         assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(11.3d);
+    }
+
+    @Test
+    void shouldRejectCreatingMonthOverlappingExistingMonth() {
+        LocalDate overlappingStart = END_DATE.minusDays(5);
+        LocalDate overlappingEnd = END_DATE.plusDays(25);
+
+        assertThatThrownBy(() -> manager.addNewMonthlyExpense(null, overlappingStart, overlappingEnd, List.of()))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getExpenses()).containsOnlyKeys(EXPENSE_MONTH);
+    }
+
+    @Test
+    void shouldRejectEditingMonthIntoNeighbouringMonth() {
+        manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, List.of());
+        LocalDate overlappingEnd = NEXT_START_DATE.plusDays(5);
+
+        assertThatThrownBy(() -> manager.editMonth(EXPENSE_MONTH, EXPENSE_MONTH_NAME, START_DATE, overlappingEnd))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getEndDate()).isEqualTo(END_DATE);
+    }
+
+    @Test
+    void shouldAllowEditingMonthWithinItsOwnRange() {
+        manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, List.of());
+
+        manager.editMonth(EXPENSE_MONTH, EXPENSE_MONTH_NAME, START_DATE.plusDays(1), END_DATE);
+
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE.plusDays(1));
+    }
+
+    @Test
+    void shouldRejectEditingIncomeDateOutsideMonth() {
+        Long incomeId = manager.addIncome(WAGE_INCOME).getIncomes().getFirst().getId();
+        LocalDate outside = END_DATE.plusDays(1);
+
+        String source = WAGE_INCOME.source();
+        double value = WAGE_INCOME.value();
+        assertThatThrownBy(() -> manager.editIncome(incomeId, source, outside, value))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getIncomes())
+                .extracting(income -> ((Income) income).date())
+                .containsExactly(WAGE_INCOME.date());
+    }
+
+    @Test
+    void shouldRejectEditingMonthDatesThatWouldLeaveIncomeOutside() {
+        manager.addIncome(WAGE_INCOME);
+        LocalDate startAfterIncome = WAGE_INCOME.date().plusDays(1);
+
+        assertThatThrownBy(() -> manager.editMonth(EXPENSE_MONTH, EXPENSE_MONTH_NAME, startAfterIncome, END_DATE))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("income");
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
     }
 
     @Test

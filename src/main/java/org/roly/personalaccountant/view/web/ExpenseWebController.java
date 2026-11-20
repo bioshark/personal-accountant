@@ -3,6 +3,7 @@ package org.roly.personalaccountant.view.web;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import org.roly.personalaccountant.domain.model.dto.Income;
@@ -99,7 +100,7 @@ public class ExpenseWebController {
      * Default date to pre-fill in the "add" forms: today when it falls within the month's range, otherwise the closest boundary (start or end).
      */
     private LocalDate defaultDateFor(MonthlyExpenses expense) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.systemDefault());
         LocalDate start = expense.getStartDate();
         LocalDate end = expense.getEndDate();
         if (today.isBefore(start)) {
@@ -133,10 +134,20 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/editincome/{incomeId}")
-    public String editIncome(@PathVariable Long incomeId, @RequestParam String source,
-            @RequestParam LocalDate date, @RequestParam double value) {
-        MonthlyExpenseEntity entity = expenseManager.editIncome(incomeId, source, date, value);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+    public String editIncome(@PathVariable Long incomeId,
+            @RequestParam String source,
+            @RequestParam LocalDate date,
+            @RequestParam double value,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        YearMonth ym;
+        try {
+            MonthlyExpenseEntity entity = expenseManager.editIncome(incomeId, source, date, value);
+            ym = YearMonth.of(entity.getYear(), entity.getMonth());
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
         return REDIRECT_MONTH + ym;
     }
 

@@ -8,11 +8,6 @@ None open.
 
 ## 2. Data Integrity & Validation
 
-- [ ] **Validate edited income dates stay inside the owning month.**
-    - Where: `editIncome` sets the date unchecked; `editPayment` already calls `validatePaymentDateInMonth`. `editMonth` also only checks that
-      payments still fit the new range, not incomes.
-    - Effect: an income can be dated outside its month; it still counts in that month, but date-based lookups (`removeIncome` by fields)
-      go to a different or no month.
 - [ ] **Validate inputs at service and DB level.**
     - Amounts/budgets: negative values are accepted everywhere (`addPayment`, `addIncome`, `adjustBudget`, templates). Spring also binds the
       strings `NaN` and `Infinity` to `double` params, which then poison every sum.
