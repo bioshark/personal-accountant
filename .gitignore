@@ -27,3 +27,19 @@ hs_err_pid*
 replay_pid*
 
 .kiro-session.md
+
+# Local financial data (H2 databases, backups)
+data/
+*.mv.db
+*.trace.db
+
+# IDE / OS
+.idea/
+.DS_Store
+
+# Local Java version (jenv)
+.java-version
+
+# Local exports and chat artifacts in the project root
+*.ser
+/*.json

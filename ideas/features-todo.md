@@ -41,11 +41,9 @@ None open.
 - [ ] Move `EndDateBackfillRunner` into a versioned Flyway data migration, then remove the runner.
 - [ ] Replace `findAll()` child-ID scans with targeted repository/jOOQ queries before Search grows.
 - [ ] Extract repeated detail-page cards/modals and inline CSS/JS into fragments/static assets.
-- [ ] Remove unused `fragments/income-list.html` (or wire it in).
 
 ## 5. Operational
 
-- [ ] Improve `.gitignore`: `data/`, `.idea/`, `.DS_Store`, `*.ser`, JSON exports/chat artifacts, `.java-version`.
 - [ ] Expand README: setup, DB backup/recovery, migration/release, and local-only security notes.
 - [ ] Exclude `src/main/resources/db/migration` from IDE reformat-on-commit (avoids Flyway checksum mismatches).
 
