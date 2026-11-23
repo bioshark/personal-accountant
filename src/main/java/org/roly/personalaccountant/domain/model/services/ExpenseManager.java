@@ -38,8 +38,7 @@ public class ExpenseManager {
     }
 
     @Transactional
-    public void addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate,
-            List<RecurringPaymentTemplate> templates) {
+    public void addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate, List<RecurringPaymentTemplate> templates) {
         MonthlyExpenses dto = new MonthlyExpenses(expenseName, startDate, endDate);
         if (repository.findByYearAndMonth(dto.getYearMonth().getYear(), dto.getYearMonth().getMonthValue()).isPresent()) {
             throw new IllegalArgumentException("An expense for " + dto.getYearMonth() + " already exists");

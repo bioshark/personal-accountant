@@ -8,6 +8,8 @@ None open.
 
 ## 2. Data Integrity & Validation
 
+- [ ] **Split ExpenseManager and do it as a Facade**
+
 - [ ] **Validate inputs at service and DB level.**
     - Amounts/budgets: negative values are accepted everywhere (`addPayment`, `addIncome`, `adjustBudget`, templates). Spring also binds the
       strings `NaN` and `Infinity` to `double` params, which then poison every sum.
@@ -55,6 +57,11 @@ None open.
 - Blocks: PWA distribution to others, remote DB, iOS companion.
 
 ## 7. Features
+
+### Site functionality
+
+- when toggle a day done, the page should not jump automatically to the top. It's annoying when you are at the last days of the month, you have to scroll down.
+- format all sums according to system settings (so thousands separators)
 
 ### Search
 
