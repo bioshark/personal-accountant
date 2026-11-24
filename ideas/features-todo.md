@@ -4,11 +4,14 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-None open.
+- [ ] **Invalid ids and rejected mutations return a 500 page instead of an error message.**
+    - Where: in `ExpenseWebController`, `removeIncome`, `removePayment`, `removeSaving`, `editSaving`, `toggleDayDone` and
+      `skipPendingPayment` don't catch `IllegalArgumentException` (only `MonthClosedException` has an `@ExceptionHandler`). The REST
+      `ExpenseController` catches nothing.
+    - Effect: a stale page (e.g. deleting a payment already deleted in another tab) or a day outside any month shows the white error page;
+      the REST API answers 500 where a 4xx is expected. This is the same kind of problem as your editIncome fix.
 
 ## 2. Data Integrity & Validation
-
-- [ ] **Split ExpenseManager and do it as a Facade**
 
 - [ ] **Validate inputs at service and DB level.**
     - Amounts/budgets: negative values are accepted everywhere (`addPayment`, `addIncome`, `adjustBudget`, templates). Spring also binds the
@@ -34,20 +37,37 @@ None open.
 
 ## 3. Tech Debt: Tests
 
-- [ ] Add a Flyway-enabled migration integration test for a fresh DB (V1 and future migrations).
+- [ ] **Add a Flyway-enabled migration integration test for a fresh DB (V1 and future migrations).**
+    - Where: `src/test/resources/application.properties` sets `spring.flyway.enabled=false` and `ddl-auto=create-drop`, so every test runs
+      on a schema Hibernate generates itself.
+    - Effect: the real V1–V4 chain and `ddl-auto=validate` against the migrated schema are never tested; a broken migration only shows up
+      when the app boots on a real DB (as happened with V2 and V3).
 - [ ] Add MVC integration tests: real request/status behavior, invalid input, `MonthClosedException` handling.
 - [ ] Add the missing `MonthlyExpenseRepositoryTest` (see test plan §7).
 
 ## 4. Tech Debt: Persistence & Architecture
 
 - [ ] Move `EndDateBackfillRunner` into a versioned Flyway data migration, then remove the runner.
-- [ ] Replace `findAll()` child-ID scans with targeted repository/jOOQ queries before Search grows.
+- [ ] **Replace `findAll()` child-ID scans and eager loading before Search grows.**
+    - Where: `removePaymentById`, `editPayment`, `removeIncomeById`, `editIncome`, `removeSavingById`, `editSaving` and pending-payment lookups
+      load every month to find one child; all five child collections of `MonthlyExpenseEntity` are `FetchType.EAGER`.
+    - Effect: each such action loads the whole database into memory; fine for a few years of data, increasingly slow after that.
+- [ ] **Split `ExpenseManager` and do it as a Facade.**
+    - Move income, payment and month logic into `IncomeService`, `PaymentService` and `MonthService`; `ExpenseManager` keeps its public API
+      and only delegates, so controllers are unchanged.
+    - Shared helpers (`getEntity`, `findExpenseForDate`, `requireOpen`, `toDto`, `validatePaymentDateInMonth`) move to a package-private
+      `MonthLookup` `@Component` injected by the services, avoiding a circular dependency on the facade.
+    - Side benefit: `@Transactional` calls between separate beans go through the Spring proxy (no self-invocation).
 - [ ] Extract repeated detail-page cards/modals and inline CSS/JS into fragments/static assets.
 
 ## 5. Operational
 
 - [ ] Expand README: setup, DB backup/recovery, migration/release, and local-only security notes.
 - [ ] Exclude `src/main/resources/db/migration` from IDE reformat-on-commit (avoids Flyway checksum mismatches).
+- [ ] **`ThreadConfig` is dead configuration.**
+    - Where: it only activates on `spring.thread-executor=virtual`, but `application.properties` sets `spring.threads.virtual.enabled=true`.
+    - Effect: the custom executor and Tomcat customizer never load; virtual threads come from Spring Boot's own support. The class and
+      `ThreadConfigTest` suggest otherwise.
 
 ## 6. Security (required before offering to others / any remote use)
 
