@@ -5,7 +5,6 @@ import java.time.YearMonth;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
@@ -21,6 +20,7 @@ import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.entity.SavingEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
 import org.roly.personalaccountant.utils.PaymentsGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseManager {
 
     private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
-    private static final String PAYMENT_NOT_FOUND = "Payment not found: ";
     private static final String PENDING_PAYMENT_NOT_FOUND = "Pending payment not found: ";
-    private final MonthlyExpenseRepository repository;
 
-    public ExpenseManager(MonthlyExpenseRepository repository) {
+    private final MonthlyExpenseRepository repository;
+    private final PaymentService paymentService;
+    private final IncomeService incomeService;
+
+    @Autowired
+    public ExpenseManager(MonthlyExpenseRepository repository, PaymentService paymentService, IncomeService incomeService) {
         this.repository = repository;
+        this.paymentService = paymentService;
+        this.incomeService = incomeService;
     }
 
     @Transactional
@@ -109,101 +114,35 @@ public class ExpenseManager {
     }
 
     public MonthlyExpenseEntity addPayment(Payment payment) {
-        LocalDate paymentDate = payment.date();
-        MonthlyExpenseEntity entity = findExpenseForDate(paymentDate);
-        requireOpen(entity);
-        entity.addPayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
-        return repository.save(entity);
+        return paymentService.addPayment(payment);
     }
 
     public MonthlyExpenseEntity removePayment(Payment payment) {
-        MonthlyExpenseEntity entity = findExpenseForDate(payment.date());
-        requireOpen(entity);
-        PaymentEntity stored = entity.getPayments().stream()
-                .filter(candidate -> matches(candidate, payment))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + payment.description() + " on " + payment.date()));
-        entity.removePayment(stored);
-        return repository.save(entity);
-    }
-
-    /**
-     * {@code PaymentEntity} has no value-based equals, so a payment identified by its fields must be matched to the stored instance before removal.
-     */
-    private static boolean matches(PaymentEntity stored, Payment payment) {
-        return stored.getDate().equals(payment.date())
-                && stored.getType() == payment.type()
-                && Objects.equals(stored.getDescription(), payment.description())
-                && Objects.equals(stored.getCategory(), payment.category())
-                && Double.compare(stored.getAmount(), payment.amount()) == 0;
+        return paymentService.removePayment(payment);
     }
 
     public MonthlyExpenseEntity removePaymentById(Long paymentId) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + paymentId));
-        requireOpen(entity);
-        entity.getPayments().removeIf(i -> i.getId().equals(paymentId));
-        return repository.save(entity);
+        return paymentService.removePaymentById(paymentId);
     }
 
     public MonthlyExpenseEntity editPayment(Long paymentId, String description, LocalDate date, double amount, PaymentType type, String category) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getPayments().stream().anyMatch(i -> i.getId().equals(paymentId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + paymentId));
-        requireOpen(entity);
-        validatePaymentDateInMonth(entity, date);
-        PaymentEntity payment = entity.getPayments().stream()
-                .filter(p -> p.getId().equals(paymentId))
-                .findFirst().orElseThrow();
-        payment.setDescription(description);
-        payment.setDate(date);
-        payment.setAmount(amount);
-        payment.setType(type);
-        payment.setCategory(category);
-        return repository.save(entity);
+        return paymentService.editPayment(paymentId, description, date, amount, type, category);
     }
 
     public MonthlyExpenseEntity addIncome(Income income) {
-        MonthlyExpenseEntity entity = findExpenseForDate(income.date());
-        requireOpen(entity);
-        entity.addIncome(new IncomeEntity(income.source(), income.date(), income.value()));
-        return repository.save(entity);
+        return incomeService.addIncome(income);
     }
 
     public MonthlyExpenseEntity removeIncome(Income income) {
-        MonthlyExpenseEntity entity = findExpenseForDate(income.date());
-        requireOpen(entity);
-        entity.removeIncome(new IncomeEntity(income.source(), income.date(), income.value()));
-        return repository.save(entity);
+        return incomeService.removeIncome(income);
     }
 
     public MonthlyExpenseEntity removeIncomeById(Long incomeId) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
-        requireOpen(entity);
-        entity.getIncomes().removeIf(i -> i.getId().equals(incomeId));
-        return repository.save(entity);
+        return incomeService.removeIncomeById(incomeId);
     }
 
     public MonthlyExpenseEntity editIncome(Long incomeId, String source, LocalDate date, double value) {
-        MonthlyExpenseEntity entity = repository.findAll().stream()
-                .filter(e -> e.getIncomes().stream().anyMatch(i -> i.getId().equals(incomeId)))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Income not found: " + incomeId));
-        requireOpen(entity);
-        validatePaymentDateInMonth(entity, date);
-        IncomeEntity income = entity.getIncomes().stream()
-                .filter(i -> i.getId().equals(incomeId))
-                .findFirst().orElseThrow();
-        income.setSource(source);
-        income.setDate(date);
-        income.setValue(value);
-        return repository.save(entity);
+        return incomeService.editIncome(incomeId, source, date, value);
     }
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
@@ -371,11 +310,6 @@ public class ExpenseManager {
         repository.deleteAll();
     }
 
-    private MonthlyExpenseEntity findExpenseForDate(LocalDate date) {
-        return repository.findByDateInRange(date)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + date));
-    }
-
     private MonthlyExpenses toDto(MonthlyExpenseEntity entity) {
         MonthlyExpenses dto = getMonthlyExpenses(entity);
         dto.setDone(entity.isMonthDone());
@@ -428,24 +362,9 @@ public class ExpenseManager {
                 .findFirst().orElseThrow();
     }
 
-    private static LocalDate effectiveEndDate(MonthlyExpenseEntity entity) {
-        return entity.getEndDate() != null
-                ? entity.getEndDate()
-                : PaymentsGenerator.resolveEndDate(entity.getStartDate(), null);
-    }
-
     private static void requireOpen(MonthlyExpenseEntity entity) {
         if (entity.isMonthDone()) {
             throw new MonthClosedException(YearMonth.of(entity.getYear(), entity.getMonth()));
-        }
-    }
-
-    private static void validatePaymentDateInMonth(MonthlyExpenseEntity entity, LocalDate date) {
-        LocalDate start = entity.getStartDate();
-        LocalDate end = effectiveEndDate(entity);
-        if (date.isBefore(start) || date.isAfter(end)) {
-            throw new IllegalArgumentException(
-                    "Date " + date + " is outside the month range (" + start + " to " + end + ")");
         }
     }
 
