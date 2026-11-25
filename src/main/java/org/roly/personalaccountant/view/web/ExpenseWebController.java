@@ -271,8 +271,10 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/adjustbudget/{yearMonth}")
-    public String adjustBudget(@PathVariable YearMonth yearMonth, @RequestParam PaymentType type,
-            @RequestParam double value, RedirectAttributes redirectAttributes) {
+    public String adjustBudget(@PathVariable YearMonth yearMonth,
+            @RequestParam PaymentType type,
+            @RequestParam double value,
+            RedirectAttributes redirectAttributes) {
         try {
             expenseManager.adjustBudget(yearMonth, type, value);
         } catch (IllegalArgumentException e) {

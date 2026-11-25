@@ -11,6 +11,12 @@ public record Payment(
         LocalDate date
 ) implements BaseTransaction {
 
+    public Payment {
+        if (!Double.isFinite(amount) || amount < 0) {
+            throw new IllegalArgumentException("Can't create a payment with negative amount: " + amount);
+        }
+    }
+
     public enum PaymentType {
         DAILY,
         FIXED,

@@ -9,4 +9,9 @@ public record Income(
         double value
 ) implements BaseTransaction {
 
+    public Income {
+        if (!Double.isFinite(value) || value < 0) {
+            throw new IllegalArgumentException("Can't create an income with negative amount: " + value);
+        }
+    }
 }

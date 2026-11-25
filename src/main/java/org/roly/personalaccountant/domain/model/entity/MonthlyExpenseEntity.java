@@ -129,6 +129,9 @@ public class MonthlyExpenseEntity {
     }
 
     public void adjustBudget(PaymentType paymentType, double newValue) {
+        if (!Double.isFinite(newValue) || newValue < 0) {
+            throw new IllegalArgumentException("Can't adjust a budget to a negative value: " + newValue);
+        }
         switch (paymentType) {
             case FIXED -> fixedBudget = newValue;
             case LEISURE -> leisureBudget = newValue;

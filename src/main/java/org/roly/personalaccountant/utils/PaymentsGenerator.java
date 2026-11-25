@@ -11,6 +11,8 @@ import org.roly.personalaccountant.domain.notifiers.ReactiveList;
 
 public class PaymentsGenerator {
 
+    private PaymentsGenerator() {}
+
     public static LinkedHashMap<LocalDate, ReactiveList<BaseTransaction>> initializeEmptyMonth(LocalDate currentDate, LocalDate endDate) {
         LinkedList<LocalDate> days = generateDaysForMonth(currentDate, endDate);
         return days.stream()

@@ -63,7 +63,9 @@ public class MonthlyExpenseService {
         if (newName == null || newName.isBlank()) {
             throw new IllegalArgumentException("Month name must not be empty");
         }
-
+        if (newStartDate.isAfter(newEndDate)) {
+            throw new IllegalArgumentException("Start date can't be after end date");
+        }
         LocalDate effectiveEnd = PaymentsGenerator.resolveEndDate(newStartDate, newEndDate);
         checkForLoosePayments(newStartDate, entity, effectiveEnd);
         checkForLooseIncomes(newStartDate, entity, effectiveEnd);

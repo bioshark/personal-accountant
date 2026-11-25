@@ -18,7 +18,7 @@ Priority order: bugs → data integrity → tech debt → operational → featur
       strings `NaN` and `Infinity` to `double` params, which then poison every sum.
     - Dates: an end date before the start date generates no days. On create this fails with the unclear "No dates found" from
       `computeMonth`; on edit `PaymentsGenerator.resolveEndDate` calls `getLast()` on the empty list and throws `NoSuchElementException` (500).
-    - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500.
+    - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500. - Question: wouldn't is also be a good idea to limit this in the UI? 
     - Saving percentages: `addSaving` only checks against the unallocated share (negative passes); `editSaving` checks nothing, so savings
       can sum past 100% or go negative.
     - DB: no `CHECK` constraints exist, so the DB accepts any of the above.
