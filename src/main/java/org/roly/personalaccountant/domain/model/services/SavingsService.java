@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SavingsService {
 
+    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
+
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
@@ -25,7 +27,8 @@ public class SavingsService {
     }
 
     public MonthlyExpenseEntity addSaving(YearMonth yearMonth, String name, double percentage) {
-        MonthlyExpenseEntity entity = helper.getEntity(yearMonth);
+        MonthlyExpenseEntity entity = helper.getEntity(yearMonth)
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
         requireOpen(entity);
         MonthlyExpenses dto = toDto(entity);
         dto.getStatistics().addSaving(new Saving(null, name, percentage));

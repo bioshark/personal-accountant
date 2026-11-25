@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class BudgetCalculatorService {
 
+    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
+
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
@@ -42,7 +44,8 @@ public class BudgetCalculatorService {
     }
 
     public void adjustBudget(YearMonth yearMonth, PaymentType paymentType, double newValue) {
-        MonthlyExpenseEntity entity = helper.getEntity(yearMonth);
+        MonthlyExpenseEntity entity = helper.getEntity(yearMonth)
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
         requireOpen(entity);
         entity.adjustBudget(paymentType, newValue);
         repository.save(entity);

@@ -24,14 +24,16 @@ public class IncomeService {
     }
 
     public MonthlyExpenseEntity addIncome(Income income) {
-        MonthlyExpenseEntity entity = helper.findExpenseForDate(income.date());
+        MonthlyExpenseEntity entity = helper.findExpenseForDate(income.date())
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + income.date()));
         requireOpen(entity);
         entity.addIncome(new IncomeEntity(income.source(), income.date(), income.value()));
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity removeIncome(Income income) {
-        MonthlyExpenseEntity entity = helper.findExpenseForDate(income.date());
+        MonthlyExpenseEntity entity = helper.findExpenseForDate(income.date())
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + income.date()));
         requireOpen(entity);
         entity.removeIncome(new IncomeEntity(income.source(), income.date(), income.value()));
         return repository.save(entity);
@@ -62,6 +64,5 @@ public class IncomeService {
         income.setValue(value);
         return repository.save(entity);
     }
-
 
 }

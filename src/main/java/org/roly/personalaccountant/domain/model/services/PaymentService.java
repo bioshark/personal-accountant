@@ -29,19 +29,22 @@ public class PaymentService {
 
     public MonthlyExpenseEntity addPayment(Payment payment) {
         LocalDate paymentDate = payment.date();
-        MonthlyExpenseEntity entity = helper.findExpenseForDate(paymentDate);
+        MonthlyExpenseEntity entity = helper.findExpenseForDate(paymentDate)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + paymentDate));
         requireOpen(entity);
         entity.addPayment(new PaymentEntity(payment.description(), payment.category(), payment.type(), payment.amount(), payment.date()));
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity removePayment(Payment payment) {
-        MonthlyExpenseEntity entity = helper.findExpenseForDate(payment.date());
+        LocalDate date = payment.date();
+        MonthlyExpenseEntity entity = helper.findExpenseForDate(date)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + date));
         requireOpen(entity);
         PaymentEntity stored = entity.getPayments().stream()
                 .filter(candidate -> matches(candidate, payment))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + payment.description() + " on " + payment.date()));
+                .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND + payment.description() + " on " + date));
         entity.removePayment(stored);
         return repository.save(entity);
     }

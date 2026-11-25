@@ -127,10 +127,17 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/removeincome/{incomeId}")
-    public String removeIncome(@PathVariable Long incomeId) {
-        MonthlyExpenseEntity entity = expenseManager.removeIncomeById(incomeId);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String removeIncome(@PathVariable Long incomeId,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.removeIncomeById(incomeId);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/editincome/{incomeId}")
@@ -190,10 +197,17 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/removepayment/{paymentId}")
-    public String removePayment(@PathVariable Long paymentId) {
-        MonthlyExpenseEntity entity = expenseManager.removePaymentById(paymentId);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String removePayment(@PathVariable Long paymentId,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.removePaymentById(paymentId);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/editpayment/{paymentId}")
@@ -232,10 +246,17 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/toggleday")
-    public String toggleDayDone(@RequestParam LocalDate date) {
-        MonthlyExpenseEntity entity = expenseManager.toggleDayDone(date);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String toggleDayDone(@RequestParam LocalDate date,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.toggleDayDone(date);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/toggledone/{yearMonth}")
@@ -272,18 +293,33 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/removesaving/{savingId}")
-    public String removeSaving(@PathVariable Long savingId) {
-        MonthlyExpenseEntity entity = expenseManager.removeSavingById(savingId);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String removeSaving(@PathVariable Long savingId,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.removeSavingById(savingId);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/editsaving/{savingId}")
-    public String editSaving(@PathVariable Long savingId, @RequestParam String name,
-            @RequestParam double percentage) {
-        MonthlyExpenseEntity entity = expenseManager.editSaving(savingId, name, percentage);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String editSaving(@PathVariable Long savingId,
+            @RequestParam String name,
+            @RequestParam double percentage,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.editSaving(savingId, name, percentage);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 
     @PostMapping("/month/pullrecurring/{yearMonth}")
@@ -312,9 +348,16 @@ public class ExpenseWebController {
     }
 
     @PostMapping("/month/skippending/{pendingId}")
-    public String skipPendingPayment(@PathVariable Long pendingId) {
-        MonthlyExpenseEntity entity = expenseManager.removePendingPayment(pendingId);
-        YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
-        return REDIRECT_MONTH + ym;
+    public String skipPendingPayment(@PathVariable Long pendingId,
+            @RequestHeader(value = "Referer", required = false) String referer,
+            RedirectAttributes redirectAttributes) {
+        try {
+            MonthlyExpenseEntity entity = expenseManager.removePendingPayment(pendingId);
+            YearMonth ym = YearMonth.of(entity.getYear(), entity.getMonth());
+            return REDIRECT_MONTH + ym;
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+            return redirectBack(referer);
+        }
     }
 }

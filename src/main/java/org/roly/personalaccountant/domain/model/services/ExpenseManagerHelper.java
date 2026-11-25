@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.roly.personalaccountant.domain.model.dto.Income;
 import org.roly.personalaccountant.domain.model.dto.MonthlyExpenses;
 import org.roly.personalaccountant.domain.model.dto.Payment;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 class ExpenseManagerHelper {
 
-    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
     private static final String PENDING_PAYMENT_NOT_FOUND = "Pending payment not found: ";
 
     private final MonthlyExpenseRepository repository;
@@ -34,15 +34,13 @@ class ExpenseManagerHelper {
         this.repository = repository;
     }
 
-    MonthlyExpenseEntity findExpenseForDate(LocalDate date) {
-        return repository.findByDateInRange(date)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + date));
+    Optional<MonthlyExpenseEntity> findExpenseForDate(LocalDate date) {
+        return repository.findByDateInRange(date);
     }
 
     @NonNull
-    MonthlyExpenseEntity getEntity(YearMonth yearMonth) {
-        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
+    Optional<MonthlyExpenseEntity> getEntity(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue());
     }
 
     static void requireOpen(MonthlyExpenseEntity entity) {

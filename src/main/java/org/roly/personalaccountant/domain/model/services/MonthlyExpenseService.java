@@ -24,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MonthlyExpenseService {
 
+    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
+
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
@@ -55,7 +57,8 @@ public class MonthlyExpenseService {
 
     @Transactional
     public void editMonth(YearMonth yearMonth, String newName, LocalDate newStartDate, LocalDate newEndDate) {
-        MonthlyExpenseEntity entity = helper.getEntity(yearMonth);
+        MonthlyExpenseEntity entity = helper.getEntity(yearMonth)
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
         requireOpen(entity);
         if (newName == null || newName.isBlank()) {
             throw new IllegalArgumentException("Month name must not be empty");
@@ -91,14 +94,16 @@ public class MonthlyExpenseService {
     }
 
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
-        MonthlyExpenseEntity entity = helper.findExpenseForDate(date);
+        MonthlyExpenseEntity entity = helper.findExpenseForDate(date)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find Expense for date " + date));
         requireOpen(entity);
         entity.toggleDayDone(date);
         return repository.save(entity);
     }
 
     public MonthlyExpenseEntity toggleMonthDone(YearMonth yearMonth) {
-        MonthlyExpenseEntity entity = helper.getEntity(yearMonth);
+        MonthlyExpenseEntity entity = helper.getEntity(yearMonth)
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
         entity.toggleMonthDone();
         return repository.save(entity);
     }

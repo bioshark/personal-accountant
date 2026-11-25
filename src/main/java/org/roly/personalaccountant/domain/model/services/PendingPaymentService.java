@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PendingPaymentService {
 
+    private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
+
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
@@ -29,7 +31,8 @@ public class PendingPaymentService {
 
     @Transactional
     public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
-        MonthlyExpenseEntity entity = helper.getEntity(yearMonth);
+        MonthlyExpenseEntity entity = helper.getEntity(yearMonth)
+                .orElseThrow(() -> new IllegalArgumentException(EXPENSE_NOT_FOUND + yearMonth));
         requireOpen(entity);
         applyTemplates(entity, templates);
         return repository.save(entity);
