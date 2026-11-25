@@ -90,6 +90,11 @@ Priority order: bugs → data integrity → tech debt → operational → featur
   - `CategoryService` is now a working example of manual jOOQ `DSLContext` usage
     (`DSL.table`/`DSL.field`, `fetchExists`, insert/update) to build on.
 
+### Export to Excel / Pdf report
+
+- export individual months to excel / pdf
+- export the entire DB to excel report where each month is a new sheet.
+
 ### DB Management (UI)
 
 - Load/switch database files from the main page
