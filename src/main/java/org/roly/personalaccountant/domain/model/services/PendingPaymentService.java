@@ -54,4 +54,19 @@ public class PendingPaymentService {
         return repository.save(entity);
     }
 
+    public double getTotalPendingPayments(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getPendingPayments)
+                .orElse(List.of()).stream()
+                .mapToDouble(PendingPaymentEntity::getAmount)
+                .sum();
+    }
+
+    public List<PendingPaymentEntity> getPendingPayments(YearMonth yearMonth) {
+        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
+                .map(MonthlyExpenseEntity::getPendingPayments)
+                .orElse(List.of());
+    }
+
+
 }

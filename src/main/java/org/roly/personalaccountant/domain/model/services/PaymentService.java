@@ -5,13 +5,10 @@ import static org.roly.personalaccountant.domain.model.services.ExpenseManagerHe
 import static org.roly.personalaccountant.domain.model.services.ExpenseManagerHelper.validatePaymentDateInMonth;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.List;
 import org.roly.personalaccountant.domain.model.dto.Payment;
 import org.roly.personalaccountant.domain.model.dto.Payment.PaymentType;
 import org.roly.personalaccountant.domain.model.entity.MonthlyExpenseEntity;
 import org.roly.personalaccountant.domain.model.entity.PaymentEntity;
-import org.roly.personalaccountant.domain.model.entity.PendingPaymentEntity;
 import org.roly.personalaccountant.domain.repository.MonthlyExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -75,20 +72,6 @@ public class PaymentService {
         payment.setType(type);
         payment.setCategory(category);
         return repository.save(entity);
-    }
-
-    public double getTotalPendingPayments(YearMonth yearMonth) {
-        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .map(MonthlyExpenseEntity::getPendingPayments)
-                .orElse(List.of()).stream()
-                .mapToDouble(PendingPaymentEntity::getAmount)
-                .sum();
-    }
-
-    public List<PendingPaymentEntity> getPendingPayments(YearMonth yearMonth) {
-        return repository.findByYearAndMonth(yearMonth.getYear(), yearMonth.getMonthValue())
-                .map(MonthlyExpenseEntity::getPendingPayments)
-                .orElse(List.of());
     }
 
 }

@@ -22,13 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class MontlyExpenseService {
+public class MonthlyExpenseService {
 
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public MontlyExpenseService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    public MonthlyExpenseService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

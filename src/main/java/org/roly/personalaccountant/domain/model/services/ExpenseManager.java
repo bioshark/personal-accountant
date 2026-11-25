@@ -13,61 +13,58 @@ import org.roly.personalaccountant.domain.model.entity.PendingPaymentEntity;
 import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ExpenseManager {
 
     private final PaymentService paymentService;
     private final IncomeService incomeService;
-    private final MontlyExpenseService montlyExpenseService;
+    private final MonthlyExpenseService monthlyExpenseService;
     private final BudgetCalculatorService budgetCalculatorService;
     private final SavingsService savingsService;
     private final PendingPaymentService pendingPaymentService;
 
     @Autowired
-    public ExpenseManager(PaymentService paymentService, IncomeService incomeService, MontlyExpenseService montlyExpenseService,
+    public ExpenseManager(PaymentService paymentService, IncomeService incomeService, MonthlyExpenseService monthlyExpenseService,
             BudgetCalculatorService budgetCalculatorService, SavingsService savingsService, PendingPaymentService pendingPaymentService) {
         this.paymentService = paymentService;
         this.incomeService = incomeService;
-        this.montlyExpenseService = montlyExpenseService;
+        this.monthlyExpenseService = monthlyExpenseService;
         this.budgetCalculatorService = budgetCalculatorService;
         this.savingsService = savingsService;
         this.pendingPaymentService = pendingPaymentService;
     }
 
-    @Transactional
     public void addNewMonthlyExpense(String expenseName, LocalDate startDate, LocalDate endDate, List<RecurringPaymentTemplate> templates) {
-        montlyExpenseService.addNewMonthlyExpense(expenseName, startDate, endDate, templates);
+        monthlyExpenseService.addNewMonthlyExpense(expenseName, startDate, endDate, templates);
     }
 
-    @Transactional
     public void editMonth(YearMonth yearMonth, String newName, LocalDate newStartDate, LocalDate newEndDate) {
-        montlyExpenseService.editMonth(yearMonth, newName, newStartDate, newEndDate);
+        monthlyExpenseService.editMonth(yearMonth, newName, newStartDate, newEndDate);
     }
 
     public boolean deleteMonthlyExpense(YearMonth yearMonth) {
-        return montlyExpenseService.deleteMonthlyExpense(yearMonth);
+        return monthlyExpenseService.deleteMonthlyExpense(yearMonth);
     }
 
     public MonthlyExpenses getExpense(YearMonth yearMonth) {
-        return montlyExpenseService.getExpense(yearMonth);
+        return monthlyExpenseService.getExpense(yearMonth);
     }
 
     public MonthlyExpenseEntity toggleDayDone(LocalDate date) {
-        return montlyExpenseService.toggleDayDone(date);
+        return monthlyExpenseService.toggleDayDone(date);
     }
 
     public MonthlyExpenseEntity toggleMonthDone(YearMonth yearMonth) {
-        return montlyExpenseService.toggleMonthDone(yearMonth);
+        return monthlyExpenseService.toggleMonthDone(yearMonth);
     }
 
     public Map<YearMonth, MonthlyExpenses> getExpenses() {
-        return montlyExpenseService.getAllExpenses();
+        return monthlyExpenseService.getAllExpenses();
     }
 
     public void clearExpenses() {
-        montlyExpenseService.clearExpenses();
+        monthlyExpenseService.clearExpenses();
     }
 
     public MonthlyExpenseEntity addPayment(Payment payment) {
@@ -84,14 +81,6 @@ public class ExpenseManager {
 
     public MonthlyExpenseEntity editPayment(Long paymentId, String description, LocalDate date, double amount, PaymentType type, String category) {
         return paymentService.editPayment(paymentId, description, date, amount, type, category);
-    }
-
-    public double getTotalPendingPayments(YearMonth yearMonth) {
-        return paymentService.getTotalPendingPayments(yearMonth);
-    }
-
-    public List<PendingPaymentEntity> getPendingPayments(YearMonth yearMonth) {
-        return paymentService.getPendingPayments(yearMonth);
     }
 
     public MonthlyExpenseEntity addIncome(Income income) {
@@ -142,7 +131,6 @@ public class ExpenseManager {
         return savingsService.editSaving(savingId, name, percentage);
     }
 
-    @Transactional
     public MonthlyExpenseEntity pullTemplatesIntoMonth(YearMonth yearMonth, List<RecurringPaymentTemplate> templates) {
         return pendingPaymentService.pullTemplatesIntoMonth(yearMonth, templates);
     }
@@ -153,6 +141,14 @@ public class ExpenseManager {
 
     public MonthlyExpenseEntity removePendingPayment(Long pendingId) {
         return pendingPaymentService.removePendingPayment(pendingId);
+    }
+
+    public double getTotalPendingPayments(YearMonth yearMonth) {
+        return pendingPaymentService.getTotalPendingPayments(yearMonth);
+    }
+
+    public List<PendingPaymentEntity> getPendingPayments(YearMonth yearMonth) {
+        return pendingPaymentService.getPendingPayments(yearMonth);
     }
 
 }

@@ -22,7 +22,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ExpenseManagerHelper {
+class ExpenseManagerHelper {
 
     private static final String EXPENSE_NOT_FOUND = "Expense not found: ";
     private static final String PENDING_PAYMENT_NOT_FOUND = "Pending payment not found: ";

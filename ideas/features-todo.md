@@ -52,12 +52,7 @@ Priority order: bugs → data integrity → tech debt → operational → featur
     - Where: `removePaymentById`, `editPayment`, `removeIncomeById`, `editIncome`, `removeSavingById`, `editSaving` and pending-payment lookups
       load every month to find one child; all five child collections of `MonthlyExpenseEntity` are `FetchType.EAGER`.
     - Effect: each such action loads the whole database into memory; fine for a few years of data, increasingly slow after that.
-- [ ] **Split `ExpenseManager` and do it as a Facade.**
-    - Move income, payment and month logic into `IncomeService`, `PaymentService` and `MonthService`; `ExpenseManager` keeps its public API
-      and only delegates, so controllers are unchanged.
-    - Shared helpers (`getEntity`, `findExpenseForDate`, `requireOpen`, `toDto`, `validatePaymentDateInMonth`) move to a package-private
-      `MonthLookup` `@Component` injected by the services, avoiding a circular dependency on the facade.
-    - Side benefit: `@Transactional` calls between separate beans go through the Spring proxy (no self-invocation).
+
 - [ ] Extract repeated detail-page cards/modals and inline CSS/JS into fragments/static assets.
 
 ## 5. Operational
