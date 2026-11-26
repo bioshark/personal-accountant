@@ -4,9 +4,7 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] **The REST API returns 500 for invalid input instead of a 4xx.**
-    - Where: `ExpenseController` (`/v1/accountant/expenses/...`) catches nothing, and there is no `@RestControllerAdvice`.
-    - Effect: an unknown id, a date outside any month or a rejected value all answer 500.
+None open.
 
 ## 2. Data Integrity & Validation
 
