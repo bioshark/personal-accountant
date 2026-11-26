@@ -599,12 +599,12 @@
             <div class="modal-body">
               <div class="mb-3">
                 <label class="form-label">Description</label>
-                <input type="text" class="form-control" name="description" th:value="${payment.description}" required>
+                <input type="text" class="form-control" name="description" th:value="${payment.description}" required maxlength="255">
               </div>
               <div class="mb-3">
                 <label class="form-label">Category</label>
                 <input class="form-control" name="category" list="categoryOptions" required
-                       autocomplete="off" th:value="${payment.category}">
+                       autocomplete="off" th:value="${payment.category}" maxlength="255">
               </div>
               <div class="mb-3">
                 <label class="form-label">Type</label>
@@ -647,7 +647,7 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Source</label>
-              <input type="text" class="form-control" name="source" th:value="${income.source}" required>
+              <input type="text" class="form-control" name="source" th:value="${income.source}" required maxlength="255">
             </div>
             <div class="mb-3">
               <label class="form-label">Date</label>
@@ -681,7 +681,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Source</label>
-            <input type="text" class="form-control" name="source" required>
+            <input type="text" class="form-control" name="source" required maxlength="255">
           </div>
           <div class="mb-3">
             <label class="form-label">Date</label>
@@ -845,7 +845,7 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Name</label>
-            <input type="text" class="form-control" name="name" required>
+            <input type="text" class="form-control" name="name" required maxlength="255">
           </div>
           <div class="mb-3">
             <label class="form-label">Percentage</label>
@@ -874,7 +874,7 @@
           <div class="modal-body">
             <div class="mb-3">
               <label class="form-label">Name</label>
-              <input type="text" class="form-control" name="name" th:value="${saving.name}" required>
+              <input type="text" class="form-control" name="name" th:value="${saving.name}" required maxlength="255">
             </div>
             <div class="mb-3">
               <label class="form-label">Percentage</label>
@@ -904,11 +904,11 @@
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Description</label>
-            <input type="text" class="form-control" name="description" required>
+            <input type="text" class="form-control" name="description" required maxlength="255">
           </div>
           <div class="mb-3">
             <label class="form-label">Category</label>
-            <input class="form-control" name="category" list="categoryOptions" required autocomplete="off">
+            <input class="form-control" name="category" list="categoryOptions" required autocomplete="off" maxlength="255">
           </div>
           <div class="mb-3">
             <label class="form-label">Type</label>

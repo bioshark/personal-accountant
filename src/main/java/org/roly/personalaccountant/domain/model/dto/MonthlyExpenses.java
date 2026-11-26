@@ -27,7 +27,7 @@ public class MonthlyExpenses {
     private boolean done;
 
     public MonthlyExpenses(String expenseName, LocalDate startDate, LocalDate endDate) {
-        if (startDate.isAfter(endDate)) {
+        if (endDate != null && startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date can't be after end date");
         }
         this.startDate = startDate;

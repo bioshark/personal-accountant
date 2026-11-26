@@ -4,21 +4,17 @@ Priority order: bugs → data integrity → tech debt → operational → featur
 
 ## 1. Bugs
 
-- [ ] **Invalid ids and rejected mutations return a 500 page instead of an error message.**
-    - Where: in `ExpenseWebController`, `removeIncome`, `removePayment`, `removeSaving`, `editSaving`, `toggleDayDone` and
-      `skipPendingPayment` don't catch `IllegalArgumentException` (only `MonthClosedException` has an `@ExceptionHandler`). The REST
-      `ExpenseController` catches nothing.
-    - Effect: a stale page (e.g. deleting a payment already deleted in another tab) or a day outside any month shows the white error page;
-      the REST API answers 500 where a 4xx is expected. This is the same kind of problem as your editIncome fix.
+- [ ] **The REST API returns 500 for invalid input instead of a 4xx.**
+    - Where: `ExpenseController` (`/v1/accountant/expenses/...`) catches nothing, and there is no `@RestControllerAdvice`.
+    - Effect: an unknown id, a date outside any month or a rejected value all answer 500.
 
 ## 2. Data Integrity & Validation
 
 - [ ] **Validate inputs at service and DB level.**
-    - Amounts/budgets: negative values are accepted everywhere (`addPayment`, `addIncome`, `adjustBudget`, templates). Spring also binds the
-      strings `NaN` and `Infinity` to `double` params, which then poison every sum.
-    - Dates: an end date before the start date generates no days. On create this fails with the unclear "No dates found" from
-      `computeMonth`; on edit `PaymentsGenerator.resolveEndDate` calls `getLast()` on the empty list and throws `NoSuchElementException` (500).
-    - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500. - Question: wouldn't is also be a good idea to limit this in the UI? 
+    - Amounts: recurring templates (`addTemplate`/`editTemplate`) and the pay amount in `payPendingPayment` (it builds a `PaymentEntity`
+      directly, bypassing the `Payment` check) still accept negative and non-finite (`NaN`, `Infinity`) values.
+    - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500.
+      The forms now cap input at 255 (`maxlength`), but the service doesn't check either.
     - Saving percentages: `addSaving` only checks against the unallocated share (negative passes); `editSaving` checks nothing, so savings
       can sum past 100% or go negative.
     - DB: no `CHECK` constraints exist, so the DB accepts any of the above.
