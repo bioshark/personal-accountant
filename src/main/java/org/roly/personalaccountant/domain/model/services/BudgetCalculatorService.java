@@ -20,7 +20,7 @@ public class BudgetCalculatorService {
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public BudgetCalculatorService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    BudgetCalculatorService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

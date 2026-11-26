@@ -18,7 +18,7 @@ public class IncomeService {
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public IncomeService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    IncomeService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

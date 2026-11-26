@@ -24,7 +24,7 @@ public class PendingPaymentService {
     private final MonthlyExpenseRepository repository;
     private final ExpenseManagerHelper helper;
 
-    public PendingPaymentService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    PendingPaymentService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

@@ -22,7 +22,7 @@ public class PaymentService {
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public PaymentService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    PaymentService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

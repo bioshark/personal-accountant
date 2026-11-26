@@ -21,7 +21,7 @@ public class SavingsService {
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public SavingsService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    SavingsService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }

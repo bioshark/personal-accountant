@@ -30,7 +30,7 @@ public class MonthlyExpenseService {
     private final ExpenseManagerHelper helper;
 
     @Autowired
-    public MonthlyExpenseService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
+    MonthlyExpenseService(MonthlyExpenseRepository repository, ExpenseManagerHelper helper) {
         this.repository = repository;
         this.helper = helper;
     }
