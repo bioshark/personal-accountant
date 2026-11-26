@@ -28,7 +28,7 @@ public class RecurringPaymentTemplate {
 
     public RecurringPaymentTemplate(String name, double defaultAmount, String category, PaymentType type) {
         this.name = name;
-        this.defaultAmount = defaultAmount;
+        this.defaultAmount = validateAmount(defaultAmount);
         this.category = category;
         this.type = type;
     }
@@ -50,7 +50,7 @@ public class RecurringPaymentTemplate {
     }
 
     public void setDefaultAmount(double defaultAmount) {
-        this.defaultAmount = defaultAmount;
+        this.defaultAmount = validateAmount(defaultAmount);
     }
 
     public String getCategory() {
@@ -67,5 +67,12 @@ public class RecurringPaymentTemplate {
 
     public void setType(PaymentType type) {
         this.type = type;
+    }
+
+    private double validateAmount(double defaultAmount) {
+        if (!Double.isFinite(defaultAmount) || defaultAmount < 0) {
+            throw new IllegalArgumentException("Can't set a negative amount for a recurring payment: " + defaultAmount);
+        }
+        return defaultAmount;
     }
 }

@@ -362,6 +362,28 @@ class ExpenseManagerTest {
         assertThat(manager.getExpense(EXPENSE_MONTH).getStartDate()).isEqualTo(START_DATE);
     }
 
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0, Double.NaN, Double.POSITIVE_INFINITY})
+    void shouldRejectEditingPaymentToInvalidAmount(double amount) {
+        manager.addPayment(new Payment(null, FOOD, FOOD, FIXED, 11.3d, PAYMENT_DATE));
+        Long paymentId = ((Payment) manager.getExpense(EXPENSE_MONTH).getPayments().get(PAYMENT_DATE).getFirst()).id();
+
+        assertThatThrownBy(() -> manager.editPayment(paymentId, FOOD, PAYMENT_DATE, amount, FIXED, FOOD)).isInstanceOf(
+                IllegalArgumentException.class);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isEqualTo(11.3d);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0, Double.NaN, Double.POSITIVE_INFINITY})
+    void shouldRejectPayingPendingPaymentWithInvalidAmount(double amount) {
+        manager.pullTemplatesIntoMonth(EXPENSE_MONTH, List.of(RENT));
+        Long pendingId = manager.getPendingPayments(EXPENSE_MONTH).getFirst().getId();
+
+        assertThatThrownBy(() -> manager.payPendingPayment(pendingId, PAYMENT_DATE, amount)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(manager.getPendingPayments(EXPENSE_MONTH)).extracting(PendingPaymentEntity::getId).containsExactly(pendingId);
+        assertThat(manager.getExpense(EXPENSE_MONTH).getStatistics().getFixedExpenseTotal()).isZero();
+    }
+
     @Test
     void shouldCreateMonthWithTemplatesAsPendingPaymentsAndBudgets() {
         manager.addNewMonthlyExpense(null, NEXT_START_DATE, null, List.of(RENT, ETF));

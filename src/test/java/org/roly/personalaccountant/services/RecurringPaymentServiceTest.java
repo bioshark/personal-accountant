@@ -10,6 +10,8 @@ import static org.roly.personalaccountant.domain.model.dto.Payment.PaymentType.S
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.roly.personalaccountant.domain.model.entity.RecurringPaymentTemplate;
 import org.roly.personalaccountant.domain.model.services.RecurringPaymentService;
 import org.roly.personalaccountant.domain.repository.RecurringPaymentTemplateRepository;
@@ -79,6 +81,22 @@ class RecurringPaymentServiceTest {
 
         assertThatThrownBy(() -> service.editTemplate(id, "Rent", 900, "House", DAILY)).isInstanceOf(IllegalArgumentException.class);
         assertThat(repository.findById(id)).get().extracting(RecurringPaymentTemplate::getType).isEqualTo(FIXED);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0, Double.NaN, Double.POSITIVE_INFINITY})
+    void shouldRejectCreatingTemplateWithInvalidAmount(double amount) {
+        assertThatThrownBy(() -> service.addTemplate("Rent", amount, "House", FIXED)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(repository.findAll()).isEmpty();
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-1.0, Double.NaN, Double.POSITIVE_INFINITY})
+    void shouldRejectEditingTemplateToInvalidAmount(double amount) {
+        Long id = service.addTemplate("Rent", 900, "House", FIXED).getId();
+
+        assertThatThrownBy(() -> service.editTemplate(id, "Rent", amount, "House", FIXED)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(repository.findById(id)).get().extracting(RecurringPaymentTemplate::getDefaultAmount).isEqualTo(900.0);
     }
 
     @Test

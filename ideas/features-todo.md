@@ -9,8 +9,6 @@ None open.
 ## 2. Data Integrity & Validation
 
 - [ ] **Validate inputs at service and DB level.**
-    - Amounts: recurring templates (`addTemplate`/`editTemplate`) and the pay amount in `payPendingPayment` (it builds a `PaymentEntity`
-      directly, bypassing the `Payment` check) still accept negative and non-finite (`NaN`, `Infinity`) values.
     - Text: description, source, category and names can be blank; anything over 255 chars fails at the DB (`varchar(255)` in V1) as a 500.
       The forms now cap input at 255 (`maxlength`), but the service doesn't check either.
     - Saving percentages: `addSaving` only checks against the unallocated share (negative passes); `editSaving` checks nothing, so savings

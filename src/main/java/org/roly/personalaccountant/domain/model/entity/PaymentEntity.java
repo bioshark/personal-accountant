@@ -37,7 +37,7 @@ public class PaymentEntity {
         this.description = description;
         this.category = category;
         this.type = type;
-        this.amount = amount;
+        this.amount = validateAmount(amount);
         this.date = date;
     }
 
@@ -78,7 +78,7 @@ public class PaymentEntity {
     }
 
     public void setAmount(Double amount) {
-        this.amount = amount;
+        this.amount = validateAmount(amount);
     }
 
     public LocalDate getDate() {
@@ -95,5 +95,12 @@ public class PaymentEntity {
 
     public void setMonthlyExpense(MonthlyExpenseEntity monthlyExpense) {
         this.monthlyExpense = monthlyExpense;
+    }
+
+    private double validateAmount(double amount) {
+        if (!Double.isFinite(amount) || amount < 0) {
+            throw new IllegalArgumentException("Can't use a negative amount: " + amount);
+        }
+        return amount;
     }
 }
